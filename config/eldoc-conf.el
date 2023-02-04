@@ -1,0 +1,6 @@
+(autoload 'turn-on-eldoc-mode "eldoc" nil t)
+(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+(add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+(add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
+(add-hook 'cider-mode-hook 'eldoc-mode)
+(add-hook 'clojure-mode-hook 'turn-on-eldoc-mode)

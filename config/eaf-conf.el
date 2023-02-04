@@ -1,0 +1,48 @@
+;; (require 'eaf)
+;; (require 'evil)
+;; (require 'evil-leader-conf)
+;; (require 'eaf-evil)
+;; (require 'eaf-browser)
+;; (require 'eaf-pdf-viewer)
+;; (require 'eaf-markdown-previewer)
+
+;; ;; so links open in eaf-browser
+;; (setq browse-url-browser-function 'eaf-open-browser)
+;; ;; (setq eaf-enable-evil-integration 't)
+;; (setq eaf-browser-default-search-engine "duckduckgo")
+;; (setq eaf-browser-continue-where-left-off 't)
+;; (setq eaf-browser-enable-add-blocker 't)
+;; (setq eaf-browser-enable-autofill 't)
+;; (setq eaf-browser-blank-page-url "http://ericgebhart.com")
+;; (setq eaf-webengine-font-size 16)
+;; (setq eaf-webengine-fixed-font-size 16)
+;; (setq eaf-marker-fontsize 14)
+;; (setq eaf-marker-letters "AOEIUSNTHDJKMW")
+;; (setq eaf-webengine-default-zoom 2.0)
+
+;; (setq eaf-evil-leader-keymap  evil-leader--default-map)
+;; (setq eaf-evil-leader-for-major-keymap evil-leader--default-map)
+;; (setq eaf-evil-leader-key ",")
+
+;; (define-key key-translation-map (kbd ",")
+;;   (lambda (prompt)
+;;     (if (derived-mode-p 'eaf-mode)
+;;         (pcase eaf--buffer-app-name
+;;           ("browser" (if (eaf-call-sync "execute_function" eaf--buffer-id "is_focus")
+;;                          (kbd ",")
+;;                        (kbd eaf-evil-leader-key)))
+;;           ("pdf-viewer" (kbd eaf-evil-leader-key))
+;;           ("image-viewer" (kbd eaf-evil-leader-key))
+;;           ("markdown-previewer" (kbd eaf-evil-leader-key))
+;;           (_  (kbd ",")))
+;;       (kbd ","))))
+
+;; ;; make more reasonable copy text command, move youtube download.
+;; (eaf-bind-key copy_text "y" eaf-pdf-viewer-keybinding)
+;; (eaf-bind-key insert_or_copy_text "y" eaf-browser-keybinding)
+;; (eaf-bind-key insert_or_download_youtube_video "Y" eaf-browser-keybinding)
+;; (eaf-bind-key insert_or_download_youtube_audio "a" eaf-browser-keybinding)
+;; (eaf-bind-key insert_or_new_blank_page "b" eaf-browser-keybinding)
+;; (eaf-bind-key insert_or_toggle_device "t" eaf-browser-keybinding)
+;; ;; this doesn't work because the function isn't defined.
+;; ;;(eaf-bind-key insert_or_yank_text "p" eaf-browser-keybinding)
