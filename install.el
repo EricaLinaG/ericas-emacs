@@ -21,6 +21,7 @@
 
 ;; trick emacs to be here, instead of .emacs.d
 (setq user-emacs-directory default-directory)
+(setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
 
 ;; this is all we need. We just want to install all the packages.
 (setq load-path
