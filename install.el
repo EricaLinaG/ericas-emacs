@@ -29,10 +29,6 @@
 	       )
 	      load-path))
 
-;; (print default-directory)
-;; (print user-emacs-directory)
-;; (print load-path)
-
 (load "mypackages")
 
 (install-mypackages)

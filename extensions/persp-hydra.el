@@ -7,20 +7,21 @@
   "
 Layouts %s(hydra-perse-names)
 
-^Navigation^      ^Selection^       ^Actions^        ^Buffers^
-^-^---------------^-^---------------^-^--------------^-^------------
-_n_: next         _l_: choose       _d_: delete      _a_: add buffer
-_p_: previous     _L_: predefined   _r_: rename      _R_: Remove
-_c_: cancel       _#_: switch #     _k_: kill        _A_: Set
-                                    _i_: import      _b_: switch
-                                    _m_: merge       _B_: scratch
-                                    _u_: unmerge     _g_: global add
-                                    _s_: save        _g_: global add
-                                    _l_: load        _g_: global add
+^Navigation^       ^Actions^        ^Buffers^
+^-^---------------^-^--------------^-^------------
+_n_: next         _d_: delete      _a_: add buffer
+_p_: previous     _r_: rename      _R_: Remove
+_c_: cancel       _k_: kill        _A_: Set
+_#_: switch #     _i_: import      _b_: switch
+                  _m_: merge       _B_: scratch
+                  _u_: unmerge     _g_: global add
+                  _s_: save        _g_: global add
+                  _l_: load        _g_: global add
 
 "
   ("a" persp-add-buffer :exit t)
 
+  ("d" 'persp-kill)
   ;; ("d" hfj/persp-kill-current)
   ;; ("l" hfj/pick-layout :exit t)
   ;; ("L" hfj/pick-predefined-layout :exit t)
@@ -50,16 +51,18 @@ _c_: cancel       _#_: switch #     _k_: kill        _A_: Set
   ("l" 'persp-state-load)
   ("#" 'persp-switch-by-number)
 
-  ("1" hfj/persp-switch-to-1 :exit t)
-  ("2" hfj/persp-switch-to-2 :exit t)
-  ("3" hfj/persp-switch-to-3 :exit t)
-  ("4" hfj/persp-switch-to-4 :exit t)
-  ("5" hfj/persp-switch-to-5 :exit t)
-  ("6" hfj/persp-switch-to-6 :exit t)
-  ("7" hfj/persp-switch-to-7 :exit t)
-  ("8" hfj/persp-switch-to-8 :exit t)
-  ("9" hfj/persp-switch-to-9 :exit t)
-  ("0" hfj/persp-switch-to-10 :exit t))
+  ;; ("1" hfj/persp-switch-to-1 :exit t)
+  ;; ("2" hfj/persp-switch-to-2 :exit t)
+  ;; ("3" hfj/persp-switch-to-3 :exit t)
+  ;; ("4" hfj/persp-switch-to-4 :exit t)
+  ;; ("5" hfj/persp-switch-to-5 :exit t)
+  ;; ("6" hfj/persp-switch-to-6 :exit t)
+  ;; ("7" hfj/persp-switch-to-7 :exit t)
+  ;; ("8" hfj/persp-switch-to-8 :exit t)
+  ;; ("9" hfj/persp-switch-to-9 :exit t)
+  ;; ("0" hfj/persp-switch-to-10 :exit t)
+
+  )
 
 ;; from the real perspective.el keymap
 ;; (define-key perspective-map (kbd "1") (lambda () (interactive) (persp-switch-by-number 1)))

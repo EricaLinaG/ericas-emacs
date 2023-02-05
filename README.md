@@ -7,7 +7,9 @@ outside of elpa.
 
 ## Installation
 
-You can use [emacsn](https://github.com/erica-linag/emacsn) to install it.
+You can use [emacsn](https://github.com/ericalinag/emacsn) to install it.
+That will allow you to have other emacs configurations installed 
+simultaneously.
 
 or you can just clone it into your .emacs.d directory.
 

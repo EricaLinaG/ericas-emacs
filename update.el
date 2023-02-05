@@ -20,7 +20,10 @@
 ;;; just run this with vanilla emacs and fool it to point here so
 ;;; our packages get installed.
 
-;; trick emacs to be here, instead of .emacs.d
+(shell-command "git pull origin master")
+
+;; Trick emacs to be here, instead of .emacs.d
+;; Requires being here or using emacs --chdir <here> to work.
 (setq user-emacs-directory default-directory)
 
 (setq load-path
@@ -28,10 +31,6 @@
                (expand-file-name "./early-packages" user-emacs-directory)
 	       )
 	      load-path))
-
-;; (print default-directory)
-;; (print user-emacs-directory)
-;; (print load-path)
 
 (load "mypackages")
 (update-mypackages)
