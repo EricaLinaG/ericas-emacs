@@ -7,21 +7,25 @@ outside of elpa.
 
 ## Installation
 
-I use Emacsn now with Chemacs2. I wouldn't want to install emacs the hard way again.
+I use Emacsn now with Chemacs2. I wouldn't want to manage my emacs the hard way again.
 
 ### Emacsn - Chemacs2
 
-I believe the preferred way is to use [Emacsn](https://github.com/ericalinag/Emacsn) to install it.
-That will allow you to have dev, stable, test, and other Emacs configurations installed simultaneously.
-With multiple profiles to execute emacs in different ways.
+Go to the [Emacsn](https://github.com/ericalinag/Emacsn) repo and follow the directions there.
+
+Using [Chemacs2](https://github.com/plexus/chemacs2) as an emacs bootloader gives lots of possibilities.
+
+Chemacs allows Emacsn to create dev, stable, test, for a default configuration 
+and also have other Emacs configurations installed simultaneously.
+With multiple profiles to execute the emacs installs in different ways.
 
 For manintenance, Emacsn provides these commands. 
   - `make <profile-name>-update` etc.
-    - `make stable-update` in ~/Emacs will update your stable install.
-    - `make test-update` in ~/Emacs will update your test install.
-    - `make doom-update` in ~/Emacs will update your doom install.
+    - `make stable-update` in ~/Emacsn will update your stable install.
+    - `make test-update` in ~/Emacsn will update your test install.
+    - `make doom-update` in ~/Emacsn will update your doom install.
 
-  - `make test-install`  in ~/Emacs will create a fresh test install of whatever the default 
+  - `make test-install`  in ~/Emacsn will create a fresh test install of whatever the default 
       configuration has in github.
 
 ### Clone -> ~/.emacs.d   The hard way ???
