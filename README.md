@@ -7,22 +7,52 @@ outside of elpa.
 
 ## Installation
 
-You can use [emacsn](https://github.com/ericalinag/emacsn) to install it.
-That will allow you to have other emacs configurations installed 
-simultaneously.
+I use Emacsn now with Chemacs2. I wouldn't want to install emacs the hard way again.
 
-or you can just clone it into your .emacs.d directory.
+### Emacsn - Chemacs2
 
-`git clone https://github.com/erica-linag/ericas-emacs.git ~/.emacs.d`
+I believe the preferred way is to use [Emacsn](https://github.com/ericalinag/Emacsn) to install it.
+That will allow you to have dev, stable, test, and other Emacs configurations installed simultaneously.
+With multiple profiles to execute emacs in different ways.
 
+For manintenance, Emacsn provides these commands. 
+  - `make <profile-name>-update` etc.
+    - `make stable-update` in ~/Emacs will update your stable install.
+    - `make test-update` in ~/Emacs will update your test install.
+    - `make doom-update` in ~/Emacs will update your doom install.
+
+  - `make test-install`  in ~/Emacs will create a fresh test install of whatever the default 
+      configuration has in github.
+
+### Clone -> ~/.emacs.d   The hard way ???
+
+You can just clone it into your *.emacs.d* directory.
+
+      `git clone https://github.com/erica-linag/ericas-emacs.git ~/.emacs.d`
+
+The following scripts can be run to either install or update all of the packages.
+The only difference is that install ignores packages that are already installed.
+I think it makes very little difference in load time. The update script adds
+a `git pull origin main` before looking for updates.
+
+The nice thing about these
+is they run from the command line and are done. They will also work just fine
+with a fresh vanilla install. The caveat is they need --chdir, or to be in their
+proper folder upon execution.
+
+      `emacs --script install.el --chdir ~/.emacs.d`
+      or
+      `emacs --script update.el  --chdir ~/.emacs.d`
+      
+or you can just run it the first time and wait for the packages to load.
 
 ## Emacs packages, some explanation of what is here.
 
-There is an _elisp_ directory full of stuff, mostly configurations and
-extensions which I wrote or borrowed from someone else that aren't available
-as packages. Initialization happens in _elisp/init.el_
+There are configurations and also extensions which I wrote or 
+borrowed from someone else that aren't available
+as packages. Initialization happens in init.el_
 
-The package list is in _elisp/early-packages/mypackages.el_.
+The package list is in _early-packages/mypackages.el_.
 
 ## The big things; 
 
@@ -50,6 +80,10 @@ have extended configurations from default.
   - Lua
   - Haskell
   - Lisps - Scheme, Guile, Rackett, etc.
+  - markdown
+  - shell
+  - org
+  
    
 #### Ivy, Ido, Helm, Vertico, etc.
 
@@ -59,7 +93,7 @@ Currently using vertico. Configurations are still there for the others.
 ## Key Files
 
 Look in elisp/:
-  - packages.el - lists all packages to load
+  - early-packages - Folder for early loading. lists all packages to load
 
   - config/ - Folder where all the real setup goes.
   - extensions/ - Folder where non-elpa custom code goes.
@@ -89,8 +123,6 @@ _google-translate-conf.el_
 
 ## Mu4e - Mail
 
-Note:  Need to test __pacman__ installation, might be super simple now.
-
 _Mu4e_ I use mu4e for email. I can't imagine a better email client. There is a
 reasonably basic mu4e configuration with multiple contexts. There is a sample mbsyncrc
 file that can be used to configure _isync/mbsync_.  
@@ -98,8 +130,7 @@ file that can be used to configure _isync/mbsync_.
 This is a bit easier now than it used to be. Arch Linux seems to install it properly
 when _mu_ is installed with pacman.
 
-Everything that can be installed as packages is. *The glaring exception is mu4e.*
-see this page about (installing mu/mu-git/mu4e)[https://www.djcbsoftware.nl/code/mu/mu4e/Installation.html#Installation].  There is a make rule that works to get everthing wired up on Arch Linux. YMMV.
+I cannot speak about other distributions or OS'.
 
 ## Key mappings
 
@@ -125,40 +156,23 @@ everything you need.
 
  * For email
     * mu-git - on Arch linux
+      * (install mu/mu-git/mu4e)[https://www.djcbsoftware.nl/code/mu/mu4e/Installation.html#Installation]
+        or maybe just do a `yay -S mu-git`.
     * isync (mbsync) 
+    * `make mbsync` to copy a sample _.mbsyncrc_ for use with _isync_ to your home directory. 
+                 Additional isync/mbsync/mu4e resources 
+                 [are here:](http://www.ict4g.net/adolfo/notes/2014/12/27/EmacsIMAP.html)
 
  * for Spelling and grammar.
     * languagetool 
     * hunspell -- add dictionaries as needed. 
     * hunspell dictionaries  [get them here!](https://github.com/EricGebhart/Hunspell-dictionaries)
-    or just do `pacman -Ss hunspell` to see what arch has.
+    Arch Linux has a lot of them.  Just do `pacman -Ss hunspell` to see what arch has.
 
  - Fonts
-  *Iosevka Fonts* 
-  [They are here](https://github.com/be5invis/Iosevka)
-  Or just install the Arch Linux packages.  `yay -S ttf-iosevka ttc-iosevka`
-
-Additional isync/mbsync/mu4e resources [are here:] (http://www.ict4g.net/adolfo/notes/2014/12/27/EmacsIMAP.html)
-
-
-## stuff, to verify and maybe chuck from here down.
-
-__*This is currently not necessary*__ 
-  it is installed with the __prepare-install__ target. I do also wonder about the current state of the automatic install of mu4e with the package install of mu.
-
-* `make mbsync` to copy a sample _.mbsyncrc_ for use with _isync_ to your home directory. 
-* (install mu/mu-git/mu4e)[https://www.djcbsoftware.nl/code/mu/mu4e/Installation.html#Installation]
-  or maybe just do a `yay -S mu-git` if you are on Arch.
-
-* Possibly copy or link the newly installed mu4e elisp to _elisp/extensions/mu4e_. 
-  Or add it to your load path. It's probably in _/usr/share/emacs/site-lisp_. that's where
-  it is on Arch Linux.
-  Alternatively you could add it to your load path.
-    (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
-  Or it may just work.
-  Or possibly try `make mu4e` it might will probably worku On Arch Linux it does.
-
-* install hunspell, languagetool and hunspell dictionaries as desired.
+  *Iosevka Fonts* [are here!](https://github.com/be5invis/Iosevka)
+  Or just install the Arch Linux packages. One is community, the other AUR. 
+      `yay -S ttf-iosevka ttc-iosevka`
 
 
 Evil Mode
@@ -195,7 +209,7 @@ eshell. See *vars.el*.
 
 ## Themes
 I am using Modus Themes now. There are lots of other themes here,
-but I'm tempted to remove all but my custom theme extensions.
+but I'm tempted to remove all but my custom palette-theme extensions.
 They frequently are deleted from elpa and cause trouble during install
 with package not found errors. The name must then be removed from packages.el.
 
