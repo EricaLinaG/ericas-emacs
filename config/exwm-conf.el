@@ -8,10 +8,10 @@
 (perspective-exwm-mode)
 
 (setq perspective-exwm-override-initial-name
-      '((0 . "misc")
+      '((0 . "main")
         (1 . "core")
         (2 . "browser")
-        (3 . "comms")
+        (3 . "comm")
         (4 . "dev")))
 
 ;; future keys and hydra

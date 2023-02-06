@@ -12,6 +12,7 @@
 (require 'git-frame)
 ;;(require 'helm)
 (require 'cider-hydra)
+(require 'persp-hydra)
 
 ;; (require 'google-translate)
 ;; (require 'ispell)
@@ -87,7 +88,8 @@
     ;; (define-key hydra-sub-map (kbd "w") #'hydra-winmove/body)
     (define-key hydra-sub-map (kbd "w") #'hydra-window/body)
     (define-key hydra-sub-map (kbd "m") #'dh-hydra-markdown-mode/body)
-    (define-key hydra-sub-map (kbd "p") #'hydra-projectile/body)
+    (define-key hydra-sub-map (kbd "p") #'hydra-persp/body)
+    (define-key hydra-sub-map (kbd "P") #'hydra-projectile/body)
     (define-key hydra-sub-map (kbd "f") #'hydra-flycheck/body)
     (define-key hydra-sub-map (kbd "g") #'hydra-git-gutter/body)
     (define-key hydra-sub-map (kbd "G") #'hydra-goto/body)
