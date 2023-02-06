@@ -1,0 +1,7 @@
+*.elc
+/.session
+elpa
+/emms/
+/projectile-bookmarks.eld
+/smex-items
+/transient/
