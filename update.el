@@ -20,7 +20,7 @@
 ;;; just run this with vanilla emacs and fool it to point here so
 ;;; our packages get installed.
 
-(shell-command "git pull origin master")
+(shell-command "git pull origin main")
 
 ;; Trick emacs to be here, instead of .emacs.d
 ;; Requires being here or using emacs --chdir <here> to work.
