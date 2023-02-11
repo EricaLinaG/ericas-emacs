@@ -38,7 +38,7 @@
   ("R" persp-remove-buffer)
   ("k" persp-kill)
   ("r" persp-rename :exit t)
-  ("a" persp-add-buffer: exit t)
+  ("a" persp-add-buffer :exit t)
   ("A" persp-set-buffer)
   ("b" persp-switch-to-buffer)
   ("B" persp-switch-to-scratch-buffer)
