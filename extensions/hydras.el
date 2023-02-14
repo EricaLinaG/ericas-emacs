@@ -938,3 +938,6 @@ Timer:  _s_ Start  _S_ Stop   _r_ Reset   _p_ Print
 ;;   (insert "\n:PROPERTIES:\n:ON: "
 ;;           (format-time-string "%Y-%m-%dT%H:%M:%S")
 ;;           "\n:BLOG:  \n:END:"))
+
+(provide 'hydras)
+;;; hydras.el ends here
