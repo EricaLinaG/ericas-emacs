@@ -13,6 +13,7 @@
 ;;(require 'helm)
 (require 'cider-hydra)
 (require 'persp-hydra)
+(require 'hydras)
 
 ;; (require 'google-translate)
 ;; (require 'ispell)
