@@ -102,7 +102,7 @@
     (define-key hydra-sub-map (kbd "A") #'hydra-org-agenda-view/body)
     (define-key hydra-sub-map (kbd "M") #'hydra-mu4e-headers/body)
     (define-key hydra-sub-map (kbd "l") #'hydra-language/body)
-    ;; (define-key hydra-sub-map (kbd "L") #'hydra-lsp/body)
+    (define-key hydra-sub-map (kbd "L") #'hydra-lsp/body)
     (define-key hydra-sub-map (kbd "H") #'hydra-helm-like-unite/body)
     hydra-sub-map))
 

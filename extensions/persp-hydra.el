@@ -3,6 +3,7 @@
 ;;; hydra for perspective
 ;;; Code:
 
+(require 'hydra)
 (require 'perspective)
 
 (defhydra hydra-persp (:hint nil)
