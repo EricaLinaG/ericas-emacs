@@ -1,13 +1,16 @@
+;;; package --- summary
+;;; commentary:
+;;; Code:
+
 (require 'perspective)
 (require 'persp-hydra)
+
 ;; (global-set-key (kbd "C-x C-b") 'persp-list-buffers)
 (customize-set-variable 'persp-mode-prefix-key (kbd "C-c d"))
 (persp-mode)
 
 (define-key perspective-map (kbd "h") #'hydra-persp/body)
-(define-key perspective-map (kbd "H") #'hydra-persp2/body)
-
-(require 'persp-hydra)
+;; (define-key perspective-map (kbd "H") #'hydra-persp2/body)
 
 ;; (hfj/define-layout "Tasks"
 ;;                    (let ((first-window (get-buffer-window)))
