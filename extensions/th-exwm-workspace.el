@@ -1,4 +1,5 @@
 (require 'dash)
+(require 'hydra)
 
 ;; Workspace management
 (exwm-input-set-key (kbd "s-a") #'th/ew/left)
