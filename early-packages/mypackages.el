@@ -285,5 +285,5 @@
 ;;(install-mypackages)
 ;;(update-mypackages)
 
-(provide 'packages)
-;;; packages.el ends here (emacs-lisp-checkdoc)
+(provide 'mypackages)
+;;; mypackages.el ends here (emacs-lisp-checkdoc)

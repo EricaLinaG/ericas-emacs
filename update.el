@@ -9,7 +9,7 @@
 ;;; The only difference between this and install.el is that install only looks
 ;;; for missing packages.  If they are installed it doesn't touch them.
 ;;; This takes a little more time, but checks to see if anything needs updating.
-;;; install is faster if repeating an install step a cause de failures.
+;;; install is faster if repeating an install step because of problems.
 
 
 ;;; Code:
