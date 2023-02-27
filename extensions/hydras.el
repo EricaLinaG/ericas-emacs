@@ -485,12 +485,10 @@ Frames: _f_rame new  _df_ delete
                                         ;("m" headlong-bookmark-jump)
   )
 
-;; (require 'eaf)
+                                        ; (require 'eaf)
 ;; (require 'eaf-browser)
 ;; (require 'eaf-pdf-viewer)
 ;; (require 'eaf-markdown-previewer)
-
-
 
 ;; (defhydra hydra-eaf (:color teal)
 ;;   "
@@ -938,6 +936,58 @@ Timer:  _s_ Start  _S_ Stop   _r_ Reset   _p_ Print
 ;;   (insert "\n:PROPERTIES:\n:ON: "
 ;;           (format-time-string "%Y-%m-%dT%H:%M:%S")
 ;;           "\n:BLOG:  \n:END:"))
+
+;; ;; yet another movement hydra.
+;; (defhydra my-window-movement ()
+;;   ("<left>" windmove-left)
+;;   ("<right>" windmove-right)
+;;   ("<down>" windmove-down)
+;;   ("<up>" windmove-up)
+;;   ("y" other-window "other")
+;;   ("h" switch-window "switch-window")
+;;   ("b" consult-buffer "buffer")
+;;   ("f" find-file "file")
+;;   ("F" find-file-other-window "other file")
+;;   ("v" (progn (split-window-right) (windmove-right)))
+;;   ("o" delete-other-windows :color blue)
+;;   ("a" ace-window)
+;;   ("s" ace-swap-window)
+;;   ("d" delete-window "delete")
+;;   ("D" ace-delete-window "ace delete")
+;;   ("i" ace-maximize-window "maximize")
+;;   ("q" nil))
+
+;; (with-eval-after-load 'hydra
+;;   (defhydra my-shortcuts (:exit t)
+;;     ("j" my-helm-journal "Journal")
+;;     ("C" my-resolve-orgzly-syncthing "Conflicts")
+;;     ("n" my-capture-timestamped-note "Note")
+;;     ("c" my-org-categorize-emacs-news/body "Categorize")
+;;     ("d" my-emacs-news-check-duplicates "Dupe")
+;;     ("s" save-buffer "Save")
+;;     ("f" my-file-shortcuts/body "File shortcut")
+;;     ("+" text-scale-increase "Increase")
+;;     ("-" text-scale-decrease "Decrease")
+;;     ("G" gif-screencast-start-or-stop "GIF screencast")
+;;     ("g" my-geeqie/body "Geeqie")
+;;     ("r" my-record-ffmpeg-toggle-recording "Record screen")
+;;     ("l" (my-toggle-or-create "*scratch*" (lambda () (switch-to-buffer (startup--get-buffer-create-scratch)))) "Lisp")
+;;     ("e" eshell-toggle "Eshell")
+;;     ("w" my-engine-dmode-hydra/body "Search web")
+;;     ("E" my-emacs-news/body "Emacs News"))
+;;   (global-set-key (kbd "<f5>") #'my-shortcuts/body)
+;;   (defhydra my-emacs-news (:exit t)
+;;     "Emacs News"
+;;     ("f" (find-file "~/sync/emacs-news/index.org") "News")
+;;     ("C" (find-file "~/proj/emacs-calendar/README.org") "Calendar")
+;;     ("C" (find-file "/ssh:web:/var/www/emacslife.com/calendar/README.org" "Calendar on server"))
+;;     ("d" my-emacs-news-check-duplicates "Dupe")
+;;     ("c" my-org-categorize-emacs-news/body "Categorize")
+;;     ("h" (my-org-update-link-description "HN") "Link HN")
+;;     ("i" (my-org-update-link-description "Irreal") "Link Irreal")
+;;     ("m" my-share-emacs-news "Mail")
+;;     ("t" (browse-url "https://tweetdeck.twitter.com") "Twitter")))
+
 
 (provide 'hydras)
 ;;; hydras.el ends here

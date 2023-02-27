@@ -13,13 +13,13 @@
 
   ^Navigation^       ^Actions^        ^Buffers^
 --^-^---------------^-^--------------^-^---------------
-  _n_: next         _S_: Switch      _a_: add
+  _n_: next         _s_: Switch      _a_: add
   _p_: previous     _r_: rename      _R_: Remove
   _#_: switch #     _k_: kill        _A_: Set
                   _i_: import      _b_: switch
     <-arrows->    _m_: merge       _B_: scratch
       1-9         _u_: unmerge     _g_: global add
-                  _s_: save
+                  _S_: save
   _c_: cancel       _l_: load
 
 "
@@ -35,7 +35,7 @@
   ("p" persp-prev)
 
   ("c" nil)
-  ("S" persp-switch)
+  ("s" persp-switch)
   ("R" persp-remove-buffer)
   ("k" persp-kill)
   ("r" persp-rename :exit t)
@@ -51,7 +51,7 @@
   ("m" persp-merge)
   ("u" persp-unmerge)
   ("g" persp-add-buffer-to-frame-global)
-  ("s" persp-state-save)
+  ("S" persp-state-save)
   ("l" persp-state-load)
   ("#" persp-switch-by-number)
   ("1" '(persp-switch-by-number 1))

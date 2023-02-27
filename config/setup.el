@@ -5,6 +5,8 @@
 
 (global-hl-line-mode 1)
 
+(setq vc-follow-symlinks t)
+
 ;;; Great for smaller screens.
 (golden-ratio-mode)
 
