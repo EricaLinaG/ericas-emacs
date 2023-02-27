@@ -125,7 +125,7 @@ _B_uffers (3-way)   _F_iles (3-way)                          _w_ordwise
   ("w" ediff-regions-wordwise))
 
 
-(defhydra hydra-hs (:idle 1.0)
+(defhydra hydra-hide-show (:idle 1.0)
   "
 Hide^^            ^Show^            ^Toggle^    ^Navigation^
 ----------------------------------------------------------------
@@ -929,6 +929,7 @@ Timer:  _s_ Start  _S_ Stop   _r_ Reset   _p_ Print
   ("q" nil)
   )
 
+
 ;; (defadvice org-insert-heading (after add-id-stuff activate)
 ;;   (template-blog-post))
 
@@ -987,6 +988,80 @@ Timer:  _s_ Start  _S_ Stop   _r_ Reset   _p_ Print
 ;;     ("i" (my-org-update-link-description "Irreal") "Link Irreal")
 ;;     ("m" my-share-emacs-news "Mail")
 ;;     ("t" (browse-url "https://tweetdeck.twitter.com") "Twitter")))
+
+;; C-\ by default.
+
+(defhydra hydra-org-hydras (:color blue :hint nil)
+  "
+Org Hydras
+---------------------------------------------------------------------------
+_o_: org            _c_: clock
+_a_: agenda         _t_: timer
+_v_: agenda-view    _r_: refile
+"
+  ("o" hydra-org)
+  ("v" hydra-org-agenda-view/body)
+  ("a" hydra-org-agenda/body)
+  ("c" hydra-org-clock/body)
+  ("t" hydra-org-timer/body)
+  ("r" hydra-org-refile/body)
+  )
+
+
+(defhydra hydra-window-hydras (:color blue :hint nil)
+  "
+Window Hydras
+---------------------------------------------------------------------------
+_o_: original window            _m_: winmove
+_w_: window                     _W_: window 2
+"
+  ("o" hydra-window-orig)
+  ("w" hydra-window)
+  ("W" hydra-window2)
+  ("m" hydra-winmove)
+  )
+
+;; just a hydra to keep all the hydras so we can explore them easily.
+(defhydra hydra-hydras (:color blue :hint nil)
+  "
+language:
+FlySpell                       Hydras
+---------------------------------------------------------------------------
+_w_: Window       _d_: Describe
+_o_: Org          _g_: goto
+_l_: Language     _L_: lsp
+
+_D_: ediff        _h_: hide show
+_G_: git-gutter   _f_: flycheck
+_p_: projectile   _P_: projectile other window
+_u_: helm-unite
+_m_: mu4e-headers
+_M_: markdown mode
+
+"
+  ("w" hydra-window-hydras/body)
+  ("o" hydra-org-hydras/body)
+  ("l" hydra-language/body)
+
+  ("d" hydra-describe/body)
+  ("g" hydra-goto/body)
+  ("m" hydra-mu4e-headers/body)
+
+  ("L" hydra-lsp/body)
+  ("D" hydra-ediff/body)
+  ("h" hydra-hide-show/body)
+
+  ("G" hydra-git-gutter/body)
+  ("f" hydra-flycheck/body)
+
+  ("P" hydra-projectile-other-window/body)
+  ("p" hydra-projectile/body)
+
+  ("u" hydra-helm-like-unite/body)
+
+  ("m" dh-hydra-markdown-mode/body)
+
+  )
 
 
 (provide 'hydras)

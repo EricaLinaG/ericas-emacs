@@ -85,7 +85,7 @@
     (define-key hydra-sub-map (kbd "f") #'hydra-flycheck/body)
     (define-key hydra-sub-map (kbd "g") #'hydra-git-gutter/body)
     (define-key hydra-sub-map (kbd "G") #'hydra-goto/body)
-    (define-key hydra-sub-map (kbd "h") #'hydra-hs/body)
+    (define-key hydra-sub-map (kbd "h") #'hydra-hide-show/body)
     (define-key hydra-sub-map (kbd "e") #'hydra-ediff/body)
     (define-key hydra-sub-map (kbd "o") #'hydra-org/body)
     (define-key hydra-sub-map (kbd "C") #'hydra-org-clock/body)
@@ -294,13 +294,6 @@
 
   "," 'evilnc-comment-operator)
 
-
-(setq space-prefix-key " ")
-(define-prefix-command 'space-map)
-(when space-prefix-key
-  (define-key space-map space-prefix-key 'space-map))
-
-(define-key space-map (kbd "s") 'persp-switch)
 
 
 (provide 'evil-leader-conf)
