@@ -4,9 +4,10 @@
 
 ;; love this. doesn't work with magit. it never gets focus,
 ;; and its impossible to get focus in a helm window once it is lost.
-;; (helm-posframe-enable)
+(require 'helm-posframe)
+(helm-posframe-enable)
 
-;;(setq helm-posframe-width 110)
+(setq helm-posframe-width 110)
 
 ;;(setq helm-display-buffer-reuse-frame t)
 ;;(setq helm-display-function #'helm-display-buffer-popup-frame)

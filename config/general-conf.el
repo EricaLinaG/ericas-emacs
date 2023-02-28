@@ -65,7 +65,7 @@
 
   ;;; Finding
  "n" 'hydra-window/body
- "T" 'find-tag-without-ns  ;; ctags
+ "T" 'find-tag-without-ns  ;; ctag
  "a" 'ag
  "s" 'evil-ace-jump-word-mode  ;;  ace jump search
 
@@ -100,7 +100,7 @@
 
  )
 
-;; `general-create-definer' creates wrappers around `general-def', so
+;; `general-create-definer' creates wrappers around `general-def,, so
 ;; `evil-global-set-key'-like syntax is also supported
 (my-leader-def 'normal
                "a" 'org-agenda

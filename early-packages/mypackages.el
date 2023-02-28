@@ -22,6 +22,7 @@
                       general
                       posframe
                       vertico-posframe
+                      helm-posframe
                       transient-posframe
                       which-key-posframe
 
