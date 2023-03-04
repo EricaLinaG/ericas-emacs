@@ -13,9 +13,11 @@
                       expand-region
                       dmenu
                       async
+                      nov
 
                       vertico
                       marginalia
+                      orderless
                       consult
                       embark
                       embark-consult
@@ -198,6 +200,7 @@
                       geiser
                       sly
                       flycheck-guile
+                      buttercup
 
                       ;;Python
                       elpy

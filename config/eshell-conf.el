@@ -8,8 +8,6 @@
 (setq eshell-review-quick-commands nil)
 (setq eshell-smart-space-goes-to-end t)
 
-(setq eshell-prompt-regexp "^[^#$]*[#$] ")
-
 (setq eshell-history-size         10000
       eshell-buffer-maximum-lines 10000
       eshell-hist-ignoredups t

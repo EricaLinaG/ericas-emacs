@@ -7,7 +7,9 @@
 (setq evil-cross-lines t)
 ;;(setq evil-want-fine-undo t)
 ;;(setq evil-regexp-search t)
-
+;; If this is true it breaks eshell. bad behavior anyway.
+(setq evil-backspace-join-lines nil)
+(setq evil-cross-lines nil)
 
 ;; Clear insert state bindings.
 ;; (setcdr evil-insert-state-map nil)

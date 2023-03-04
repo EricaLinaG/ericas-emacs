@@ -1,6 +1,7 @@
-;;;package --- Summary
-;;;Commentary
-;;;Code
+;;; package --- Summary
+;;; Commentary:
+;;; Code:
+
 (require 'hydra)
 (require 'lsp-mode)
 
@@ -485,7 +486,41 @@ Frames: _f_rame new  _df_ delete
                                         ;("m" headlong-bookmark-jump)
   )
 
-                                        ; (require 'eaf)
+;; yet another movement hydra.
+(defhydra hydra-simple-winmove ()
+  ("<left>" windmove-left)
+  ("<right>" windmove-right)
+  ("<down>" windmove-down)
+  ("<up>" windmove-up)
+  ("y" other-window "other")
+  ("h" switch-window "switch-window")
+  ("b" consult-buffer "buffer")
+  ("f" find-file "file")
+  ("F" find-file-other-window "other file")
+  ("v" (progn (split-window-right) (windmove-right)))
+  ("o" delete-other-windows :color blue)
+  ("a" ace-window)
+  ("s" ace-swap-window)
+  ("d" delete-window "delete")
+  ("D" ace-delete-window "ace delete")
+  ("i" ace-maximize-window "maximize")
+  ("q" nil))
+
+(defhydra hydra-window-hydras (:color blue :hint nil)
+  "
+Window Hydras
+---------------------------------------------------------------------------
+_o_: original window            _m_: winmove
+_w_: window                     _W_: window 2
+"
+  ("o" hydra-window-orig)
+  ("w" hydra-window)
+  ("W" hydra-window2)
+  ("m" hydra-winmove)
+  ("s" hydra-simple-winmove)
+  )                                        ; (require 'eaf)
+
+
 ;; (require 'eaf-browser)
 ;; (require 'eaf-pdf-viewer)
 ;; (require 'eaf-markdown-previewer)
@@ -555,9 +590,6 @@ _n_: Navigate           _._: mark position _/_: jump to mark
   ("n" hydra-navigate/body))
 
 ;;(global-set-key (kbd "s-g") 'goto/body)
-
-
-
 
 
 (defhydra hydra-language (:color blue :hint nil)
@@ -929,6 +961,21 @@ Timer:  _s_ Start  _S_ Stop   _r_ Reset   _p_ Print
   ("q" nil)
   )
 
+(defhydra hydra-org-hydras (:color blue :hint nil)
+  "
+Org Hydras
+---------------------------------------------------------------------------
+_o_: org            _c_: clock
+_a_: agenda         _t_: timer
+_v_: agenda-view    _r_: refile
+"
+  ("o" hydra-org)
+  ("v" hydra-org-agenda-view/body)
+  ("a" hydra-org-agenda/body)
+  ("c" hydra-org-clock/body)
+  ("t" hydra-org-timer/body)
+  ("r" hydra-org-refile/body)
+  )
 
 ;; (defadvice org-insert-heading (after add-id-stuff activate)
 ;;   (template-blog-post))
@@ -938,25 +985,6 @@ Timer:  _s_ Start  _S_ Stop   _r_ Reset   _p_ Print
 ;;           (format-time-string "%Y-%m-%dT%H:%M:%S")
 ;;           "\n:BLOG:  \n:END:"))
 
-;; ;; yet another movement hydra.
-;; (defhydra my-window-movement ()
-;;   ("<left>" windmove-left)
-;;   ("<right>" windmove-right)
-;;   ("<down>" windmove-down)
-;;   ("<up>" windmove-up)
-;;   ("y" other-window "other")
-;;   ("h" switch-window "switch-window")
-;;   ("b" consult-buffer "buffer")
-;;   ("f" find-file "file")
-;;   ("F" find-file-other-window "other file")
-;;   ("v" (progn (split-window-right) (windmove-right)))
-;;   ("o" delete-other-windows :color blue)
-;;   ("a" ace-window)
-;;   ("s" ace-swap-window)
-;;   ("d" delete-window "delete")
-;;   ("D" ace-delete-window "ace delete")
-;;   ("i" ace-maximize-window "maximize")
-;;   ("q" nil))
 
 ;; (with-eval-after-load 'hydra
 ;;   (defhydra my-shortcuts (:exit t)
@@ -991,35 +1019,10 @@ Timer:  _s_ Start  _S_ Stop   _r_ Reset   _p_ Print
 
 ;; C-\ by default.
 
-(defhydra hydra-org-hydras (:color blue :hint nil)
-  "
-Org Hydras
----------------------------------------------------------------------------
-_o_: org            _c_: clock
-_a_: agenda         _t_: timer
-_v_: agenda-view    _r_: refile
-"
-  ("o" hydra-org)
-  ("v" hydra-org-agenda-view/body)
-  ("a" hydra-org-agenda/body)
-  ("c" hydra-org-clock/body)
-  ("t" hydra-org-timer/body)
-  ("r" hydra-org-refile/body)
-  )
 
 
-(defhydra hydra-window-hydras (:color blue :hint nil)
-  "
-Window Hydras
----------------------------------------------------------------------------
-_o_: original window            _m_: winmove
-_w_: window                     _W_: window 2
-"
-  ("o" hydra-window-orig)
-  ("w" hydra-window)
-  ("W" hydra-window2)
-  ("m" hydra-winmove)
-  )
+
+
 
 ;; just a hydra to keep all the hydras so we can explore them easily.
 (defhydra hydra-hydras (:color blue :hint nil)

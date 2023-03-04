@@ -12,6 +12,8 @@
 
 (require 'marginalia)
 
+(setq completion-styles '(orderless))
+
 ;; (use-package marginalia
 ;;              ;; Either bind `marginalia-cycle' globally or only in the minibuffer
 ;;              :bind (("M-A" . marginalia-cycle)

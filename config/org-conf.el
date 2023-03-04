@@ -383,9 +383,11 @@
             [] Meditate
             [] Flute
             [] Exercise
+            [] tango
             [] Jardinage/Weeding
             [] Write
             [] Code
+            [] Create
           :LOGBOOK:
              - Added: %U
           :END:"
@@ -400,21 +402,21 @@
           "* TODO [#A] %?
            SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))
            %a"))
-        ("ti" "Inbox" entry (file+olp "~/org/projects.org" "Inbox")
+        ("ti" "Inbox" entry (file+olp "~/Documents/org/projects.org" "Inbox")
          "* TODO %^{Description}
           %?
           :LOGBOOK:
              - Added: %U
           :END:"
          :empty-lines 1)
-        ("td" "Todo" entry (file "~/org/projects.org")
+        ("td" "Todo" entry (file "~/Documents/org/projects.org")
          "* TODO %^{Description}
           %?
           :LOGBOOK:
              - Added: %U
           :END:"
          :empty-lines 1)
-        ("tD" "Todo with Clipboard" entry (file "~/org/projects.org")
+        ("tD" "Todo with Clipboard" entry (file "~/Documents/org/projects.org")
          "* TODO %^{Description}
           %?
           %c
@@ -424,7 +426,7 @@
          :empty-lines 1)
 
         ("n" "Note Entries")
-        ("nn" "Note" entry (file "~/org/Refile.org")
+        ("nn" "Note" entry (file "~/Documents/org/Refile.org")
          "* NOTE %^{Description}
           %?
           %c
@@ -432,7 +434,7 @@
             - Added: %U
           :END:"
          :empty-lines 1)
-        ("nt" "Note with tags" entry (file "~/org/Refile.org")
+        ("nt" "Note with tags" entry (file "~/Documents/org/Refile.org")
          "* NOTE %^{Description}
           %?
           %c
@@ -440,7 +442,7 @@
             - Added: %U
           :END:"
          :empty-lines 1)
-        ("nN" "Note with Clipboard" entry (file "~/org/Refile.org")
+        ("nN" "Note with Clipboard" entry (file "~/Documents/org/Refile.org")
          "* NOTE %^{Description}
           %?
           %c
@@ -449,7 +451,7 @@
           :END:"
          :empty-lines 1)
         ("nh" "note headline" entry
-         (file+headline "~/org/DT.org" "Notes")
+         (file+headline "~/Documents/org/DT.org" "Notes")
          "* %<%I:%M %p> - %a :note:%^g\n\n%?\n\n"
          :clock-in :clock-resume
          :empty-lines 1)
@@ -461,59 +463,74 @@
 
         ("j" "Journal Entries")
         ("jj" "Journal" entry
-         (file+olp+datetree "~/org/Journal.org")
+         (file+olp+datetree "~/Documents/org/Journal.org")
          "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
          ;; ,(dw/read-file-as-string "~/org/Templates/Daily.org")
          :clock-in :clock-resume
          :empty-lines 1)
         ("jr" "Random" entry
-         (file+olp+datetree "~/org/Journal.org")
+         (file+olp+datetree "~/Documents/org/Journal.org")
          "\n* %<%I:%M %p> - Random :random:\n\n%?\n\n"
          :clock-in :clock-resume
          :empty-lines 1)
         ("jL" "Learn" entry
-         (file+olp+datetree "~/org/Journal.org")
+         (file+olp+datetree "~/Documents/org/Journal.org")
          "\n* %<%I:%M %p> - To Learn :learn:\n\n%?\n\n"
          :clock-in :clock-resume
          :empty-lines 1)
         ("jl" "Language" entry
-         (file+olp+datetree "~/org/Journal.org")
+         (file+olp+datetree "~/Documents/org/Journal.org")
          "\n* %<%I:%M %p> - Journal :language:\n\n%?\n\n"
          :clock-in :clock-resume
          :empty-lines 1)
         ("jm" "Meeting" entry
-         (file+olp+datetree "~/org/Journal.org")
+         (file+olp+datetree "~/Documents/org/Journal.org")
          "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
          :clock-in :clock-resume
          :empty-lines 1)
 
         ("b" "Book Entries")
         ("bc" "Concept" entry
-         (file+headline "~/org/DT.org" "Capture")
+         (file+headline "~/Documents/org/DT.org" "Capture")
          "\n* %<%I:%M %p> - Concept :concept:\n\n%?\n\n"
          :clock-in :clock-resume
          :empty-lines 1)
         ("ba" "Awareness" entry
-         (file+headline "~/org/DT.org" "Capture")
+         (file+headline "~/Documents/org/DT.org" "Capture")
          "\n* %<%I:%M %p> - Awareness :awareness:\n\n%?\n\n"
          :clock-in :clock-resume
          :empty-lines 1)
         ("bp" "Physical" entry
-         (file+headline "~/org/DT.org" "Capture")
+         (file+headline "~/Documents/org/DT.org" "Capture")
          "\n* %<%I:%M %p> - Physical :physical:\n\n%?\n\n"
          :clock-in :clock-resume
          :empty-lines 1)
 
+        ;; ConciousTango entries
+        ;;   - categories of web site
+        ;;     - meditations, challenges, concepts,
+        ;; Ericalina entries
+        ;; EricGebhart entries
+        ;; philo entries
+        ;; 3d
+        ;; flute
+        ;; meditations
+        ;; tech
+        ;; emacs
+        ;; guix
+        ;;
+        ;; maybe these all fit categorically, then the publishing is targeted..yes.
+
 
         ("w" "Workflows")
         ("we" "Checking Email" entry
-         (file+olp+datetree "~/org/Journal.org")
+         (file+olp+datetree "~/Documents/org/Journal.org")
          "* Checking Email :email:\n\n%?"
          :clock-in :clock-resume :empty-lines 1)
 
         ("m" "Metrics Capture")
         ("mw" "Weight" table-line
-         (file+headline "~/org/Metrics.org" "Weight")
+         (file+headline "~/Documents/org/Metrics.org" "Weight")
          "| %U | %^{Weight} | %^{Notes} |"
          :kill-buffer t)))
 
@@ -541,7 +558,11 @@
 
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((emacs-lisp . t)
+ '((haskell . t)
+   (org . t)
+   (shell . t)
+   (clojure . t)
+   (emacs-lisp . t)
    (python . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
