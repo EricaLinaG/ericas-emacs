@@ -367,6 +367,7 @@
   #+TBLFM: $4=$2*$3;%.2f::@>$4=vsum(@3..@-1);%.2f
   " :empty-lines 1)
 
+        ("s" "Slipbox" entry  (file "Documents/org/org-roam/inbox.org") "* %?\n")
 
         ("tS" "Sample" entry (file+olp "~/org/projects.org" "Sample")
          "* SAMPLE %^{Description}
