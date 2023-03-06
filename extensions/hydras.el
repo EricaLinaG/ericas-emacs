@@ -506,18 +506,68 @@ Frames: _f_rame new  _df_ delete
   ("i" ace-maximize-window "maximize")
   ("q" nil))
 
+(defhydra hydra-frames-windows (:color teal
+                                       :hint nil)
+  "
+  Frame commands:
+  _m_: make-frame   _d_: delete-frame          _Z_: suspend-frame
+  _q_: quit         _b_: buffer-other-frame    _M_: toggle-maximize
+  _o_: other-frame  _f_: find-file-other-frame
+  Window commands:
+  _0_: delete-window     _1_: delete-other-window  _2_: split below
+  _3_: split right       _\\^_: enlarge vertical     _-_: shrink vertical
+  _{_: shrink horizontal _}_: enlarge horizontal   _+_: balance-windows
+  _a_: ace-window        _t_: toggle-window-split  _O_: other-window
+  _k_/_j_/_h_/_l_: windmove-up/down/left/right
+  _M-k_/_M-j_/_M-h_/_M-l_: buf-move-up/down/left/right
+  Tab hydra: _T_"
+  ;; Frame commands
+  ("m" make-frame-command)
+  ("b" switch-to-buffer-other-frame)
+  ("d" delete-frame)
+  ("o" other-frame)
+  ("f" find-file-other-frame)
+  ("Z" suspend-frame)
+  ("M" toggle-frame-maximized)
+  ;; Window commands
+  ("0" delete-window)
+  ("1" delete-other-windows)
+  ("2" split-window-below)
+  ("3" split-window-right)
+  ("^" enlarge-window :color pink)
+  ("-" shrink-window :color pink)
+  ("}" enlarge-window-horizontally :color pink)
+  ("{" shrink-window-horizontally :color pink)
+  ("+" balance-windows)
+  ("t" toggle-window-split)
+  ("a" ace-window)
+  ("O" other-window)
+  ("k" windmove-up)
+  ("j" windmove-down)
+  ("h" windmove-left)
+  ("l" windmove-right)
+  ("M-k" buf-move-up)
+  ("M-j" buf-move-down)
+  ("M-h" buf-move-left)
+  ("M-l" buf-move-right)
+  ;; Tab hydra
+  ("T" hydra-tab/body)
+  ("q" nil))
+
 (defhydra hydra-window-hydras (:color blue :hint nil)
   "
 Window Hydras
 ---------------------------------------------------------------------------
+_f_: frames and windows         _s_: simple-winmove
 _o_: original window            _m_: winmove
 _w_: window                     _W_: window 2
 "
-  ("o" hydra-window-orig)
-  ("w" hydra-window)
-  ("W" hydra-window2)
-  ("m" hydra-winmove)
-  ("s" hydra-simple-winmove)
+  ("f" hydra-frames-windows/body)
+  ("o" hydra-window-orig/body)
+  ("w" hydra-window/body)
+  ("W" hydra-window2/body)
+  ("m" hydra-winmove/body)
+  ("s" hydra-simple-winmove/body)
   )                                        ; (require 'eaf)
 
 
@@ -600,10 +650,15 @@ FlySpell                       Hydras
 _s_: ispell word                _l_: LangTool
 _S_: spell next highlighted     _i_: Input language
 _f_: flyspell toggle on/off     _t_: Translate
+                                _d_: Dictionary
+                                _I_: Ispell
 "
   ("s" ispell-word)
   ("S" flyspell-check-next-highlighted-word)
   ("f" flyspell-toggle)
+
+  ("d" hydra-dictionary/body)
+  ("I" hydra-ispell/body)
 
   ("l" hydra-langtool/body)
   ("i" hydra-langinput/body)
@@ -659,7 +714,64 @@ _t_: translate sentence & point       _T_: Translate
   ("T" #'google-translate-smooth-translate)
   )
 
+(defhydra hydra-dictionary (:color teal
+                                   :hint nil)
+  ("q" nil "quit")
+  ("l" dictionary-lookup-definition "lookup")
+  ("s" dictionary-search "search")
+  ("n" dictionary-new-search "new search")
+  ("p" dictionary-previous "previous")
+  ("c" dictionary-close "close"))
 
+(defhydra hydra-ispell (:color teal
+                               :hint nil)
+  "
+    _r_:egion  _c_:hange-dictionary
+    "
+  ("q" nil "quit")
+  ("r" ispell-region)
+  ("c" ispell-change-dictionary))
+
+(defhydra hydra-emms (:color teal
+                             :hint nil)
+  "
+    _p_:laylist  _b_:rowse  _r_:eset  _c_:onnect
+    _k_:ill      _u_:pdate
+  "
+  ("q" nil "quit")
+  ("p" emms)
+  ("b" emms-smart-browse)
+  ("r" emms-player-mpd-update-all-reset-cache)
+  ("c" mpd/start-music-daemon)
+  ("k" mpd/kill-music-daemon)
+  ("u" mpd/update-database))
+
+(defun exwm-async-run (name)
+  (start-process name nil name))
+
+(defhydra hydra-programs (:color teal
+                                 :hint nil)
+  "
+  _B_:rowser _a_:genda    _e_:lfeed _p_:ass     _y_:tdl
+  _g_:nus    _D_:ebbugs   _s_:hell  _w_:ebjump  _d_:ictionary
+  _i_:spell  _b_:ookmarks _E_:ww    _r_:ecentf  _c_:alc
+  "
+  ("q" nil "quit")
+  ("B" (exwm-async-run "chromium"))
+  ("b" hydra-bookmarks/body)
+  ("d" hydra-dictionary/body)
+  ("a" org-agenda)
+  ("i" hydra-ispell/body)
+  ("e" elfeed)
+  ("E" eww-search-words)
+  ("p" pass)
+  ("c" calc)
+  ("r" counsel-recentf)
+  ("g" gnus)
+  ("D" debbugs-gnu)
+  ("s" eshell)
+  ("w" webjump)
+  ("y" hydra-ytdl/body))
 
 (defhydra hydra-describe (:color blue
                                  :hint nil)
@@ -961,6 +1073,22 @@ Timer:  _s_ Start  _S_ Stop   _r_ Reset   _p_ Print
   ("q" nil)
   )
 
+(defhydra hydra-org-roam (:color teal
+                                 :hint nil)
+  "
+  _f_:ind file  _i_:nsert  _I_:ndex  _g_:raph
+  _c_:apture  _s_:erver
+  "
+  ("q" nil "quit")
+  ("f" org-roam-node-find)
+  ("i" org-roam-node-insert)
+  ("I" org-roam-jump-to-index)
+  ("g" org-roam-graph)
+  ("c" org-roam-capture)
+  ("s" org-roam-server-mode)
+  )
+
+
 (defhydra hydra-org-hydras (:color blue :hint nil)
   "
 Org Hydras
@@ -975,7 +1103,16 @@ _v_: agenda-view    _r_: refile
   ("c" hydra-org-clock/body)
   ("t" hydra-org-timer/body)
   ("r" hydra-org-refile/body)
+  ("r" hydra-org-roam/body)
   )
+
+(defhydra hydra-bookmarks (:color teal
+                                  :hint nil)
+  ("m" bookmark-set "set")
+  ("b" bookmark-jump "jump")
+  ("l" list-bookmarks "list")
+  ("s" bookmark-save "save")
+  ("q" nil "quit"))
 
 ;; (defadvice org-insert-heading (after add-id-stuff activate)
 ;;   (template-blog-post))
@@ -986,84 +1123,85 @@ _v_: agenda-view    _r_: refile
 ;;           "\n:BLOG:  \n:END:"))
 
 
-;; (with-eval-after-load 'hydra
-;;   (defhydra my-shortcuts (:exit t)
-;;     ("j" my-helm-journal "Journal")
-;;     ("C" my-resolve-orgzly-syncthing "Conflicts")
-;;     ("n" my-capture-timestamped-note "Note")
-;;     ("c" my-org-categorize-emacs-news/body "Categorize")
-;;     ("d" my-emacs-news-check-duplicates "Dupe")
-;;     ("s" save-buffer "Save")
-;;     ("f" my-file-shortcuts/body "File shortcut")
-;;     ("+" text-scale-increase "Increase")
-;;     ("-" text-scale-decrease "Decrease")
-;;     ("G" gif-screencast-start-or-stop "GIF screencast")
-;;     ("g" my-geeqie/body "Geeqie")
-;;     ("r" my-record-ffmpeg-toggle-recording "Record screen")
-;;     ("l" (my-toggle-or-create "*scratch*" (lambda () (switch-to-buffer (startup--get-buffer-create-scratch)))) "Lisp")
-;;     ("e" eshell-toggle "Eshell")
-;;     ("w" my-engine-dmode-hydra/body "Search web")
-;;     ("E" my-emacs-news/body "Emacs News"))
-;;   (global-set-key (kbd "<f5>") #'my-shortcuts/body)
-;;   (defhydra my-emacs-news (:exit t)
-;;     "Emacs News"
-;;     ("f" (find-file "~/sync/emacs-news/index.org") "News")
-;;     ("C" (find-file "~/proj/emacs-calendar/README.org") "Calendar")
-;;     ("C" (find-file "/ssh:web:/var/www/emacslife.com/calendar/README.org" "Calendar on server"))
-;;     ("d" my-emacs-news-check-duplicates "Dupe")
-;;     ("c" my-org-categorize-emacs-news/body "Categorize")
-;;     ("h" (my-org-update-link-description "HN") "Link HN")
-;;     ("i" (my-org-update-link-description "Irreal") "Link Irreal")
-;;     ("m" my-share-emacs-news "Mail")
-;;     ("t" (browse-url "https://tweetdeck.twitter.com") "Twitter")))
 
-;; C-\ by default.
+(defhydra hydra-multiple-cursors (:color pink
+                                         :hint nil
+                                         :post hydra-modal--call-body-conditionally)
+  ("q" nil "quit")
+  ("n" mc/mark-next-like-this "next" :column "Mark")
+  ("p" mc/mark-previous-like-this "previous")
+  ("N" mc/unmark-next-like-this "next" :column "Unmark")
+  ("P" mc/unmark-previous-like-this "previous")
+  ("r" mc/mark-all-like-this "like region" :column "All like this")
+  ("R" mc/mark-all-in-region "in region")
+  ("a" mc/edit-beginnings-of-lines "beginning" :column "Lines")
+  ("e" mc/edit-ends-of-lines "end")
+  ("i n" mc/insert-numbers "numbers" :column "Insert")
+  ("i l" mc/insert-letters "letters")
+  ("S s" mc/sort-regions "sort" :column "Sort")
+  ("S r" mc/reverse-regions "reverse")
+  ("s n" mc/skip-to-next-like-this "next" :column "Skip")
+  ("s p" mc/skip-to-previous-like-this "previous"))
 
-
-
-
-
+(defhydra hydra-macros (:color teal
+                               :hint nil)
+  "
+  _r_: region  _e_: execute   _c_: counter  _f_: format
+  _n_: next    _p_: previous  _i_: insert   _q_: query
+ _(_: start  _)_: stop
+  "
+  ("q" nil "quit")
+  ("Q" kbd-macro-query)
+  ("(" kmacro-start-macro-or-insert-counter)
+  (")" kmacro-end-or-call-macro)
+  ("r" apply-macro-to-region-lines)
+  ("e" kmacro-end-and-call-macro)
+  ("n" kmacro-cycle-ring-next)
+  ("p" kmacro-cycle-ring-previous)
+  ("i" kmacro-insert-counter)
+  ("c" kmacro-set-counter)
+  ("q" kbd-macro-query)
+  ("f" kmacro-set-format))
 
 ;; just a hydra to keep all the hydras so we can explore them easily.
 (defhydra hydra-hydras (:color blue :hint nil)
   "
-language:
-FlySpell                       Hydras
+Hydras:
 ---------------------------------------------------------------------------
-_w_: Window       _d_: Describe
-_o_: Org          _g_: goto
-_l_: Language     _L_: lsp
+_w_: Window        _d_: Describe
+_o_: Org           _g_: goto
+_l_: Language      _L_: lsp
+_c_: multi-cursors _a_: async-apps
+_e_: ems
 
-_D_: ediff        _h_: hide show
-_G_: git-gutter   _f_: flycheck
-_p_: projectile   _P_: projectile other window
+_D_: ediff         _h_: hide show
+_G_: git-gutter    _f_: flycheck
+_p_: projectile    _P_: projectile other window
 _u_: helm-unite
-_m_: mu4e-headers
-_M_: markdown mode
+_H_: mu4e-headers
+_M_: markdown mode _m_: macros
 
 "
-  ("w" hydra-window-hydras/body)
-  ("o" hydra-org-hydras/body)
+  ("a" hydra-programs/body)
+  ("b" hydra-bookmarks/body)
+  ("c" hydra-multiple-cursors/body)
   ("l" hydra-language/body)
-
-  ("d" hydra-describe/body)
-  ("g" hydra-goto/body)
-  ("m" hydra-mu4e-headers/body)
-
   ("L" hydra-lsp/body)
+  ("d" hydra-describe/body)
   ("D" hydra-ediff/body)
-  ("h" hydra-hide-show/body)
-
-  ("G" hydra-git-gutter/body)
+  ("e" hydra-emms/body)
   ("f" hydra-flycheck/body)
-
+  ("g" hydra-goto/body)
+  ("G" hydra-git-gutter/body)
+  ("h" hydra-hide-show/body)
+  ("H" hydra-mu4e-headers/body)
+  ("M" dh-hydra-markdown-mode/body)
+  ("m" hydra-macros/body)
+  ("o" hydra-org-hydras/body)
   ("P" hydra-projectile-other-window/body)
   ("p" hydra-projectile/body)
-
   ("u" hydra-helm-like-unite/body)
-
-  ("m" dh-hydra-markdown-mode/body)
-
+  ("w" hydra-window-hydras/body)
   )
 
 

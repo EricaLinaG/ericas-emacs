@@ -14,6 +14,7 @@
 ;; Clear insert state bindings.
 ;; (setcdr evil-insert-state-map nil)
 
+
 ;; Set the initial evil state that certain major modes will be in.
 (evil-set-initial-state 'cider-stacktrace-mode 'emacs)
 (evil-set-initial-state 'cider-browse-ns-mode 'emacs)
@@ -153,6 +154,9 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;;; undo
 (setq evil-want-fine-undo t)
 
+
+;;; make evil work better in more places.
+(evil-collection-init)
 
 ;; Different cursors for different states.
 ;; (setq evil-emacs-state-cursor '("red" box))

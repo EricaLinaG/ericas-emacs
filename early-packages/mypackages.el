@@ -212,6 +212,12 @@
 
                       ;;org mode.
                       org
+                      org-roam
+                      org-ref
+                      org-ref-prettify
+                      org-roam-timestamps
+                      org-roam-bibtex
+                      org-rich-yank
                       org-babel-eval-in-repl
                       org-bullets
                       visual-fill-column

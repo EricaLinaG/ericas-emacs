@@ -157,6 +157,7 @@
         ("blog" . ?b)
         ("code" . ?c)
         ("tango" . ?t)
+        ("dancingtango" . ?d)
         ("thought" . ?T)
         ("research" . ?r)
         ("planning" . ?p)
@@ -500,6 +501,11 @@
          "\n* %<%I:%M %p> - Awareness :awareness:\n\n%?\n\n"
          :clock-in :clock-resume
          :empty-lines 1)
+        ("bm" "Meditation" entry
+         (file+headline "~/Documents/org/DT.org" "Capture")
+         "\n* %<%I:%M %p> - Meditation :meditation:\n\n%?\n\n"
+         :clock-in :clock-resume
+         :empty-lines 1)
         ("bp" "Physical" entry
          (file+headline "~/Documents/org/DT.org" "Capture")
          "\n* %<%I:%M %p> - Physical :physical:\n\n%?\n\n"
@@ -509,12 +515,43 @@
         ;; ConciousTango entries
         ;;   - categories of web site
         ;;     - meditations, challenges, concepts,
-        ;; Ericalina entries
-        ;; EricGebhart entries
+        ;; !!! meditations are challenges. !!!
+
+        ("m" "Meditations")
+        ("mp" posture entry
+         (file+headline "/Docements/org/CT.org" "Capture")
+         "\n %<%I:%M %p> - Posture :posture:\n\n%?\n\n"
+         :clock-in :clock-resume
+         :empty-lines 1)
+        ("mP" pelvic_floor entry
+         (file+headline "/Documents/org/CT.org" "Capture")
+         "\n %<%I:%M %p> - Pelvic-floor :pelvic-floor:\n\n%?\n\n"
+         :clock-in :clock-resume
+         :empty-lines 1)
+        ("ms" sitting entry
+         (file+headline "/Documents/org/CT.org" "Capture")
+         "\n %<%I:%M %p> - Sitting :sitting:\n\n%?\n\n"
+         :clock-in :clock-resume
+         :empty-lines 1)
+        ("mS" standing entry
+         (file+headline "/Documents/org/CT.org" "Capture")
+         "\n %<%I:%M %p> - Standing :standing:\n\n%?\n\n"
+         :clock-in :clock-resume
+         :empty-lines 1)
+        ("mv" videos entry
+         (file+headline "/Documents/org/CT.org" "Capture")
+         "\n %<%I:%M %p> - Videos :videos:\n\n%?\n\n"
+         :clock-in :clock-resume
+         :empty-lines 1)
+        ("mw" walking entry
+         (file+headline "/Documents/org/CT.org" "Capture")
+         "\n %<%I:%M %p> - Walking :walking:\n\n%?\n\n"
+         :clock-in :clock-resume
+         :empty-lines 1)
+
         ;; philo entries
         ;; 3d
         ;; flute
-        ;; meditations
         ;; tech
         ;; emacs
         ;; guix
@@ -533,7 +570,6 @@
          (file+headline "~/Documents/org/Metrics.org" "Weight")
          "| %U | %^{Weight} | %^{Notes} |"
          :kill-buffer t)))
-
 
 (define-key global-map (kbd "C-c j")
   (lambda () (interactive) (org-capture nil "jj")))
