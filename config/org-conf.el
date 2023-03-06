@@ -20,6 +20,14 @@
 
 (add-hook 'org-mode-hook 'org-mode-setup)
 
+;; # doesnt work that way saving for a minute.
+;; (add-to-list 'org-pretty-tags-surrogate-strings
+;;              '(("#+end_src" . "«")
+;;                ("#+begin_src" . "»")
+;;                ("#+END_SRC" . "«")
+;;                ("#+BEGIN_SRC" . "»")
+;;                ("#+NAME:" . "»")))
+
 (defun ee/org-font-setup ()
   ;; Replace list hyphen with dot
   (font-lock-add-keywords 'org-mode

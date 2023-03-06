@@ -218,6 +218,7 @@
                       org-roam-timestamps
                       org-roam-bibtex
                       org-rich-yank
+                      org-pretty-tags
                       org-babel-eval-in-repl
                       org-bullets
                       visual-fill-column
