@@ -9,6 +9,23 @@
 
 (setq use-dialog-box nil)
 
+(setq modus-vivendi-tinted-palette-overrides
+      '(
+        (bg-red-nuanced     "#250004")
+        (bg-green-nuanced   "#002718")
+        (bg-yellow-nuanced  "#1c0f00")
+        (bg-blue-nuanced    "#131c4d")
+                                        ;(bg-magenta-nuanced "#1f032f")
+        (bg-magenta-nuanced "#1f000f")
+        (bg-cyan-nuanced    "#04253f")
+
+        ;; (fg-main "#333333")
+        ;; (comment red-faint)
+        ;; (keyword cyan-cooler)
+
+        ))
+
+
 ;; (require 'mini-frame)
 
 ;; make it half as wide as the frame.
