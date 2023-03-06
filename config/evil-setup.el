@@ -155,13 +155,13 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (setq evil-want-fine-undo t)
 
 
-;;; make evil work better in more places.
-(evil-collection-init)
+;;; make evil work better in more places. too much for me.
+;;; (evil-collection-init)
 
 ;; Different cursors for different states.
-;; (setq evil-emacs-state-cursor '("red" box))
-;; (setq evil-normal-state-cursor '("lawn green" box))
-;; (setq evil-visual-state-cursor '("orange" box))
-;; (setq evil-insert-state-cursor '("deep sky blue" bar))
-;; (setq evil-replace-state-cursor '("red" bar))
-;; (setq evil-operator-state-cursor '("red" hollow))
+(setq evil-emacs-state-cursor '("red" box))
+(setq evil-normal-state-cursor '("lawn green" box))
+(setq evil-visual-state-cursor '("orange" box))
+(setq evil-insert-state-cursor '("deep sky blue" bar))
+(setq evil-replace-state-cursor '("red" bar))
+(setq evil-operator-state-cursor '("red" hollow))
