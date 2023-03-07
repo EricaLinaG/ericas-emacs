@@ -1096,14 +1096,15 @@ Org Hydras
 _o_: org            _c_: clock
 _a_: agenda         _t_: timer
 _v_: agenda-view    _r_: refile
+_R_: Roam
 "
-  ("o" hydra-org)
+  ("o" hydra-org/body)
   ("v" hydra-org-agenda-view/body)
   ("a" hydra-org-agenda/body)
   ("c" hydra-org-clock/body)
   ("t" hydra-org-timer/body)
   ("r" hydra-org-refile/body)
-  ("r" hydra-org-roam/body)
+  ("R" hydra-org-roam/body)
   )
 
 (defhydra hydra-bookmarks (:color teal
