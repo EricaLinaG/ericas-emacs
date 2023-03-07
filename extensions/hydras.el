@@ -429,8 +429,8 @@ Frames: _f_rame new  _df_ delete
  ------------------------------------------------------------------
  Jump^                    Split        Delete             Swap
  ------------------------------------------------------------------
- _j_ Jump Window           _v_vert      _O_  Other windows    _s_ swap
- _b_ Buffer jump           _x_:horz     _da_ Ace              _a_ Ace
+ _j_ Jump Window           _v_vert      _O_  Other windows    _o_ swap
+ _b_ Buffer jump           _x_:horz     _da_ Ace
  _B_ Buffer other window              _dw_ Window
                          _|_right     _db_ Buffer
                          ___below     _df_ Frame
@@ -757,7 +757,7 @@ _t_: translate sentence & point       _T_: Translate
   _i_:spell  _b_:ookmarks _E_:ww    _r_:ecentf  _c_:alc
   "
   ("q" nil "quit")
-  ("B" (exwm-async-run "chromium"))
+  ("B" (exwm-async-run "qutebrowser"))
   ("b" hydra-bookmarks/body)
   ("d" hydra-dictionary/body)
   ("a" org-agenda)

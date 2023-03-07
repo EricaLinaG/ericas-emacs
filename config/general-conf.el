@@ -51,54 +51,61 @@
 
 ;; ** Global Keybindings
 (my-leader-def
- :keymaps 'normal
- ;; bind "SPC a"
- "a" 'org-agenda
- "b" 'counsel-bookmark
- "t" 'hydra-persp/body
- "c" 'org-capture
+  :keymaps 'normal
+  ;; bind "SPC a"
+  "a" 'org-agenda
+  "b" 'counsel-bookmark
+  "B" 'helm-buffer
+  "t" 'hydra-persp/body
+  "c" 'org-capture
  ;;;;;;;;;;;;;;;;;;;;;;
- "D" 'describe-mode
- "d" 'dmenu
- "l" 'hydra-language/body
-
+  "D" 'describe-mode
+  "d" 'dmenu
+  "l" 'hydra-language/body
+  "u" 'hydra-frames-windows/body
 
   ;;; Finding
- "n" 'hydra-window/body
- "T" 'find-tag-without-ns  ;; ctag
- "a" 'ag
- "s" 'evil-ace-jump-word-mode  ;;  ace jump search
+  "n" 'hydra-window/body
+  "T" 'find-tag-without-ns  ;; ctag
+  "a" 'ag
+  "s" 'evil-ace-jump-word-mode  ;;  ace jump search
 
- "u" 'hydra-sub-map
- "U" 'hydra-hydras/body
- "G" 'golden-ratio-mode
- "g" 'magit-other-frame  ;; magit is git.
- "i" 'imenu
- "j" 'dired-jump
+  ;; "u" 'hydra-sub-map
+  "U" 'hydra-hydras/body
+  "G" 'golden-ratio-mode
+  "g" 'magit-other-frame  ;; magit is git.
+  "i" 'imenu
+  "j" 'dired-jump
 
- "f" 'find-file
- ;;"O" 'ido-find-file-other-window
+  ;; "f" 'find-file
+  "f" 'helm-find-file
+  ;;"O" 'ido-find-file-other-window
 
- "o" 'hydra-org/body
- ;; "p" 'projectile-buffers-with-file
- "h" 'ibuffer
- "H" 'consult-buffer  ;switch-to-buffer
- "w" 'helm-buffer  ;switch-to-buffer
- "m" 'woman
+  "o" 'hydra-org/body
+  "r" 'hydra-org-roam/body
+  ;; "p" 'projectile-buffers-with-file
+  "H" 'ibuffer
+  "h" 'consult-buffer  ;switch-to-buffer
+  "m" 'woman
+  "M" 'hydra-multiple-cursors/body
+  "M" 'hydra-macros/body
+  "p" 'hydra-persp/body
+  "P" 'hydra-programs/body
+  "w" 'hydra-window-hydras/body
 
- "x" 'smex  ;; M-x.
- "K" 'delete-frame
- "k" 'kill-this-buffer
- "q" 'kill-this-buffer
+  "x" 'smex  ;; M-x.
+  "K" 'delete-frame
+  "k" 'kill-this-buffer
+  "q" 'kill-this-buffer
 
- "e" 'er/expand-region
+  "e" 'er/expand-region
 
- "0" 'delete-window
- "1" 'delete-other-windows
- "2" 'split-window-below
- "3" 'split-window-right
+  "0" 'delete-window
+  "1" 'delete-other-windows
+  "2" 'split-window-below
+  "3" 'split-window-right
 
- )
+  )
 
 ;; `general-create-definer' creates wrappers around `general-def,, so
 ;; `evil-global-set-key'-like syntax is also supported
