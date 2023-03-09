@@ -10,6 +10,10 @@
 ;;; Great for smaller screens.
 (golden-ratio-mode)
 
+;;; add cbr and cbz to archive mode in the automode alist.
+(add-to-list 'auto-mode-alist '("\\.\\(cbr\\)\\'" . archive-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(cbz\\)\\'" . archive-mode))
+
 ;;(global-undo-tree-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;

@@ -11,7 +11,11 @@
 (require 'evil-org-agenda)
 (evil-org-agenda-set-keys)
 
+(require 'org-auto-tangle)
+(add-hook 'org-mode-hook 'org-auto-tangle-mode)
+
 (add-hook 'org-mode-hook (lambda () (org-pretty-table-mode)))
+(setq org-src-fontify-natively t)
 
 (defun org-mode-setup ()
   (org-indent-mode)
@@ -605,6 +609,17 @@
  'org-babel-load-languages
  '((haskell . t)
    (org . t)
+   (makefile . t)
+   (scheme . t)
+   (js . t)
+   (css . t)
+   (awk . t)
+   (sed . t)
+   (C . t)
+   ;; (cpp . t)
+   (latex . t)
+   (gnuplot . t)
+   (lua . t)
    (shell . t)
    (clojure . t)
    (emacs-lisp . t)
