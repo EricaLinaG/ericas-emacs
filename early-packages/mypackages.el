@@ -215,6 +215,7 @@
                       org-roam
                       org-ref
                       org-ref-prettify
+                      org-auto-tangle
                       org-roam-timestamps
                       org-roam-bibtex
                       org-rich-yank
