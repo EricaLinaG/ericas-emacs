@@ -2,7 +2,7 @@
 :PROPERTIES:
 :CUSTOM_ID: my-emacs-setup.
 :END:
-An old school emacs setup that uses packages. no /use-package/, just
+A simple straight forward  emacs setup that uses packages. no /use-package/, just
 elpa, some config files and some extensions outside of elpa.
 
 ** Installation
@@ -98,8 +98,10 @@ all: install mu4e mbsync
 :END:
 I've switched to using [[https://github.com/protesilaos/modus-themes][Modus themes.]] It is so nice to have a nice new style.
 I've used some form of vi emulation in emacs since version 17.
-I currently use [[https://github.com/emacs-evil/evil][Evil-mode]]. I've used [[https://www.emacswiki.org/emacs/mu4e][Mu4e]] as my mail client for years. It's still
-the best.  I have [[https://github.com/abo-abo/hydra][Lots of Hydras.]]  They are available on evil-leader *,* or *SPC.*
+I currently use [[https://github.com/emacs-evil/evil][Evil-mode for that]]. I've used [[https://www.emacswiki.org/emacs/mu4e][Mu4e]] as my mail client for years. It's still
+the best.  I have [[https://github.com/abo-abo/hydra][Lots of Hydras.]] I love them for how easily they create usable interface
+to something new. They are available on evil-leader *,* or *SPC.*
+
 I use  [[https://github.com/minad/vertico][Vertico]] and  [[https://github.com/tumashu/posframe][PosFrame]] for most of completing functions I use, I used
 helm the year or two before that, ivy, ido, smex, for years before that.
 Obviously I'm using  [[https://orgmode.org/][Org]], but consider myself a forever noob. Time clocking,
@@ -107,6 +109,7 @@ invoicing and notes brought me to Org, now it is invading my life.
 
 I do have some nice code that allows me to create org articles for jekyll from
 sub-trees. Which is really nice way to keep a website.
+
 [[https://github.com/emacs-dashboard/emacs-dashboard][Dashboard]] was one of those things that I was surprised to like.   But I dont
 think of it as a splash screen, I'm beginning to think of it as central command,
 and that appeals to me. [[https://www.emacswiki.org/emacs/UndoTree][Undo-tree]] is the coolest undo ever, have to have it.
@@ -115,11 +118,12 @@ I've recently been using [[https://github.com/ch11ng/exwm][ Exwm]] as my window 
 I navigate projects, tasks, buffers and windows.
 
 I use either *QuteBrowser* or *Vimb* as my browsers and dont spend much time in them.
+I'm starting to use Eww more, so Ill have to adjust for that.
 
 I like learning languages also. I am a native english speaker and I speak French fluently.
 I use utilities like [[https://languagetool.org][Language Tool]], [[https://hunspell.github.io][hunspell dictionaries]], [[https://orgmode.org/worg/org-contrib/org-drill.html][org-drill]], google-translate,
 alternative input methods and anything else I can find that will make the multilingual
-learning experience better.
+learning experience better. I'm looking to add wordnik.el.
 
 I came to Emacs as an experienced progammer. I program lots of languages,
 these are the main ones. They may or may not have extended configurations from default.
@@ -138,14 +142,18 @@ these are the main ones. They may or may not have extended configurations from d
   - lua
   - shell
   - awk, sed, etc.
+
+I tend to use Emacs for everything, so beyond writing code there is all of this.
+
 - Creative writing
 - Org publishing,
-  - jekyll
+  - Websites
+    - jekyll
   - pdf
-  - LaTeX
 - Natural Language learning.
 - Organization and scheduling.
 - Email
+- File manager
 - Window Manager
 
 ** My package list
@@ -811,7 +819,7 @@ good idea to go read /config/evil-leader-conf.el/ whether you want
 /Evil/ key bindings or not. It will give you a good idea of
 functionality to look for or map to your own keys in /keys.el/
 
-** Additional packages needed
+** Additional software needed
 :PROPERTIES:
 :CUSTOM_ID: additional-packages-needed
 :END:
@@ -852,7 +860,7 @@ adapted from the solarized-theme. Palette-themes allow for the creation
 of themes simply by defining a palette of colors. There are four
 different variations of the solarized themes included.
 
-** Install and update
+** Install and update functions
 
 *** Within Emacs
 To use the package list for an update or an install is a
@@ -864,7 +872,7 @@ or
 
 *** Outside of Emacs
 
-These are mostly for convevience, they can be called by a vanilla emacs from outside
+These are mostly for convenience, they can be called by a vanilla emacs from outside
 of the install.  This is how *Emacsn* initializes and updates this distribution.
 
 They can be called like so.
