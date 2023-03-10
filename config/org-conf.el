@@ -13,6 +13,7 @@
 
 (require 'org-auto-tangle)
 (add-hook 'org-mode-hook 'org-auto-tangle-mode)
+(setq org-auto-tangle-default t)  ;Turn auto tangling on by default.
 
 (add-hook 'org-mode-hook (lambda () (org-pretty-table-mode)))
 (setq org-src-fontify-natively t)

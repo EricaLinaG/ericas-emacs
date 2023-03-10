@@ -270,6 +270,12 @@
 ;;
 ;; Install stuff from packages.
 
+(defun early-install-mypackages ()
+  "Install a theme and any other early things."
+  (dolist (pkg '(modus-themes))
+    (unless (package-installed-p pkg))
+    (package-install pkg)))
+
 (defun install-mypackages ()
   "Install my/packages if they arent already."
   (dolist (pkg my/packages)

@@ -24,9 +24,8 @@
 ;; so org doesn't step on the S-Arrow keys from windmove.
 (setq org-replace-disputed-keys t)
 
-(load "mypackages") ; make sure all the packages are installed.
-(update-mypackages)
-;;(install-mypackages) ; make sure, if it just starts up that it will
+(load "mypackages")
+(early-install-mypackages) ; make sure we have a theme
 
 ;; just so I dont have to look at Emacs default so long.
 (load "appearance")
@@ -35,7 +34,6 @@
 ;; (load-theme 'strange-deeper-blue t)
 ;; (enable-theme 'strange-deeper-blue)
 (require 'modus-themes)
-
 
 ;; Faint yellow comments and a different shade of green for strings
 (setq modus-themes-common-palette-overrides
@@ -53,6 +51,10 @@
       modus-themes-org-blocks 'tinted-background)
 
 (load-theme 'modus-vivendi-tinted t)             ; Dark theme
+
+;; Now we get to load our packages.
+(update-mypackages)
+;;(install-mypackages) ; make sure, if it just starts up that it will
 
 ;; load up everything, compiling as needed.
 ;; still the simplest, even though just load could
