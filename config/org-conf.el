@@ -11,6 +11,9 @@
 (require 'evil-org-agenda)
 (evil-org-agenda-set-keys)
 
+;; keep org tangle from breaking my Makefiles.
+(setq org-src-preserve-indentation t)
+
 (require 'org-auto-tangle)
 (add-hook 'org-mode-hook 'org-auto-tangle-mode)
 (setq org-auto-tangle-default t)  ;Turn auto tangling on by default.
