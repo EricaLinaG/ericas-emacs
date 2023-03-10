@@ -6,6 +6,18 @@
 (require 'hydra)
 (require 'perspective)
 
+
+(defun layout-3 (dir &optional file)
+  "Change to DIR directory and open 3 windows then load the FILE if given."
+  (cd dir)
+  (split-window-right)
+  (split-window-right)
+  (split-window-right)
+  (windmove-right)
+  (if file
+      (find-file file)
+    (find-file "README.org")))
+
 (defhydra hydra-persp (:hint nil)
   "
      Perspectives
@@ -20,11 +32,20 @@
     <-arrows->    _m_: merge       _B_: scratch
       1-9         _u_: unmerge     _g_: global add
                   _S_: save
-  _c_: cancel       _l_: load
-
+  _q_: quit       _l_: load
+  ^Windows^
+  _v_: vert       _x_: horiz
+  _e_: emacs      _E_: emacsn     _X_: xmonad
 "
   ("a" persp-add-buffer :exit t)
 
+  ("e" (layout-3 "~/Emacsn/dev/" "README.org"))
+  ("X" (layout-3 "~/.xmonad/" "xmonad.hs"))
+  ("E" (layout-3 "~/Emacsn/" "README.org"))
+
+  ("v" split-window-right)
+  ("x" split-window-below)
+  ;; ("t" transpose-frame "'")
   ;; ("d" hfj/persp-kill-current)
   ;; ("l" hfj/pick-layout :exit t)
   ;; ("L" hfj/pick-predefined-layout :exit t)
@@ -34,7 +55,7 @@
   ("n" persp-next)
   ("p" persp-prev)
 
-  ("c" nil)
+  ("q" nil)
   ("s" persp-switch)
   ("R" persp-remove-buffer)
   ("k" persp-kill)
