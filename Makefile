@@ -5,6 +5,7 @@ install:
 	ln -s elisp $(HOME)/elisp
 
 # no longer needed really
+# At least Arch installs it properly now.
 .PHONY: mu4e
 mu4e:
 	cp -r ~/.cache/yay/mu-git/src/mu/mu4e $(HOME)/elisp/extensions/

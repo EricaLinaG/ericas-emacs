@@ -65,91 +65,235 @@ execution.
 
 or you can just run it the first time and wait for the packages to load.
 
-** Emacs packages, some explanation of what is here.
-:PROPERTIES:
-:CUSTOM_ID: emacs-packages-some-explanation-of-what-is-here.
-:END:
-There are configurations and also extensions which I wrote or borrowed
-from someone else that aren't available as packages. Initialization
-happens in init.el_
+*** The Makefile - Optional
 
-The package list is in /early-packages/mypackages.el/.
+Emacsn is the prefered way to install, but you can use the
+Makefile as well.  The only part I ever use now is the mbsync
+rule to get a .mbsyncrc into my home directory for Mu4e.
+
+#+begin_src makefile :tangle ./Makefile
+# dont need this either if installing with Emacsn
+.PHONY: install
+install:
+	ln -s .emacs $(HOME)/.emacs
+	ln -s elisp $(HOME)/elisp
+
+# no longer needed really
+# At least Arch installs it properly now.
+.PHONY: mu4e
+mu4e:
+	cp -r ~/.cache/yay/mu-git/src/mu/mu4e $(HOME)/elisp/extensions/
+
+# get an example mbsync rc
+.PHONY: mbsync
+mbsync:
+	ln -s mbsyncrc ~/.mbsyncrc
+
+all: install mu4e mbsync
+#+end_src
 
 ** The big things;
 :PROPERTIES:
 :CUSTOM_ID: the-big-things
 :END:
-- [[https://github.com/emacs-evil/evil][Evil-mode]](which can be easily
-  switched off in /elisp/init.el/).
-- [[https://github.com/protesilaos/modus-themes][Modus themes.]]
-- [[https://github.com/abo-abo/hydra][Lots of Hydras.]]
-- [[https://orgmode.org/][Org]]
-- [[https://www.emacswiki.org/emacs/mu4e][Mu4e]]
-- [[https://github.com/minad/vertico][Vertico]]
-- [[https://github.com/tumashu/posframe][PosFrame]]
-- [[https://github.com/emacs-dashboard/emacs-dashboard][Dashboard]]
-- [[https://www.emacswiki.org/emacs/UndoTree][undo-tree]]
-- [[https://github.com/magnars/multiple-cursors.el][multiple cursors]]
+I've switched to using [[https://github.com/protesilaos/modus-themes][Modus themes.]] It is so nice to have a nice new style.
+I've used some form of vi emulation in emacs since version 17.
+I currently use [[https://github.com/emacs-evil/evil][Evil-mode]]. I've used [[https://www.emacswiki.org/emacs/mu4e][Mu4e]] as my mail client for years. It's still
+the best.  I have [[https://github.com/abo-abo/hydra][Lots of Hydras.]]  They are available on evil-leader *,* or *SPC.*
+I use  [[https://github.com/minad/vertico][Vertico]] and  [[https://github.com/tumashu/posframe][PosFrame]] for most of completing functions I use, I used
+helm the year or two before that, ivy, ido, smex, for years before that.
+Obviously I'm using  [[https://orgmode.org/][Org]], but consider myself a forever noob. Time clocking,
+invoicing and notes brought me to Org, now it is invading my life.
 
-I program lots of languages, these are the main ones. They may or may
-not have extended configurations from default.
+I do have some nice code that allows me to create org articles for jekyll from
+sub-trees. Which is really nice way to keep a website.
+[[https://github.com/emacs-dashboard/emacs-dashboard][Dashboard]] was one of those things that I was surprised to like.   But I dont
+think of it as a splash screen, I'm beginning to think of it as central command,
+and that appeals to me. [[https://www.emacswiki.org/emacs/UndoTree][Undo-tree]] is the coolest undo ever, have to have it.
+I'm still learning [[https://github.com/magnars/multiple-cursors.el][multiple cursors]] I'm more used to the vi macro way of thinking.
+I've recently been using [[https://github.com/ch11ng/exwm][ Exwm]] as my window manager and [[https://github.com/nex3/perspective-el][Perspective]] to manage how
+I navigate projects, tasks, buffers and windows.
 
-- Languages:
+I use either *QuteBrowser* or *Vimb* as my browsers and dont spend much time in them.
+
+I like learning languages also. I am a native english speaker and I speak French fluently.
+I use utilities like [[https://languagetool.org][Language Tool]], [[https://hunspell.github.io][hunspell dictionaries]], [[https://orgmode.org/worg/org-contrib/org-drill.html][org-drill]], google-translate,
+alternative input methods and anything else I can find that will make the multilingual
+learning experience better.
+
+I came to Emacs as an experienced progammer. I program lots of languages,
+these are the main ones. They may or may not have extended configurations from default.
+
+- Coding
+  - Elisp
   - C, C++
   - Clojure
   - Clojure script
   - Python
-  - Lua
   - Haskell
-  - Lisps - Scheme, Guile, Rackett, etc.
+  - Lisps - Scheme, Guile, Racket, etc.
   - markdown
+  - js
+  - java
+  - lua
   - shell
   - awk, sed, etc.
-  - org
+- Creative writing
+- Org publishing,
+  - jekyll
+  - pdf
+  - LaTeX
+- Natural Language learning.
+- Organization and scheduling.
+- Email
+- Window Manager
 
-**** Ivy, Ido, Helm, Vertico, etc.
-:PROPERTIES:
-:CUSTOM_ID: ivy-ido-helm-vertico-etc.
-:END:
+** My package list
+
+I keep a master package list. That is all it is. No use-package. Using vanilla
+Emacs packages works with this list. Any time I install a package I wish to keep
+I add it here.  Sometimes it gets a /*-conf.el/ in the /config/ directory.
+
+From the list, I can then have update and install functions that I can use to
+ensure everything is installed and up to date.
+
+This package list is automatically tangled into early-packages/mypackages.el/.
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+    ;;; mypackages --- A list of all the packages to keep installed.
+    ;;; Commentary:
+    ;; All my packages, easy to install and update.
+    ;; Provides two functions, one for install, one for update.
+    ;;; Code:
+
+#+end_src
+
+If you are new to emacs you can read about any package with C-h P.
+
+*** UI sort of things.
+Just some basic stuff for the user interface.
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+ (defvar my/packages
+  '(golden-ratio
+   general
+   projectile
+   perspective
+   find-file-in-project
+   dashboard
+   windower
+   expand-region
+   dmenu
+   async
+   nov
+#+end_src
+
+*** Completers, ivy, helm, vertico, ...
 I've used pretty much all the helpers over the years, ivy, ido, smex,
-helm, vertico. Currently using vertico. Configurations are still there
-for the others.  I find vertico not quite as nice as helm with ag, I should
+helm, vertico. Currently using vertico with posframe. Configurations are
+still there for the others.  I find vertico not quite as nice as helm with ag, I should
 see about fixing my ag interface.
 
+**** Vertico
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  vertico
+  marginalia
+  orderless
+  consult
+  embark
+  embark-consult
+#+end_src
 
-** Key Files
-:PROPERTIES:
-:CUSTOM_ID: key-files
-:END:
-Look in elisp/:
+**** Posframe
 
-- early-packages - Folder for early loading. lists all
-packages to load
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  posframe
+  vertico-posframe
+  helm-posframe
+  transient-posframe
+  which-key-posframe
+#+end_src
 
-- config/ - Folder where all the real setup goes.
+**** ido, smex
 
-- extensions/ - Folder where non-elpa custom code goes.
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;;ido ido-flx ido-imenu
+  smex
+#+end_src
 
-- config/vars.el - miscellaneous variable setting.
+**** Helm
 
-- config/keys.el - key bindings, mostly F keys.
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;; helm - an experiment in progess...
+  helm
+  helm-projectile
+  helm-fish-completion
+  helm-evil-markers
+  helm-descbinds
+  helm-swoop
+  helm-org
+  helm-cider
+  cljr-helm
 
-- config/evil-leader.el - more key bindings, vi style.
+  helm-ag
+  helm-sly
+  helm-clojuredocs
 
-Look in /packages.el/ if I happen to add a package through
-/package-install/ I then go add it to /packages.el/ so I won't forget
-and configuration is repeatable. If I forget, the next fresh install
-will likely fail with package not installed.
+  ;; hydra -- A lot to think about here...
+  ;; https://github.com/abo-abo/hydra/wiki/Hydras-by-Topic
+  ;; have to bind them, and try them, and make some.
+  ;; maybe evil-leader stuff can just pop over.
+  ;; maybe a few at first, that I use all the time.
+  ;; ,fqgbsiaw   hmmm. don't know it's necessary...
+  hydra pretty-hydra cider-hydra major-mode-hydra
 
-** Natural Languages
-:PROPERTIES:
-:CUSTOM_ID: natural-languages
-:END:
+  dash dash-functional
+#+end_src
+
+*** Emms Music player
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  emms
+  emms-info-mediainfo
+  emms-mark-ext
+  ;; emms-player-simple-mpv
+  emms-soundcloud
+  ;; emms-state
+  helm-emms
+  org-emms
+
+#+end_src
+
+Dired, buffers,icons,hl
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  diff-hl ;; has a dired mode.
+
+  all-the-icons
+  all-the-icons-dired
+  all-the-icons-completion
+  all-the-icons-ibuffer
+
+  diredfl
+  dired-rsync
+  fd-dired
+  ranger
+
+  ;; modeline
+  ;; smart-mode-line rich-minority
+  doom-modeline ;; the doom modeline
+
+  ibuffer-projectile
+  ibuffer-tramp
+  ibuffer-git
+#+end_src
+
+*** Languages, translation
 
 This is an active and changing portion of my Emacs at the moment.
 
 I have been studying French for the last few years. I am now studying
-Italian. I am working on replacing Anki with Org drill in my routine.
+Italian also. I am working on replacing Anki with Org drill in my routine.
 
 I can also see that I'll probably want to add another language or two in
 the future. I have a nice function to switch between input methods and
@@ -161,6 +305,472 @@ even if you are going to turn off evil-mode. Check out
 /elisp/extensions/language.el/ and /elisp/config/lang-config.el/ and
 /google-translate-conf.el/
 
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;; Multi-language support
+  google-translate
+  langtool
+  mw-thesaurus
+  powerthesaurus
+
+#+end_src
+
+*** Navigation, jump, misc.
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;;navigation
+  ace-jump-mode ace-window frog-jump-buffer ace-jump-buffer
+  ;; basic tools
+  which-key
+  el-get
+  gited
+  session
+
+  ;; Choose: ido/smex or ivy/swiper/counsel and/or helm.
+  ;; ido/smex and helm are known to play nice. See helm doc.
+  ;;
+  ;; find-file = counsel-find-file = helm-find-file
+  ;; smex = counsel-m-x = helm-m-x ~= Nicer M-x...
+  ;; ido = ivy =  helm = fuzzy search of candidates, in many situations,
+  ;; files, buffers, symbols.
+  ;; swiper = helm_swoop = occur incrementally..
+  ;; I do like helm on the big wide screen, because the minibuffer is so
+  ;; far away down there in the corner. Both Ido and ivy are more minibuffer
+  ;; centric. I've used ido and smex since the beginning... 20+ years.
+  ;; trying out helm
+
+  multi-term
+#+end_src
+
+*** Exwm - The Emacs window manager.
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  exwm
+  helm-exwm
+  exwm-mff
+  perspective-exwm
+#+end_src
+
+*** Shell
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;; eshell
+  eshell-autojump
+  fish-completion
+
+#+end_src
+
+*** Evil, VI emulation
+
+I've been using emacs in some sort of Vi emulation since 1995. Evil-mode
+is, IMHO the best vi emulator so far. Although neovim is doing a really
+good job. vimscript is an unfortunate language. You can easily turn it
+off in /setup.el/ . The Evil mode setup includes a few but not all of
+the Evil-mode extensions. For more information check out the
+[[http://www.emacswiki.org/emacs/Evil][Evil-mode documentation.]]
+
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;; evil-mode
+  evil
+  evil-nerd-commenter
+  evil-leader
+  evil-mu4e
+  evil-org
+
+#+end_src
+
+*** Parenthesis
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;; Parentheses.
+  evil-surround
+  highlight-parentheses
+  ;; paredit evil-paredit
+  smartparens evil-smartparens evil-cleverparens
+  ;; lispy lispyville ;; -- not a fan.
+  rainbow-mode
+  mic-paren
+
+#+end_src
+
+*** Coding support
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;; git
+  magit git-gutter
+
+  ;;coding support
+  restclient
+  restclient-helm
+
+  eldoc
+  auto-compile
+  company
+  origami
+  undo-tree
+  flycheck-tip
+  kibit-helper
+  flycheck-pos-tip
+  aggressive-indent
+
+  ;; Silver Surfer, grep, ctags.
+  ag wgrep wgrep-ag ctags-update
+
+  ;;extras
+  ;;treemacs treemacs-evil treemacs-magit treemacs-projectile
+  expand-region floobits
+  gist
+  exec-path-from-shell
+
+#+end_src
+
+**** Clojure, Cider, etc.
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;; clojure -- need to rexamine this. lots of newer stuff.
+  cider clj-refactor ac-cider
+  cider-eval-sexp-fu
+  clojure-mode eval-sexp-fu clojure-mode-extra-font-locking ;popup
+  uuid rainbow-delimiters flycheck-clojure
+  cider-hydra
+  flycheck-clj-kondo
+  4clojure
+
+  ;; clojure script
+  cljsbuild-mode smartscan
+
+#+end_src
+
+**** LSP-mode
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  lsp-mode
+  lsp-treemacs
+  lsp-ui
+
+#+end_src
+
+*** Coding languages
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  lua-mode
+  company-lua
+  ruby-mode
+  hy-mode
+
+  json-mode
+  markdown-mode
+  yaml-mode
+  apache-mode
+
+  ;;Shell
+  company-shell
+
+  ;;C/C++
+  ;; Not sure, need to pursue a better C/C++ setup
+  ;;irony company-irony company-ctags helm-etags ;company-rtags
+
+  ;;haskell
+  haskell-mode
+  ;;ghc
+  haskell-snippets
+  dante ;; GHCi
+  ;;helm-ghc
+  flycheck-haskell
+
+  ;;scheme/common lisp
+  geiser
+  sly
+  flycheck-guile
+  buttercup
+
+  ;;Python
+  elpy
+  pyenv-mode ein
+  python-docstring
+  py-autopep8
+  py-yapf pydoc
+  python-black
+
+#+end_src
+
+*** Org
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;;org mode.
+  org
+  org-roam
+  org-ref
+  org-ref-prettify
+  org-auto-tangle
+  org-roam-timestamps
+  org-roam-bibtex
+  org-rich-yank
+  org-pretty-tags
+  org-babel-eval-in-repl
+  org-bullets
+  visual-fill-column
+  org-cliplink
+  org-drill
+  org-drill-table
+  ox-gfm
+
+#+end_src
+
+*** Applications
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;;slack - hasn't worked very well so far..
+  slack
+  oauth2
+  alert
+  emojify
+  ;;helm-slack
+#+end_src
+
+*** Aesthetics
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+
+
+  ;; themes
+  modus-themes
+  doom-themes
+  monokai-theme monokai-alt-theme obsidian-theme atom-dark-theme
+  bubbleberry-theme atom-one-dark-theme
+  ujelly-theme twilight-theme
+  tango-2-theme tango-plus-theme tangotango-theme zenburn-theme
+  waher-theme underwater-theme toxi-theme sublime-themes
+  subatomic-theme sunny-day-theme subatomic256-theme
+  soft-stone-theme soft-morning-theme purple-haze-theme
+  noctilux-theme naquadah-theme leuven-theme lavender-theme
+  light-soap-theme ir-black-theme inkpot-theme heroku-theme
+  github-theme gandalf-theme flatland-theme firecode-theme
+  flatui-theme espresso-theme django-theme darkmine-theme
+  darcula-theme oldlace-theme cyberpunk-theme clues-theme
+  busybee-theme boron-theme bliss-theme
+  ample-zen-theme ample-theme lush-theme smyx-theme gotham-theme
+  solarized-theme dark-krystal-theme))
+
+#+end_src
+
+** Some functions to install and update
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+  ;;
+  ;; Install stuff from packages.
+
+  (defun early-install-mypackages ()
+    "Install a theme and any other early things."
+    (dolist (pkg '(modus-themes))
+      (unless (package-installed-p pkg))
+      (package-install pkg)))
+
+  (defun install-mypackages ()
+    "Install my/packages if they arent already."
+    (dolist (pkg my/packages)
+      (unless (package-installed-p pkg))
+      (package-install pkg)))
+
+  (defun update-mypackages ()
+    "Update my/packages if they need it."
+    (interactive)
+    (dolist (pkg my/packages)
+      (package-install pkg)))
+#+end_src
+
+Thats all the packages and how I manage them.
+
+** Set up the package archives
+
+#+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
+
+  (require 'package)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+  (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
+  ;;(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+
+  (package-initialize)
+  (when (not package-archive-contents)
+    (package-refresh-contents))
+
+  ;; let this be controlled elsewhere.
+  ;;(install-mypackages)
+  ;;(update-mypackages)
+
+  (provide 'mypackages)
+  ;;; mypackages.el ends here (emacs-lisp-checkdoc)
+#+end_src
+
+** Init.el and the rest
+:PROPERTIES:
+:CUSTOM_ID: key-files
+:END:
+
+*** init.el - The beginning.
+Set up the load paths.  Turn off cl-function warnings.
+Point custom to ~/.config/emacs-custom.el.
+
+**** The load path
+
+- *early-packages/*, is just the packages and hints.
+- *extensions/* are custom elisp code.
+- *config/* is for all of the package configurations.
+- *themes/* is for all of the package configurations.
+
+#+begin_src emacs-lisp :tangle ./init.el
+  ;;; init.el --- init.el for Ericas-Emacs
+  ;;; Commentary:
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; Set the loadpath / bytecompile everything - Go -- Eric
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; Code:
+  ;; cl is obsolete, cl-lib is the replacement
+  ;; Lots of current packages still use cl.
+  ;; this gets rid of the warning everytime emacs starts.
+  (setq byte-compile-warnings '(cl-functions))
+
+  (setq load-path
+        (append (list
+                 (expand-file-name "./early-packages" user-emacs-directory)
+                 (expand-file-name "./themes" user-emacs-directory)
+                 (expand-file-name "./extensions" user-emacs-directory)
+                 (expand-file-name "./config" user-emacs-directory))
+                load-path))
+
+  (setq custom-file "~/.config/emacs-custom.el")
+  (load custom-file)
+  #+end_src
+
+**** The org and windmove clash
+Org likes to take over the arrow keys. I kind of miss them, hydras help.
+
+  #+begin_src emacs-lisp :tangle ./init.el
+  ;; so org doesn't step on the S-Arrow keys from windmove.
+  (setq org-replace-disputed-keys t)
+  #+end_src
+
+**** Load just enough to get a theme
+Load my packages and then install enough to get a theme.
+
+  #+begin_src emacs-lisp :tangle ./init.el
+  (load "mypackages")
+  (early-install-mypackages) ; make sure we have a theme
+  #+end_src
+
+**** Load the Modus theme
+ Load up the Theme so we don't have to look at that stark white gnu screen
+ if it takes a minute to install.
+
+  #+begin_src emacs-lisp :tangle ./init.el
+  ;; just so I dont have to look at Emacs default so long.
+  (load "appearance")
+  (load "themes-init")
+  ;; this is a local theme I made. Code is in themes.
+  ;; (load-theme 'strange-deeper-blue t)
+  ;; (enable-theme 'strange-deeper-blue)
+  (require 'modus-themes)
+  #+end_src
+
+**** Tweak the Modus theme
+
+Tweak some Modus colors with different choices.
+
+  #+begin_src emacs-lisp :tangle ./init.el
+  ;; Faint yellow comments and a different shade of green for strings
+  (setq modus-themes-common-palette-overrides
+        '((string yellow-faint)
+          (fringe unspecified)
+          ;;(string green-warmer)
+          (bg-region bg-lavender) ; try `bg-ochre' `bg-lavender', `bg-sage'
+          (fg-region unspecified)
+          (bg-paren-match bg-magenta-intense)
+          (underline-paren-match fg-main)))
+  (setq modus-themes-bold-constructs t
+        modus-themes-italic-constructs t
+        modus-themes-prompts '(intense-bold)
+        modus-themes-completions 'intense-bold
+        modus-themes-org-blocks 'tinted-background)
+
+  (load-theme 'modus-vivendi-tinted t)             ; Dark theme
+  #+end_src
+
+**** load all the packages.
+
+This loads the list from /mypackages/.  Install only cares if it is or not.
+update will check everyone and make sure it is as new as possible.
+
+  #+begin_src emacs-lisp :tangle ./init.el
+  ;; Now we get to load our packages.
+  (update-mypackages)
+  ;;(install-mypackages) ; make sure, if it just starts up that it will
+  #+end_src
+
+**** Load everything else.
+
+Load up the extensions, configurations and themes.
+
+  #+begin_src emacs-lisp :tangle ./init.el
+    ;; load up everything, compiling as needed.
+    ;; still the simplest, even though just load could
+    ;; work if auto compile was on for loading and saving..
+    ;; theoretically, if everything was just right.
+    ;; takes the same amount of time either way.
+
+    ;; conditionally recompile and load these dirs.
+    (require 'bytecompiledir)
+    (byte-compile-directory (expand-file-name "./extensions" user-emacs-directory))
+    (byte-compile-directory (expand-file-name "./config" user-emacs-directory))
+    (byte-compile-directory (expand-file-name "./themes" user-emacs-directory))
+
+    (load "display_hints") ; advice for various buffers.
+  #+end_src
+
+**** Turn some stuff on.
+
+Evil mode, highlight line, golden ratio, visible bell, etc.
+
+  #+begin_src emacs-lisp :tangle ./init.el
+
+    ;;; Some global modes
+    ;;; Turn on Vi mode.
+    (evil-mode t)
+
+    ;;; line highlight
+    (global-hl-line-mode 1)
+
+    ;;; Great for smaller screens. or bigger ones...
+    (golden-ratio-mode)
+
+    (setq visible-bell 1)
+
+    ;; windmove navigation
+    (windmove-default-keybindings)         ; shifted arrow keys
+    (setq windmove-wrap-around t)
+
+    (provide 'init)
+    ;;; init.el ends here
+#+end_src
+
+*** Other Key Files
+
+- config/ - Folder where all the real setup goes.
+
+- extensions/ - Folder where non-elpa custom code goes.
+
+- extensions/hydras.el - All the hydras
+
+- config/vars.el - miscellaneous variable setting.
+
+- config/keys.el - key bindings, mostly F keys.
+
+- config/general-conf.el - key bindings for *SPC*.
+
+- config/evil-leader.el - more key bindings, vi style.
+
 ** Mu4e - Mail
 :PROPERTIES:
 :CUSTOM_ID: mu4e---mail
@@ -169,6 +779,8 @@ even if you are going to turn off evil-mode. Check out
 There is a reasonably basic mu4e configuration with multiple contexts.
 There is a sample mbsyncrc file that can be used to configure
 /isync/mbsync/.
+
+=make mbsync= will copy a sample /.mbsyncrc/ to your home directory.
 
 This is a bit easier now than it used to be. Arch Linux seems to install
 it properly when /mu/ is installed with pacman.
@@ -183,9 +795,11 @@ I have been switching over to General, I now have a *Space* key that is
 the entry to point to the most used things and hydras. It has a lot of
 overlap with my evil-leader menus.  Slowly centralizing on General.
 
+Its all up in the air as I am rearranging my Emacs UI at the moment.
+
 I have an extensive menu system on Evil-leader which allows for *,w* for
 write, *,q* delete-buffer, etc. the entire Hydra subsystem is available
-at h.
+at *,h*.
 
 I use /which-key-posframe/ which is almost like hydra with all the
 submenus. The only thing about posframe is that it seems to behave
@@ -218,60 +832,137 @@ easy way to install everything you need.
 - Fonts /Iosevka Fonts/ [[https://github.com/be5invis/Iosevka][are here!]] Or just install the Arch Linux packages. One is community, the
   other AUR. =yay -S ttf-iosevka ttc-iosevka=
 
-** Evil Mode
-:PROPERTIES:
-:CUSTOM_ID: evil-mode
-:END:
-I've been using emacs in some sort of Vi emulation since 1995. Evil-mode
-is, IMHO the best vi emulator so far. Although neovim is doing a really
-good job. vimscript is an unfortunate language. You can easily turn it
-off in /setup.el/ . The Evil mode setup includes a few but not all of
-the Evil-mode extensions. For more information check out the
-[[http://www.emacswiki.org/emacs/Evil][Evil-mode documentation.]]
-
-Included along with evil mode are:
-[[https://github.com/cofi/evil-leader][evil-leader]]
-[[https://github.com/roman/evil-paredit][evil-paredit]]
-[[https://github.com/redguardtoo/evil-nerd-commenter][evil-nerd-commenter]]
-[[https://github.com/timcharper/evil-surround][evil-surround]]
-evil-org
-
-** CycleBufs
-:PROPERTIES:
-:CUSTOM_ID: cyclebufs
-:END:
-I don't use this anymore. I'm currently switching to perspective which
-works well with projectile and Exwm.
-
-Cyclebufs is now built on top of BS - Buffer Selection. There are
-several bs-configurations, and extra functionality which makes switching
-buffers more contextual. Reusing windows for different mode groups
-shell, dired, and bs-show if they are visible.
-
-Also cycling of buffers based on groups.
-
-As an example, the shell group contains shell, eshell, ansi-term, cider,
-and inferior python modes. Once a buffer has one of the modes in the
-group, cycling will stay within that group. There is also contextual
-cycling based on the mode group of the current buffer, cycling through
-shells, *buffers, or file buffers accordingly.
-
-Cyclebufs will open a shell buffer of your choice based on the value of
-cb-shell-command. The default is eshell. See /vars.el/.
-
 ** Themes
 :PROPERTIES:
 :CUSTOM_ID: themes
 :END:
 I am using Modus Themes now. There are lots of other themes here, but
-I'm tempted to remove all but my custom palette-theme extensions. They
+I'm tempted to remove all but my custom palette-theme extensions. Themes are
 frequently are deleted from elpa and cause trouble during install with
 package not found errors. The name must then be removed from
-packages.el.
+/mypackages.el/.
 
-Lots of themes from packages. Additionally my own personal theme
-strange-deeper-blue. As well as a couple of variations on solarized.
-There is also a palette-themes.el which is a more general library
+There Lots of themes from packages which is ironic considering I used the same theme
+for 26 years and only recently switched from my own personal theme
+strange-deeper-blue.
+
+*** Palette themes
+I also wrote a palette-themes.el which is a more general library
 adapted from the solarized-theme. Palette-themes allow for the creation
 of themes simply by defining a palette of colors. There are four
 different variations of the solarized themes included.
+
+** Install and update
+
+*** Within Emacs
+To use the package list for an update or an install is a
+little bit nicer than =list-packages U x q=
+
+=M-x install-mypackages=
+or
+=M-x update-mypackages=
+
+*** Outside of Emacs
+
+These are mostly for convevience, they can be called by a vanilla emacs from outside
+of the install.  This is how *Emacsn* initializes and updates this distribution.
+
+They can be called like so.
+
+=emacs --script install.el --chdir <directory to here>=
+=emacs --script update.el --chdir <directory to here>=
+
+**** install.el
+
+Basically we grab the current working directory and make that the user directory.
+Then we load the package list, and install them. Its just a little bit of what init.el does.
+
+#+begin_src emacs-lisp :tangle ./install.el
+;;; install --- Installs packages for the first time.
+
+;;; Commentary:
+;;; Give a script to run to install all the packages the first time.
+;;; Skips packages that are already installed.
+
+;;; This will only work if run from the directory it is in.
+;;; We change the user-emacs-directory to here so that Emacs will install
+;;; its packages here.
+
+;;; Install only looks for missing packages.  It does not check for upgrades.
+
+
+;;; Code:
+
+;;; Because when we get here, emacs is still pointing at its .emacs.d and we
+;;; need it to point here. I'm not yet sure why it doesn't point here.
+;;; chemacs must not set it when we use --script which means we can
+;;; just run this with vanilla emacs and fool it to point here so
+;;; our packages get installed.
+
+;; trick emacs to be here, instead of it's .emacs.d
+(setq user-emacs-directory default-directory)
+(setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
+
+;; this is all we need. We just want to install all the packages.
+(setq load-path
+      (append (list
+               (expand-file-name "./early-packages" user-emacs-directory)
+	       )
+	      load-path))
+
+(load "mypackages")
+
+(install-mypackages)
+
+(provide 'install)
+;;; install.el ends here
+#+end_src
+
+**** update.el
+
+First we do a =git pull origin= in the current working directory.
+Basically we grab the current working directory and make that the user directory.
+Then we update or install all of the packages that need it.
+
+#+begin_src emacs-lisp :tangle ./update.el
+;;; update --- Update packages, install missing packages.
+
+;;; Commentary:
+;;; Give a script to run to install all the packages the first time.
+;;; This will only work if run from the directory it is in.
+;;; We change the user-emacs-directory to here so that Emacs will install
+;;; its packages here.
+
+;;; The only difference between this and install.el is that install only looks
+;;; for missing packages.  If they are installed it doesn't touch them.
+;;; This takes a little more time, but checks to see if anything needs updating.
+;;; install is faster if repeating an install step because of problems.
+
+
+;;; Code:
+
+;;; Because when we get here, emacs is still pointing at ~/.emacs.d and we
+;;; need it to point here. I'm not yet sure why it doesn't point here.
+;;; chemacs must not set it when we use --script which means we can
+;;; just run this with vanilla emacs and fool it to point here so
+;;; our packages get installed.
+
+(shell-command "git pull origin main")
+
+;; Trick emacs to be here, instead of .emacs.d
+;; Requires being here or using emacs --chdir <here> to work.
+(setq user-emacs-directory default-directory)
+(setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
+
+(setq load-path
+      (append (list
+               (expand-file-name "./early-packages" user-emacs-directory)
+	       )
+	      load-path))
+
+(load "mypackages")
+(update-mypackages)
+
+(provide 'update)
+;;; update.el ends here
+#+end_src
