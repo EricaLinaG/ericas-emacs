@@ -25,6 +25,8 @@
 (setq org-replace-disputed-keys t)
 
 (load "mypackages") ; make sure all the packages are installed.
+(update-mypackages)
+;;(install-mypackages) ; make sure, if it just starts up that it will
 
 ;; just so I dont have to look at Emacs default so long.
 (load "appearance")
