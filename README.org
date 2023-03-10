@@ -1,0 +1,277 @@
+* My emacs setup.
+:PROPERTIES:
+:CUSTOM_ID: my-emacs-setup.
+:END:
+An old school emacs setup that uses packages. no /use-package/, just
+elpa, some config files and some extensions outside of elpa.
+
+** Installation
+:PROPERTIES:
+:CUSTOM_ID: installation
+:END:
+I use Emacsn now with Chemacs2. I wouldn't want to manage my emacs the
+hard way again.
+
+*** Emacsn - Chemacs2
+:PROPERTIES:
+:CUSTOM_ID: emacsn---chemacs2
+:END:
+Go to the [[https://github.com/ericalinag/Emacsn][Emacsn]] repo and
+follow the directions there.
+
+Using [[https://github.com/plexus/chemacs2][Chemacs2]] as an emacs
+bootloader gives lots of possibilities.
+
+Chemacs allows Emacsn to create dev, stable, test, for a default
+configuration and also have other Emacs configurations installed
+simultaneously. With multiple profiles to execute the emacs installs in
+different ways.
+
+For maintenance, Emacsn makes Chemacs transparent and
+provides many commands to create, destroy,
+and maintain various Emacs configuratons, installations and their
+Chemacs profiles.
+
+- =make test-install= in ~/Emacsn will create a fresh test install of
+  whatever the default configuration has in github.
+
+*** Clone -> ~/.emacs.d The hard way ???
+:PROPERTIES:
+:CUSTOM_ID: clone---.emacs.d-the-hard-way
+:END:
+You can just clone this into your /.emacs.d/ directory.
+
+#+begin_example
+  `git clone https://github.com/erica-linag/ericas-emacs.git ~/.emacs.d`
+#+end_example
+
+The following scripts can be run to either install or update all of the
+packages. The only difference is that install ignores packages that are
+already installed. I think it makes very little difference in load time.
+The update script adds a =git pull origin= before looking for
+updates.
+
+The nice thing about these is they run from the command line and are
+done. They will also work just fine with a fresh vanilla install. The
+caveat is they need --chdir, or to be in their proper folder upon
+execution.
+
+#+begin_example
+  `emacs --script install.el --chdir ~/.emacs.d`
+  or
+  `emacs --script update.el  --chdir ~/.emacs.d`
+
+#+end_example
+
+or you can just run it the first time and wait for the packages to load.
+
+** Emacs packages, some explanation of what is here.
+:PROPERTIES:
+:CUSTOM_ID: emacs-packages-some-explanation-of-what-is-here.
+:END:
+There are configurations and also extensions which I wrote or borrowed
+from someone else that aren't available as packages. Initialization
+happens in init.el_
+
+The package list is in /early-packages/mypackages.el/.
+
+** The big things;
+:PROPERTIES:
+:CUSTOM_ID: the-big-things
+:END:
+- [[https://github.com/emacs-evil/evil][Evil-mode]](which can be easily
+  switched off in /elisp/init.el/).
+- [[https://github.com/protesilaos/modus-themes][Modus themes.]]
+- [[https://github.com/abo-abo/hydra][Lots of Hydras.]]
+- [[https://orgmode.org/][Org]]
+- [[https://www.emacswiki.org/emacs/mu4e][Mu4e]]
+- [[https://github.com/minad/vertico][Vertico]]
+- [[https://github.com/tumashu/posframe][PosFrame]]
+- [[https://github.com/emacs-dashboard/emacs-dashboard][Dashboard]]
+- [[https://www.emacswiki.org/emacs/UndoTree][undo-tree]]
+- [[https://github.com/magnars/multiple-cursors.el][multiple cursors]]
+
+I program lots of languages, these are the main ones. They may or may
+not have extended configurations from default.
+
+- Languages:
+  - C, C++
+  - Clojure
+  - Clojure script
+  - Python
+  - Lua
+  - Haskell
+  - Lisps - Scheme, Guile, Rackett, etc.
+  - markdown
+  - shell
+  - awk, sed, etc.
+  - org
+
+**** Ivy, Ido, Helm, Vertico, etc.
+:PROPERTIES:
+:CUSTOM_ID: ivy-ido-helm-vertico-etc.
+:END:
+I've used pretty much all the helpers over the years, ivy, ido, smex,
+helm, vertico. Currently using vertico. Configurations are still there
+for the others.  I find vertico not quite as nice as helm with ag, I should
+see about fixing my ag interface.
+
+
+** Key Files
+:PROPERTIES:
+:CUSTOM_ID: key-files
+:END:
+Look in elisp/:
+
+- early-packages - Folder for early loading. lists all
+packages to load
+
+- config/ - Folder where all the real setup goes.
+
+- extensions/ - Folder where non-elpa custom code goes.
+
+- config/vars.el - miscellaneous variable setting.
+
+- config/keys.el - key bindings, mostly F keys.
+
+- config/evil-leader.el - more key bindings, vi style.
+
+Look in /packages.el/ if I happen to add a package through
+/package-install/ I then go add it to /packages.el/ so I won't forget
+and configuration is repeatable. If I forget, the next fresh install
+will likely fail with package not installed.
+
+** Natural Languages
+:PROPERTIES:
+:CUSTOM_ID: natural-languages
+:END:
+
+This is an active and changing portion of my Emacs at the moment.
+
+I have been studying French for the last few years. I am now studying
+Italian. I am working on replacing Anki with Org drill in my routine.
+
+I can also see that I'll probably want to add another language or two in
+the future. I have a nice function to switch between input methods and
+dictionaries. Ispell, flyspell, and hunspell are all working together
+for spell checking. Google translate is there for highlighted text,
+current word, or sentence at point and Language Tool is there to check
+grammar. Take a look at the language sub-menu in /evil-leader-conf.el/
+even if you are going to turn off evil-mode. Check out
+/elisp/extensions/language.el/ and /elisp/config/lang-config.el/ and
+/google-translate-conf.el/
+
+** Mu4e - Mail
+:PROPERTIES:
+:CUSTOM_ID: mu4e---mail
+:END:
+/Mu4e/ I use mu4e for email. I can't imagine a better email client.
+There is a reasonably basic mu4e configuration with multiple contexts.
+There is a sample mbsyncrc file that can be used to configure
+/isync/mbsync/.
+
+This is a bit easier now than it used to be. Arch Linux seems to install
+it properly when /mu/ is installed with pacman.
+
+I cannot speak about other distributions or OS'.
+
+** Key mappings
+:PROPERTIES:
+:CUSTOM_ID: key-mappings
+:END:
+I have been switching over to General, I now have a *Space* key that is
+the entry to point to the most used things and hydras. It has a lot of
+overlap with my evil-leader menus.  Slowly centralizing on General.
+
+I have an extensive menu system on Evil-leader which allows for *,w* for
+write, *,q* delete-buffer, etc. the entire Hydra subsystem is available
+at h.
+
+I use /which-key-posframe/ which is almost like hydra with all the
+submenus. The only thing about posframe is that it seems to behave
+badly in terminal mode. It just turns off instead of falling back to something
+reasonable.
+
+Mostly, the key mappings I added are non-intrusive. It is definitely a
+good idea to go read /config/evil-leader-conf.el/ whether you want
+/Evil/ key bindings or not. It will give you a good idea of
+functionality to look for or map to your own keys in /keys.el/
+
+** Additional packages needed
+:PROPERTIES:
+:CUSTOM_ID: additional-packages-needed
+:END:
+See my [[http://github.com/ericalinag/arch-pkgs][arch-pkgs repo]] for an
+easy way to install everything you need.
+
+- For email
+  - mu-git - on Arch linux
+    - [[https://www.djcbsoftware.nl/code/mu/mu4e/Installation.html#Installation][install mu/mu-git/mu4e]] or maybe just do a =yay -S mu-git=.
+  - isync (mbsync) - =yay -S isync=
+  - =make mbsync= to copy a sample /.mbsyncrc/ for use with /isync/ to
+    your home directory. Additional isync/mbsync/mu4e resources [[http://www.ict4g.net/adolfo/notes/2014/12/27/EmacsIMAP.html][are here:]]
+- for Spelling and grammar.
+  - languagetool
+  - hunspell -- add dictionaries as needed.
+  - hunspell dictionaries [[https://github.com/EricGebhart/Hunspell-dictionaries][get them here!]]
+    Arch Linux has a lot of them. Just do =pacman -Ss hunspell= to see what arch has.
+- Fonts /Iosevka Fonts/ [[https://github.com/be5invis/Iosevka][are here!]] Or just install the Arch Linux packages. One is community, the
+  other AUR. =yay -S ttf-iosevka ttc-iosevka=
+
+** Evil Mode
+:PROPERTIES:
+:CUSTOM_ID: evil-mode
+:END:
+I've been using emacs in some sort of Vi emulation since 1995. Evil-mode
+is, IMHO the best vi emulator so far. Although neovim is doing a really
+good job. vimscript is an unfortunate language. You can easily turn it
+off in /setup.el/ . The Evil mode setup includes a few but not all of
+the Evil-mode extensions. For more information check out the
+[[http://www.emacswiki.org/emacs/Evil][Evil-mode documentation.]]
+
+Included along with evil mode are:
+[[https://github.com/cofi/evil-leader][evil-leader]]
+[[https://github.com/roman/evil-paredit][evil-paredit]]
+[[https://github.com/redguardtoo/evil-nerd-commenter][evil-nerd-commenter]]
+[[https://github.com/timcharper/evil-surround][evil-surround]]
+evil-org
+
+** CycleBufs
+:PROPERTIES:
+:CUSTOM_ID: cyclebufs
+:END:
+I don't use this anymore. I'm currently switching to perspective which
+works well with projectile and Exwm.
+
+Cyclebufs is now built on top of BS - Buffer Selection. There are
+several bs-configurations, and extra functionality which makes switching
+buffers more contextual. Reusing windows for different mode groups
+shell, dired, and bs-show if they are visible.
+
+Also cycling of buffers based on groups.
+
+As an example, the shell group contains shell, eshell, ansi-term, cider,
+and inferior python modes. Once a buffer has one of the modes in the
+group, cycling will stay within that group. There is also contextual
+cycling based on the mode group of the current buffer, cycling through
+shells, *buffers, or file buffers accordingly.
+
+Cyclebufs will open a shell buffer of your choice based on the value of
+cb-shell-command. The default is eshell. See /vars.el/.
+
+** Themes
+:PROPERTIES:
+:CUSTOM_ID: themes
+:END:
+I am using Modus Themes now. There are lots of other themes here, but
+I'm tempted to remove all but my custom palette-theme extensions. They
+frequently are deleted from elpa and cause trouble during install with
+package not found errors. The name must then be removed from
+packages.el.
+
+Lots of themes from packages. Additionally my own personal theme
+strange-deeper-blue. As well as a couple of variations on solarized.
+There is also a palette-themes.el which is a more general library
+adapted from the solarized-theme. Palette-themes allow for the creation
+of themes simply by defining a palette of colors. There are four
+different variations of the solarized themes included.

@@ -7,6 +7,8 @@
 (require 'perspective)
 
 
+;; Should make one that takes a directory, a list of files,
+;; and a list of executables. Essentially Xmonad topics
 (defun layout-3 (dir &optional file)
   "Change to DIR directory and open 3 windows then load the FILE if given."
   (cd dir)
@@ -36,12 +38,15 @@
   ^Windows^
   _v_: vert       _x_: horiz
   _e_: emacs      _E_: emacsn     _X_: xmonad
+  _Q_: qmk
 "
+  ("q" nil)
   ("a" persp-add-buffer :exit t)
 
   ("e" (layout-3 "~/Emacsn/dev/" "README.org"))
   ("X" (layout-3 "~/.xmonad/" "xmonad.hs"))
   ("E" (layout-3 "~/Emacsn/" "README.org"))
+  ("Q" (layout-3 "~/play/qmk-firmware/users/ericgebhart" "README.org"))
 
   ("v" split-window-right)
   ("x" split-window-below)
@@ -55,7 +60,6 @@
   ("n" persp-next)
   ("p" persp-prev)
 
-  ("q" nil)
   ("s" persp-switch)
   ("R" persp-remove-buffer)
   ("k" persp-kill)
