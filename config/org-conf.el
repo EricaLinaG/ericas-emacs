@@ -18,6 +18,16 @@
 (add-hook 'org-mode-hook 'org-auto-tangle-mode)
 (setq org-auto-tangle-default t)  ;Turn auto tangling on by default.
 
+;; make source blocks look nicer.
+(add-hook 'org-mode-hook
+          (lambda ()
+            (push '("#+begin_src" . "«") prettify-symbols-alist)
+            (push '("#+BEGIN_SRC" . "«") prettify-symbols-alist)
+            (push '("#+end_src" . "»" ) prettify-symbols-alist)
+            (push '("#+END_SRC" . "»" ) prettify-symbols-alist)
+            (push '(":tangle" . "T▶" ) prettify-symbols-alist)
+            ))
+
 (add-hook 'org-mode-hook (lambda () (org-pretty-table-mode)))
 (setq org-src-fontify-natively t)
 
@@ -27,14 +37,6 @@
   (visual-line-mode 1))
 
 (add-hook 'org-mode-hook 'org-mode-setup)
-
-;; # doesnt work that way saving for a minute.
-;; (add-to-list 'org-pretty-tags-surrogate-strings
-;;              '(("#+end_src" . "«")
-;;                ("#+begin_src" . "»")
-;;                ("#+END_SRC" . "«")
-;;                ("#+BEGIN_SRC" . "»")
-;;                ("#+NAME:" . "»")))
 
 (defun ee/org-font-setup ()
   ;; Replace list hyphen with dot

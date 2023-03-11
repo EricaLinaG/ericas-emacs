@@ -9,6 +9,8 @@
 
 (setq use-dialog-box nil)
 
+;; Over ride the code block background colors. They were
+;; much to bright.
 (setq modus-vivendi-tinted-palette-overrides
       '(
         (bg-red-nuanced     "#250004")
