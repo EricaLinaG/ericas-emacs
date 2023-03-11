@@ -1,10 +1,22 @@
-;; Enable vertico
+;;; Vertico-conf --- Vertico needs some settings
+;;; Commentary:
+;;; Code:
+
+;; only turn this on if we arent in a terminal.
+;; It behaves extra badly then.
+(when (display-graphic-p)
+  (require 'vertico-posframe)
+  (vertico-posframe-mode 1))
+
 (require 'vertico)
+(require 'consult)
 
 (vertico-mode)
 
-(require 'vertico-posframe)
-(vertico-posframe-mode 1)
+(consult-customize consult--source-buffer :hidden t :default nil)
+(add-to-list 'consult-buffer-sources persp-consult-source)
+
+
 
 (setq read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t

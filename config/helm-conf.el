@@ -5,7 +5,8 @@
 ;; love this. doesn't work with magit. it never gets focus,
 ;; and its impossible to get focus in a helm window once it is lost.
 (require 'helm-posframe)
-(helm-posframe-enable)
+(when (display-graphic-p)
+  (helm-posframe-enable))
 
 (setq helm-posframe-width 110)
 
