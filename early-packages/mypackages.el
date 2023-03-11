@@ -97,24 +97,7 @@
   ace-jump-mode ace-window frog-jump-buffer ace-jump-buffer
   ;; basic tools
   which-key
-  el-get
-  gited
   session
-
-  ;; Choose: ido/smex or ivy/swiper/counsel and/or helm.
-  ;; ido/smex and helm are known to play nice. See helm doc.
-  ;;
-  ;; find-file = counsel-find-file = helm-find-file
-  ;; smex = counsel-m-x = helm-m-x ~= Nicer M-x...
-  ;; ido = ivy =  helm = fuzzy search of candidates, in many situations,
-  ;; files, buffers, symbols.
-  ;; swiper = helm_swoop = occur incrementally..
-  ;; I do like helm on the big wide screen, because the minibuffer is so
-  ;; far away down there in the corner. Both Ido and ivy are more minibuffer
-  ;; centric. I've used ido and smex since the beginning... 20+ years.
-  ;; trying out helm
-
-  multi-term
 
   exwm
   helm-exwm
@@ -124,6 +107,9 @@
   ;; eshell
   eshell-autojump
   fish-completion
+
+  multi-term
+  vterm
 
   ;; evil-mode
   evil
@@ -143,6 +129,8 @@
 
   ;; git
   magit git-gutter
+  el-get
+  gited
 
   ;;coding support
   restclient
