@@ -1,95 +1,66 @@
-* My emacs setup.
+* Erica's Emacs
 :PROPERTIES:
-:CUSTOM_ID: my-emacs-setup.
+:CUSTOM_ID: ericas-emacs
 :END:
-A simple straight forward  emacs setup that uses packages. no /use-package/, just
+A simple straight forward  /emacs.d/ with /init.el/ configuration that uses packages. No /use-package/, just
 elpa, some config files and some extensions outside of elpa.
+
+This is a semi-literate configuration. All code from the root and early-packages/ folder is tangled from the
+source blocks in this document. The rest of the code is in the /extensions/ and /config/ directories.
+
+Here are some of the things that I do in and with emacs.
+
+Coding, creative and technical writing, language learning, website publishing, tango teacher, tango DJ, musician,
+time clocking, invoicing, scheduling, email, note taking, epub reading, comic reading, file managing,
+and window managing.  I know I've forgotten things.
 
 ** Installation
 :PROPERTIES:
 :CUSTOM_ID: installation
 :END:
 I use Emacsn now with Chemacs2. I wouldn't want to manage my emacs the
-hard way again.
+hard way again.  Emacsn makes Chemacs2 easy.
 
-*** Emacsn - Chemacs2
+*** Using Emacsn with Chemacs2
 :PROPERTIES:
 :CUSTOM_ID: emacsn---chemacs2
 :END:
-Go to the [[https://github.com/ericalinag/Emacsn][Emacsn]] repo and
-follow the directions there.
+Go to the [[https://github.com/ericalinag/Emacsn][Emacsn]] repo and follow the directions there, this flavor of Emacs
+is the default and one of many to choose from. Emacsn allows us install along
+side other configurations, and to also keep dev, stable and test images,
+of our Emacs.
 
-Using [[https://github.com/plexus/chemacs2][Chemacs2]] as an emacs
-bootloader gives lots of possibilities.
-
-Chemacs allows Emacsn to create dev, stable, test, for a default
-configuration and also have other Emacs configurations installed
-simultaneously. With multiple profiles to execute the emacs installs in
-different ways.
-
-For maintenance, Emacsn makes Chemacs transparent and
-provides many commands to create, destroy,
-and maintain various Emacs configuratons, installations and their
-Chemacs profiles.
-
-- =make test-install= in ~/Emacsn will create a fresh test install of
-  whatever the default configuration has in github.
-
-*** Clone -> ~/.emacs.d The hard way ???
+*** Emacs.d - Clone -> ~/.emacs.d The hard way ???
 :PROPERTIES:
 :CUSTOM_ID: clone---.emacs.d-the-hard-way
 :END:
-You can just clone this into your /.emacs.d/ directory.
+You can also just clone this into your /.emacs.d/ directory.
 
 #+begin_example
   `git clone https://github.com/erica-linag/ericas-emacs.git ~/.emacs.d`
 #+end_example
 
-The following scripts can be run to either install or update all of the
-packages. The only difference is that install ignores packages that are
-already installed. I think it makes very little difference in load time.
-The update script adds a =git pull origin= before looking for
-updates.
+It is only necessary to run emacs after that.  There are scripts
+which can be run for automation if desired.
 
-The nice thing about these is they run from the command line and are
-done. They will also work just fine with a fresh vanilla install. The
-caveat is they need --chdir, or to be in their proper folder upon
-execution.
 
-#+begin_example
-  `emacs --script install.el --chdir ~/.emacs.d`
-  or
-  `emacs --script update.el  --chdir ~/.emacs.d`
+*** The Makefile
 
-#+end_example
+Emacsn took all the responsibilities away from this Makefile.
+Using Emacsn or git clone into /emacs.d/ is all that is required.
 
-or you can just run it the first time and wait for the packages to load.
+The only thing left is the sample /.mbsyncrc/ file.
 
-*** The Makefile - Optional
-
-Emacsn is the prefered way to install, but you can use the
-Makefile as well.  The only part I ever use now is the mbsync
-rule to get a .mbsyncrc into my home directory for Mu4e.
+Just running =make= will copy it to your home directory.
 
 #+begin_src makefile :tangle ./Makefile
-# dont need this either if installing with Emacsn
-.PHONY: install
-install:
-	ln -s .emacs $(HOME)/.emacs
-	ln -s elisp $(HOME)/elisp
-
-# no longer needed really
-# At least Arch installs it properly now.
-.PHONY: mu4e
-mu4e:
-	cp -r ~/.cache/yay/mu-git/src/mu/mu4e $(HOME)/elisp/extensions/
 
 # get an example mbsync rc
 .PHONY: mbsync
 mbsync:
-	ln -s mbsyncrc ~/.mbsyncrc
+	cp mbsyncrc ~/.mbsyncrc
 
-all: install mu4e mbsync
+all: mbsync
 #+end_src
 
 ** The big things;
@@ -260,6 +231,8 @@ see about fixing my ag interface.
 
 *** Emms Music player
 
+I am a tango teacher and DJ I am slowly switching over to emms.
+
 #+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
   emms
   emms-info-mediainfo
@@ -272,7 +245,7 @@ see about fixing my ag interface.
 
 #+end_src
 
-Dired, buffers,icons,hl
+I use dired as my file manager. I like for it to look nice.
 
 #+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
   diff-hl ;; has a dired mode.
@@ -823,20 +796,29 @@ functionality to look for or map to your own keys in /keys.el/
 :PROPERTIES:
 :CUSTOM_ID: additional-packages-needed
 :END:
-See my [[http://github.com/ericalinag/arch-pkgs][arch-pkgs repo]] for an
-easy way to install everything you need.
 
-- For email
+I use isync/mbsync to retrieve mail, mu for indexes and mu4e as my email client.
+
+I use language tool and hunspell for grammar and spelling. And finally I use the
+Iosevka fonts.
+
+Everything you really need, on Arch Linux, is this plus some hunspell dictionaries.
+
+=yay -S mu isync languagetool hunspell ttf-iosevka ttc-iosevka=
+
+Arch Linux has a lot of dictionaries, Just do =pacman -Ss hunspell= to see what is there.
+
+*** EMail
   - mu-git - on Arch linux
     - [[https://www.djcbsoftware.nl/code/mu/mu4e/Installation.html#Installation][install mu/mu-git/mu4e]] or maybe just do a =yay -S mu-git=.
   - isync (mbsync) - =yay -S isync=
   - =make mbsync= to copy a sample /.mbsyncrc/ for use with /isync/ to
     your home directory. Additional isync/mbsync/mu4e resources [[http://www.ict4g.net/adolfo/notes/2014/12/27/EmacsIMAP.html][are here:]]
-- for Spelling and grammar.
+*** Spelling and grammar.
   - languagetool
   - hunspell -- add dictionaries as needed.
-  - hunspell dictionaries [[https://github.com/EricGebhart/Hunspell-dictionaries][get them here!]]
-    Arch Linux has a lot of them. Just do =pacman -Ss hunspell= to see what arch has.
+  - hunspell dictionaries, I also have  [[https://github.com/EricGebhart/Hunspell-dictionaries][them here]]
+*** Fonts
 - Fonts /Iosevka Fonts/ [[https://github.com/be5invis/Iosevka][are here!]] Or just install the Arch Linux packages. One is community, the
   other AUR. =yay -S ttf-iosevka ttc-iosevka=
 
@@ -860,7 +842,14 @@ adapted from the solarized-theme. Palette-themes allow for the creation
 of themes simply by defining a palette of colors. There are four
 different variations of the solarized themes included.
 
-** Install and update functions
+** Install and update scripts/functions
+
+This Emacs uses packages, so if that is all you want, read no further.
+
+The packages of this Emacs configuration can be easily installed or
+updated with a couple of commands. They can also  be
+updated from outside of Emacs which makes it easier to
+manage them.
 
 *** Within Emacs
 To use the package list for an update or an install is a
@@ -872,18 +861,43 @@ or
 
 *** Outside of Emacs
 
+These are just to make sure things are current with git and all the Emacs
+packages are installed and up to date. These commands are used by
+*Emacsn* to manage Ericas-Emacs. Emacsn takes care of all of this for you.
+
+The following scripts can be run to either install or update all of the
+packages. The only difference is that install ignores packages that are
+already installed. I think it makes very little difference in load time.
+The update script adds a =git pull origin= before looking for
+updates.
+
+The nice thing about these is they run from the command line and are
+done. They will also work just fine with a fresh vanilla install. The
+caveat is they need --chdir, or to be in their proper folder upon
+execution. Wherever this is installed is where /--chdir/ should be and
+where the scripts live.
+
+If they are in ~/.emacs.d/, then these would work.
+
+#+begin_example
+  `emacs --script install.el --chdir ~/.emacs.d`
+  or
+  `emacs --script update.el  --chdir ~/.emacs.d`
+
+#+end_example
+
 These are mostly for convenience, they can be called by a vanilla emacs from outside
 of the install.  This is how *Emacsn* initializes and updates this distribution.
-
-They can be called like so.
-
-=emacs --script install.el --chdir <directory to here>=
-=emacs --script update.el --chdir <directory to here>=
+The update does also do a /git pull origin/ to checkout the latest version of it's self.
 
 **** install.el
 
-Basically we grab the current working directory and make that the user directory.
+This is a simple script, with some user directory manipulation to fool emacs.
+We make the current working directory the user directory.
 Then we load the package list, and install them. Its just a little bit of what init.el does.
+
+It is important to either invoke emacs where this script is, or to use the /--chdir/ option
+to move emacs there.
 
 #+begin_src emacs-lisp :tangle ./install.el
 ;;; install --- Installs packages for the first time.
@@ -928,9 +942,12 @@ Then we load the package list, and install them. Its just a little bit of what i
 
 **** update.el
 
-First we do a =git pull origin= in the current working directory.
-Basically we grab the current working directory and make that the user directory.
+We make the current working directory the user directory.
+We do a =git pull origin=.
 Then we update or install all of the packages that need it.
+
+It is important to either invoke emacs where this script is, or to use the /--chdir/ option
+to move emacs there.
 
 #+begin_src emacs-lisp :tangle ./update.el
 ;;; update --- Update packages, install missing packages.
@@ -974,3 +991,58 @@ Then we update or install all of the packages that need it.
 (provide 'update)
 ;;; update.el ends here
 #+end_src
+
+** Display Hints
+
+Some ancient display hints I should probably revisit.
+
+#+begin-src emacs-elisp :tangle early-packages/display-hints.el
+;; set the initial frame size
+;;(setq initial-frame-alist '((top . 20) (left . 0) (width . 200) (height . 60)))
+
+;;Display-Buffer-Alist controls window display choices.
+                                        ; display buffer alist is not really working in 24.3 as far
+                                        ; as I can tell. some settings do work, but not all. Waiting for 24.4
+                                        ; there is a window test function in functions to play with this.
+                                        ; setting to nil at the end.
+
+(add-to-list 'display-buffer-alist
+             '("\\*.*\\*"
+               (display-buffer-pop-up-window
+                )
+               (reusable-frames)
+               (window-height . 5)))
+
+(add-to-list 'display-buffer-alist
+             '("\\*shell\\*"
+               (
+                display-buffer-in-previous-window
+                display-buffer-below-selected
+                )
+               (reusable-frames)
+               (window-height . 15)
+               (window-width . 60)))
+
+(add-to-list 'display-buffer-alist
+             '("\\*help\\*"
+               (
+                display-buffer-reuse-window
+                display-buffer-in-previous-window
+                display-buffer-below-selected
+                display-buffer-pop-up-window)
+               (reusable-frames)
+               (window-height . 20)))
+
+(add-to-list 'display-buffer-alist
+             '("\\*cider\\*"
+               (
+                display-buffer-below-selected
+                display-buffer-reuse-window
+                display-buffer-in-previous-window
+                display-buffer-pop-up-window )
+               (reusable-frames)
+               (window-height . 20)))
+
+(setq display-buffer-alist nil)
+(setq checkdoc-arguments-in-order-flag nil)
+#+end-src
