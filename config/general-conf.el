@@ -54,8 +54,8 @@
   :keymaps 'normal
   ;; bind "SPC a"
   "a" 'org-agenda
-  "b" 'counsel-bookmark
-  "B" 'helm-buffer
+  "B" 'counsel-bookmark
+  "b" 'helm-buffer
   "t" 'hydra-persp/body
   "c" 'org-capture
  ;;;;;;;;;;;;;;;;;;;;;;
@@ -89,7 +89,7 @@
   "m" 'woman
   "M" 'hydra-multiple-cursors/body
   "M" 'hydra-macros/body
-  "p" 'hydra-persp/body
+  "p" 'hydra-persp/body  ; this is on t also.
   "P" 'hydra-programs/body
   "w" 'hydra-window-hydras/body
 

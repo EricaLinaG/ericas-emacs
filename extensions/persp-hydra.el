@@ -44,8 +44,8 @@
 
   ^Layouts^
   _P_: Prompt
-  _e_: emacs dev  _E_: emacsn      _X_: xmonad
-  _Q_: qmk        _D_: BD          _m_: Music
+  _e_: Emacs dev  _E_: Emacsn      _X_: Xmonad
+  _Q_: QMK        _D_: BD          _m_: Music
   _T_: 3D
 "
   ("q" nil)
