@@ -34,6 +34,14 @@
 
 ;;;squiggly-clojure.
 
+;; I always want to see the end of my messages buffer.
+(add-hook 'post-command-hook
+          (lambda ()
+            (let ((messages (get-buffer "*Messages*")))
+              (unless (eq (current-buffer) messages)
+                (with-current-buffer messages
+                  (goto-char (point-max)))))))
+
 ;; (eval-after-load 'flycheck '(flycheck-clojure-setup))
 ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 

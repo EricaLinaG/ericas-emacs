@@ -30,6 +30,7 @@
 
 (add-hook 'org-mode-hook (lambda () (org-pretty-table-mode)))
 (setq org-src-fontify-natively t)
+(setq org-src-tab-acts-natively t)
 
 (defun org-mode-setup ()
   (org-indent-mode)
