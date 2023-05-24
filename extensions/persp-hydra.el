@@ -6,19 +6,22 @@
 (require 'hydra)
 (require 'perspective)
 
-
 ;; Should make one that takes a directory, a list of files,
 ;; and a list of executables. Essentially Xmonad topics
 (defun layout-3 (dir &optional file)
   "Change to DIR directory and open 3 windows then load the FILE if given."
-  (cd dir)
+  (if dir
+      (cd dir)
+    (cd (read-directory-name "Default Directory:")))
   (split-window-right)
   (split-window-right)
   (split-window-right)
   (windmove-right)
   (if file
       (find-file file)
-    (find-file "README.org")))
+    (find-file (read-file-name
+                "Find file: " nil default-directory
+                (confirm-nonexistent-file-or-buffer))) ))
 
 (defhydra hydra-persp (:hint nil)
   "
@@ -35,10 +38,15 @@
       1-9         _u_: unmerge     _g_: global add
                   _S_: save
   _q_: quit       _l_: load
+
   ^Windows^
   _v_: vert       _x_: horiz
-  _e_: emacs      _E_: emacsn     _X_: xmonad
-  _Q_: qmk
+
+  ^Layouts^
+  _P_: Prompt
+  _e_: emacs dev  _E_: emacsn      _X_: xmonad
+  _Q_: qmk        _D_: BD          _m_: Music
+  _T_: 3D
 "
   ("q" nil)
   ("a" persp-add-buffer :exit t)
@@ -46,7 +54,11 @@
   ("e" (layout-3 "~/Emacsn/dev/" "README.org"))
   ("X" (layout-3 "~/.xmonad/" "xmonad.hs"))
   ("E" (layout-3 "~/Emacsn/" "README.org"))
+  ("T" (layout-3 "~/play/3D" "README.org"))
   ("Q" (layout-3 "~/play/qmk-firmware/users/ericgebhart" "README.org"))
+  ("M" (layout-3 "/home/Music" "README.org"))
+  ("D" (layout-3 "/home/BD" "README.org"))
+  ("P" (layout-3 nil))
 
   ("v" split-window-right)
   ("x" split-window-below)
