@@ -24,8 +24,8 @@
     consult
     embark
     embark-consult
-    cape
-    corfu
+    ;;cape
+    ;;corfu
 
     posframe
     vertico-posframe
