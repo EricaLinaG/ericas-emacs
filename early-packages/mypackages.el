@@ -24,8 +24,9 @@
     consult
     embark
     embark-consult
-    ;;cape
-    ;;corfu
+    cape
+    corfu
+    corfu-terminal
 
     posframe
     vertico-posframe
@@ -257,40 +258,40 @@
     ample-zen-theme ample-theme lush-theme smyx-theme gotham-theme
     solarized-theme dark-krystal-theme))
 
-  ;;
-  ;; Install stuff from packages.
+;;
+;; Install stuff from packages.
 
-  (defun early-install-mypackages ()
-    "Install a theme and any other early things."
-    (dolist (pkg '(modus-themes))
-      (unless (package-installed-p pkg))
-      (package-install pkg)))
+(defun early-install-mypackages ()
+  "Install a theme and any other early things."
+  (dolist (pkg '(modus-themes))
+    (unless (package-installed-p pkg))
+    (package-install pkg)))
 
-  (defun install-mypackages ()
-    "Install my/packages if they arent already."
-    (dolist (pkg my/packages)
-      (unless (package-installed-p pkg))
-      (package-install pkg)))
+(defun install-mypackages ()
+  "Install my/packages if they arent already."
+  (dolist (pkg my/packages)
+    (unless (package-installed-p pkg))
+    (package-install pkg)))
 
-  (defun update-mypackages ()
-    "Update my/packages if they need it."
-    (interactive)
-    (dolist (pkg my/packages)
-      (package-install pkg)))
+(defun update-mypackages ()
+  "Update my/packages if they need it."
+  (interactive)
+  (dolist (pkg my/packages)
+    (package-install pkg)))
 
-  (require 'package)
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-  (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
-  ;;(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
+;;(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
-  (package-initialize)
-  (when (not package-archive-contents)
-    (package-refresh-contents))
+(package-initialize)
+(when (not package-archive-contents)
+  (package-refresh-contents))
 
-  ;; let this be controlled elsewhere.
-  ;;(install-mypackages)
-  ;;(update-mypackages)
+;; let this be controlled elsewhere.
+;;(install-mypackages)
+;;(update-mypackages)
 
-  (provide 'mypackages)
+(provide 'mypackages)
   ;;; mypackages.el ends here (emacs-lisp-checkdoc)
