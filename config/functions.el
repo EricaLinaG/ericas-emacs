@@ -17,8 +17,6 @@
   (balance-windows)
   (split-window-horizontally)
   (split-window-horizontally)
-  (split-window-horizontally)
-  (split-window-horizontally)
   ;;(split-window-below)
   ;;(cb-get-shell)
   )

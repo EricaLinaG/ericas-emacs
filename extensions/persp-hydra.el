@@ -8,12 +8,12 @@
 
 ;; Should make one that takes a directory, a list of files,
 ;; and a list of executables. Essentially Xmonad topics
-(defun layout-3 (dir &optional file)
+(defun layout-3 (dir name &optional file)
   "Change to DIR directory and open 3 windows then load the FILE if given."
+  (persp-switch name)
   (if dir
       (cd dir)
     (cd (read-directory-name "Default Directory:")))
-  (split-window-right)
   (split-window-right)
   (split-window-right)
   (windmove-right)
@@ -42,8 +42,8 @@
   ^Windows^
   _v_: vert       _x_: horiz
 
-  ^Layouts^
-  _P_: Prompt
+  ^Create new perspective.^
+  _c_: Custom
   _e_: Emacs dev  _E_: Emacsn      _X_: Xmonad
   _Q_: QMK        _D_: BD          _m_: Music
   _T_: 3D
@@ -51,14 +51,14 @@
   ("q" nil)
   ("a" persp-add-buffer :exit t)
 
-  ("e" (layout-3 "~/Emacsn/dev/" "README.org"))
-  ("X" (layout-3 "~/.xmonad/" "xmonad.hs"))
-  ("E" (layout-3 "~/Emacsn/" "README.org"))
-  ("T" (layout-3 "~/play/3D" "README.org"))
-  ("Q" (layout-3 "~/play/qmk-firmware/users/ericgebhart" "README.org"))
-  ("M" (layout-3 "/home/Music" "README.org"))
-  ("D" (layout-3 "/home/BD" "README.org"))
-  ("P" (layout-3 nil))
+  ("c" (layout-3 nil nil))
+  ("e" (layout-3 "~/Emacsn/dev/" "Emacsn dev" "README.org"))
+  ("X" (layout-3 "~/.xmonad/"    "Xmonad" "xmonad.hs"))
+  ("E" (layout-3 "~/Emacsn/"     "Emacsn" "README.org"))
+  ("T" (layout-3 "~/play/3D"     "3D"     "README.org"))
+  ("Q" (layout-3 "~/play/qmk-firmware/users/ericgebhart" "QMK_firmware" "README.org"))
+  ("M" (layout-3 "/home/Music"   "Music"  "README.org"))
+  ("D" (layout-3 "/home/BD"      "BD"     "README.org"))
 
   ("v" split-window-right)
   ("x" split-window-below)
@@ -81,9 +81,7 @@
   ("b" persp-switch-to-buffer)
   ("B" persp-switch-to-scratch-buffer)
   ("i" persp-import)
-  ("n" persp-next)
   ("<right>" persp-next)
-  ("p" persp-prev)
   ("<left>" persp-prev)
   ("m" persp-merge)
   ("u" persp-unmerge)
