@@ -46,7 +46,7 @@
   _c_: Custom
   _e_: Emacs dev  _E_: Emacsn      _X_: Xmonad
   _Q_: QMK        _D_: BD          _m_: Music
-  _T_: 3D
+  _T_: 3D         _s_: SPR
 "
   ("q" nil)
   ("a" persp-add-buffer :exit t)
@@ -59,6 +59,7 @@
   ("Q" (layout-3 "~/play/qmk-firmware/users/ericgebhart" "QMK_firmware" "README.org"))
   ("M" (layout-3 "/home/Music"   "Music"  "README.org"))
   ("D" (layout-3 "/home/BD"      "BD"     "README.org"))
+  ("z" (layout-3 "~/play/SPR/"   "Emacsn" "README.org"))
 
   ("v" split-window-right)
   ("x" split-window-below)
