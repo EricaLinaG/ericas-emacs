@@ -34,6 +34,22 @@
 (general-def 'normal emacs-lisp-mode-map
   "K" 'elisp-slime-nav-describe-elisp-thing-at-point)
 
+;; ;; put t
+;; (general-def 'emacs emms-playlist-mode-map
+;;   "h" 'hydra-emms/body)
+;; (general-def 'emacs emms-browser-mode-map
+;;
+;;)
+(general-define-key
+ ;; NOTE: keymaps specified with :keymaps must be quoted
+ :keymaps 'emms-playlist-mode-map
+ "h" 'hydra-emms/body)
+(general-define-key
+ ;; NOTE: keymaps specified with :keymaps must be quoted
+ :keymaps 'emms-browser-mode-map
+ "h" 'hydra-emms/body)
+
+
 ;; * Prefix Keybindings
 ;; :prefix can be used to prevent redundant specification of prefix keys
 ;; again, variables are not necessary and likely not useful if you are only
@@ -57,6 +73,7 @@
   "B" 'counsel-bookmark
   "b" 'helm-buffer
   "t" 'hydra-persp/body
+  "e" 'hydra-emms/body
   "c" 'org-capture
  ;;;;;;;;;;;;;;;;;;;;;;
   "D" 'describe-mode
@@ -98,7 +115,7 @@
   "k" 'kill-this-buffer
   "q" 'kill-this-buffer
 
-  "e" 'er/expand-region
+  "E" 'er/expand-region
 
   "0" 'delete-window
   "1" 'delete-other-windows

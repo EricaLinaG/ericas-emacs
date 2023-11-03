@@ -23,6 +23,18 @@
                 "Find file: " nil default-directory
                 (confirm-nonexistent-file-or-buffer))) ))
 
+(defun layout-0 (dir name &optional file)
+  "Create perspective of NAME, Change to DIR directory and open 0 windows then load the FILE if given."
+  (persp-switch name)
+  (if dir
+      (cd dir)
+    (cd (read-directory-name "Default Directory:")))
+  (if file
+      (find-file file)
+    (find-file (read-file-name
+                "Find file: " nil default-directory
+                (confirm-nonexistent-file-or-buffer))) ))
+
 (defhydra hydra-persp (:hint nil)
   "
      Perspectives
@@ -45,19 +57,26 @@
   ^Create new perspective.^
   _c_: Custom
   _e_: Emacs dev  _E_: Emacsn      _X_: Xmonad
-  _Q_: QMK        _D_: BD          _m_: Music
-  _T_: 3D         _s_: SPR
+  _Q_: myQMK      _D_: BD          _M_: Music
+  _T_: 3D         _z_: SPR         _Z_: Emacsn stable
 "
   ("q" nil)
   ("a" persp-add-buffer :exit t)
 
   ("c" (layout-3 nil nil))
   ("e" (layout-3 "~/Emacsn/dev/" "Emacsn dev" "README.org"))
+  ("Z" (layout-3 "~/Emacsn/stable/" "Emacsn stable" "README.org"))
   ("X" (layout-3 "~/.xmonad/"    "Xmonad" "xmonad.hs"))
   ("E" (layout-3 "~/Emacsn/"     "Emacsn" "README.org"))
   ("T" (layout-3 "~/play/3D"     "3D"     "README.org"))
-  ("Q" (layout-3 "~/play/qmk-firmware/users/ericgebhart" "QMK_firmware" "README.org"))
-  ("M" (layout-3 "/home/Music"   "Music"  "README.org"))
+  ("Q" (layout-3 "~/play/myQMK" "myQMK" "README.org"))
+  ("M" (progn (layout-0 "/home/Music"   "Music"  "README.org")
+              (split-window-right)
+              (emms-browser)
+              (turn-off-evil-mode)
+              (split-window-right)
+              (emms)
+              (mpd/start-music-daemon)))
   ("D" (layout-3 "/home/BD"      "BD"     "README.org"))
   ("z" (layout-3 "~/play/SPR/"   "Emacsn" "README.org"))
 

@@ -67,8 +67,8 @@
 
 ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
 ;;(set-frame-parameter (selected-frame) 'alpha <both>)
-(set-frame-parameter (selected-frame) 'alpha '(75 . 50))
-(add-to-list 'default-frame-alist '(alpha . (75 . 50)))
+(set-frame-parameter (selected-frame) 'alpha '(85 . 70))
+(add-to-list 'default-frame-alist '(alpha . (85 . 70)))
 
 ;;get rid of clutter, menus, scrollbars, etc.
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))

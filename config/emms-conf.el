@@ -1,51 +1,82 @@
 (require 'emms-setup)
+(require 'emms-soundcloud)
+(require 'emms-info-mediainfo)
 
 (setq emms-player-list '(emms-player-vlc)
       emms-info-functions '(emms-info-native))
 
+(require 'emms-player-simple)
 (require 'emms-player-mpd)
 (emms-all)
 
-;; this package doesnt compile  17/01/23
-;;(require 'emms-mark-ext)
-(require 'helm-emms)
-(require 'emms-info-mediainfo)
-(add-to-list 'emms-info-functions 'emms-info-mediainfo)
-(require 'emms-soundcloud)
+;; libre-fm
+;;(emms-librefm-scrobbler-enable)
 
-;; this package doesnt compile  17/01/23
-;; This plugin provides control functions (e.g. ab-loop, speed, fullscreen).
-;; (require 'emms-player-simple-mpv-control-functions)
+;; ;; notifications
+;; (require 'emms-dbus)
+;; (emms-dbus-enable)
 
-;; Usage:
+;;(emms-default-players)
+;; (require 'emms-player-mplayer)
+;; (require 'emms-player-vlc)
+;; (require 'emms-player-mpv)
 
-;; ;; An example of setting like emms-player-mplayer.el
-;; ;; `emms-player-my-mpv' is defined in this case.
-;; (define-emms-simple-player-mpv my-mpv '(file url streamlist playlist)
-;;   (concat "\\`\\(http[s]?\\|mms\\)://\\|"
-;;           (apply #'emms-player-simple-regexp
-;;                  "aac" "pls" "m3u"
-;;                  emms-player-base-format-list))
-;;   "mpv" "--no-terminal" "--force-window=no" "--audio-display=no")
+(require 'emms-source-file)
+(require 'emms-source-playlist)
 
-;; (emms-player-simple-mpv-add-to-converters
-;;  'emms-player-my-mpv "." '(playlist)
-;;  (lambda (track-name) (format "--playlist=%s" track-name)))
+;; (add-to-list 'emms-player-list '(emms-player-mpg321
+;;                                  emms-player-ogg123
+;;                                  ;; emms-player-mplayer
+;;                                  ;; emms-player-vlc
+;;                                  ;; emms-player-mpv
+;;                                  emms-player-mpd))
 
-;; (add-to-list 'emms-player-list 'emms-player-my-mpv)
+(setq emms-player-list '(emms-player-mpd)
+      emms-info-functions '(emms-info-mpd))
 
-;;The following example configuration files are available:
+;;(add-to-list 'emms-info-functions 'emms-info-native)
+;;(add-to-list 'emms-info-functions 'emms-info-mediainfo)
+;;(add-to-list 'emms-info-functions 'emms-info-mpd)
 
-;; + emms-player-simple-mpv-e.g.time-display.el
-;; + emms-player-simple-mpv-e.g.playlist-fname.el
-;; + emms-player-simple-mpv-e.g.hydra.el
-
+;;(setq emms-volume-change-function #'emms-volume-mpd-change)
 
 (setq emms-seek-seconds 5)
-(setq emms-player-list '(emms-player-mpd))
-(setq emms-info-functions '(emms-info-mpd))
 (setq emms-player-mpd-server-name "localhost")
-(setq emms-player-mpd-server-port "6601")
+(setq emms-player-mpd-server-port "6600")
+(setq mpc-host "localhost:6600")
+(setq emms-player-mpd-music-directory "/home/Music/Music")
+
+;; covers
+(setq emms-browser-covers #'emms-browser-cache-thumbnail-async)
+(setq emms-browser-thumbnail-small-size 64)
+(setq emms-browser-thumbnail-medium-size 128)
+;; filters
+(emms-browser-make-filter "all" #'ignore)
+(emms-browser-make-filter "recent"
+                          (lambda (track) (< 30
+                                        (time-to-number-of-days
+                                         (time-subtract (current-time)
+                                                        (emms-info-track-file-mtime track))))))
+(emms-browser-set-filter (assoc "all" emms-browser-filters))
+
+(setq emms-browser-info-title-format "%i%n - %a - %A %y")
+(setq emms-browser-playlist-info-title-format
+      emms-browser-info-title-format)
+
+(setq-default
+ emms-source-file-default-directory "/home/Music/Music"
+
+ emms-source-playlist-default-format 'm3u
+ emms-playlist-mode-center-when-go t
+ emms-playlist-default-major-mode 'emms-playlist-mode
+ emms-show-format "NP: %s"
+
+ emms-player-mpv-environment '("PULSE_PROP_media.role=music")
+ emms-player-mpv-parameters '("--quiet" "--really-quiet" "--no-audio-display" "--force-window=no" "--vo=null"))
+
+(require 'emms-history)
+(emms-history-load) ;; persistent playlists
+(require 'helm-emms)
 
 ;; key bindings.
 ;; ("s-m p" . emms)
@@ -56,15 +87,13 @@
 ;; ("<XF86AudioPlay>" . emms-pause)
 ;; ("<XF86AudioStop>" . emms-stop)
 
-(setq mpc-host "localhost:6601")
-
 (defun mpd/start-music-daemon ()
   "Start MPD, connects to it and syncs the metadata cache."
   (interactive)
   (shell-command "mpd")
   (mpd/update-database)
   (emms-player-mpd-connect)
-  (emms-cache-set-from-mpd-all)
+  ;;(emms-cache-set-from-mpd-all)
   (message "MPD Started!"))
 (global-set-key (kbd "s-m c") 'mpd/start-music-daemon)
 
@@ -73,7 +102,7 @@
   "Stops playback and kill the music daemon."
   (interactive)
   (emms-stop)
-  (call-process "killall" nil nil nil "mpd")
+  (call-process ""killall nil nil nil "mpd")
   (message "MPD Killed!"))
 (global-set-key (kbd "s-m k") 'mpd/kill-music-daemon)
 

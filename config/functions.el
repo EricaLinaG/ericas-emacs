@@ -31,7 +31,7 @@
   (when (not (file-exists-p (buffer-file-name)))
     (set-buffer-modified-p t)))
 
-( defun what-face (pos)
+(defun what-face (pos)
   (interactive "d")
   (let ((face (or (get-char-property (point) 'read-face-name)
                   (get-char-property (point) 'face))))

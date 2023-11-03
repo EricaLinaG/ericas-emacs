@@ -5,6 +5,8 @@
 
 (global-hl-line-mode 1)
 
+(setq help-window-select t)
+
 (setq vc-follow-symlinks t)
 
 ;;; Great for smaller screens.
@@ -27,8 +29,8 @@
 ;; term and ansi-term misbehave a lot in my experience.
 
 ;;(setq cb-shell-command 'shell)
-(setq cb-shell-command 'multi-term)
-;;(setq cb-shell-command 'eshell)
+;;(setq cb-shell-command 'multi-term)
+(setq cb-shell-command 'eshell)
 ;;(setq cb-shell-command 'term)
 ;;(setq cb-shell-command 'ansi-term)
 

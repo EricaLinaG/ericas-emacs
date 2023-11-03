@@ -7,9 +7,10 @@
 (setq evil-cross-lines t)
 ;;(setq evil-want-fine-undo t)
 ;;(setq evil-regexp-search t)
+
 ;; If this is true it breaks eshell. bad behavior anyway.
 (setq evil-backspace-join-lines nil)
-(setq evil-cross-lines nil)
+;;(setq evil-cross-lines nil)
 
 ;; Clear insert state bindings.
 ;; (setcdr evil-insert-state-map nil)
@@ -26,8 +27,17 @@
 (evil-set-initial-state 'cider-connections-buffer-mode 'emacs)
 (evil-set-initial-state 'ibuffer-mode 'normal)
 (evil-set-initial-state 'mu4e:compose 'normal)
+;; playlist,emms mode works. not the browser.
+(evil-set-initial-state 'Emms-Browser 'emacs)
+(evil-set-initial-state 'emms-browser 'emacs)
+(evil-set-initial-state 'EMMS 'emacs)
+(evil-set-initial-state 'emms-browser-mode 'emacs)
+(evil-set-initial-state 'emms-playlist-mode 'emacs)
+(evil-set-initial-state 'emms-browser-search 'emacs)
+(evil-set-initial-state 'emms-browser-search-mode 'emacs)
 
 (require 'evil-surround)
+
 (global-evil-surround-mode 1)
 
 (evil-define-command cofi/maybe-exit ()

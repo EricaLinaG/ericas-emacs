@@ -36,6 +36,7 @@ of our Emacs.
 :PROPERTIES:
 :CUSTOM_ID: clone---.emacs.d-the-hard-way
 :END:
+It is not hard at all.
 You can also just clone this into your /.emacs.d/ directory.
 
 #+begin_example
@@ -252,17 +253,25 @@ see about fixing my ag interface.
 
 *** Emms Music player
 
-I am a tango teacher and DJ I am slowly switching over to emms.
+I am a tango teacher and DJ I have suddenly switched over to emms.
 I worked on the now defunct Songbird/Nightingale music player and I
 would like to bring those features that I wrote forward to Emms in Emacs.
+
+My Emms configuration is working with the Music Player Daemon.
+I copy the mpd directory in this repo into my music directory and then link
+the user default configuration file, =~./.config/mpd/mpd.conf= to the =mpd.conf= file there.
+
+I have a perspective for Emms in my perspective hydra, available from =SPC=.
+It will create an Emms perspective, start mpd, connect to mpd and start the browser and the playlist
+and brings up README.org in the Music folder.
+
+I also have a small Emms hydra attached to 'h' in the browser and playlist modes.
 
 #+begin_src emacs-lisp :tangle ./early-packages/mypackages.el
   emms
   emms-info-mediainfo
   emms-mark-ext
-  ;; emms-player-simple-mpv
   emms-soundcloud
-  ;; emms-state
   helm-emms
   org-emms
 #+end_src
