@@ -742,7 +742,7 @@ _t_: translate sentence & point       _T_: Translate
   "
   ("q" nil "quit")
   ("p" emms)
-  ("b" emms-smart-browse)
+  ("b" emms-browse)
   ("R" emms-player-mpd-update-all-reset-cache)
   ("C" emms-player-mpd-connect)
   ("S" mpd/start-music-daemon)

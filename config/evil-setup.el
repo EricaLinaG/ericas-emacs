@@ -27,13 +27,11 @@
 (evil-set-initial-state 'cider-connections-buffer-mode 'emacs)
 (evil-set-initial-state 'ibuffer-mode 'normal)
 (evil-set-initial-state 'mu4e:compose 'normal)
-;; playlist,emms mode works. not the browser.
-(evil-set-initial-state 'Emms-Browser 'emacs)
-(evil-set-initial-state 'emms-browser 'emacs)
+;; playlist,emms mode works. not the browser or search.
 (evil-set-initial-state 'EMMS 'emacs)
+(evil-set-initial-state 'Emms-Browser 'emacs)
 (evil-set-initial-state 'emms-browser-mode 'emacs)
 (evil-set-initial-state 'emms-playlist-mode 'emacs)
-(evil-set-initial-state 'emms-browser-search 'emacs)
 (evil-set-initial-state 'emms-browser-search-mode 'emacs)
 
 (require 'evil-surround)
