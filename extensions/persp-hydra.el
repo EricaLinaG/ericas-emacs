@@ -66,7 +66,7 @@
   ("c" (layout-3 nil nil))
   ("e" (layout-3 "~/Emacsn/dev/" "Emacsn dev" "README.org") :exit t)
   ("Z" (layout-3 "~/Emacsn/stable/" "Emacsn stable" "README.org") :exit t)
-  ("X" (layout-3 "~/.xmonad/"    "Xmonad" "xmonad.HS") :exit t)
+  ("X" (layout-3 "~/.xmonad/"    "Xmonad" "xmonad.hs") :exit t)
   ("E" (layout-3 "~/Emacsn/"     "Emacsn" "README.org") :exit t)
   ("T" (layout-3 "~/play/3D"     "3D"     "README.org"))
   ("Q" (layout-3 "~/play/myQMK" "myQMK" "README.org") :exit t)

@@ -741,7 +741,7 @@ _t_: translate sentence & point       _T_: Translate
     Windows         MPD          Cache
 --------------------------------------------------------
     _p_: Playlist  _C_: Connect  _R_: Reset
-    _b_: Browse    _K_: Kill
+    _b_: Browse    _K_: Kill     _N_: Mpd Update & Reset
     _l_: p lists   _S_: Start    _F_: Cache set From mpd
     _S_: Streams   _U_: Update   _A_: Add Dir Tree
                  _D_: update dir
@@ -765,11 +765,12 @@ _t_: translate sentence & point       _T_: Translate
   "
   ("q" nil)
   ("P" emms-start)
-  ("b" emms-browse)
+  ("b" emms-browser)
   ("p" emms-playlist-mode-go)
   ("l" emms-metaplaylist-mode-go)
   ("s" emms-streams)
-  ("R" emms-player-mpd-update-all-reset-cache)
+  ("R" emms-cache-reset)
+  ("N" emms-player-mpd-update-all-reset-cache)
   ("F" emms-cache-set-from-mpd-all)
   ("A" emms-add-directory-tree)
   ("D" my-mpd-update-dir)

@@ -24,11 +24,19 @@
 
 
 ;; mpd-info sucks. Missing metadata. Metaflac and native are better.
+
+;; But so far, nothing works. The metadata in the music files is not found.
+;; just metaflac and or native doesnt work. no album artist or date
+;; metaflac on the cli certainly works fine.
+
+;; I modified the info-mpd to have album artist. Seems to have worked.
+;; I dont see a reason metaflac or native wouldnt work, but they don't.
 (add-to-list 'emms-info-functions 'emms-info-metaflac)
 (add-to-list 'emms-info-functions 'emms-info-mp3info)
 (add-to-list 'emms-info-functions 'emms-info-ogginfo)
-(add-to-list 'emms-info-functions 'emms-info-libtag)
+;; (add-to-list 'emms-info-functions 'emms-info-libtag)
 ;;(add-to-list 'emms-info-functions 'emms-info-mediainfo)
+(add-to-list 'emms-info-functions 'emms-info-mpd)
 (add-to-list 'emms-info-functions 'emms-info-native)
 
 ;; Attempt to get some reasonable tag data
@@ -39,9 +47,9 @@
 (add-to-list 'emms-info-metaflac-options "--show-tag=RATING")
 (add-to-list 'emms-info-metaflac-options "--show-tag=DESCRIPTION")
 (add-to-list 'emms-info-metaflac-options "--show-tag=COMPOSER")
-(add-to-list 'emms-info-metaflac-options "--show-all-tags")
+;; (add-to-list 'emms-info-metaflac-options "--show-all-tags")
 
-;; presumably to get a browse-by-TYPE  - didnt really work/
+;; presumably to get a browse-by-TYPE
 (emms-browser-add-category "albumartist" 'info-albumartist)
 
 (setq emms-volume-change-function #'emms-volume-mpd-change)
@@ -291,3 +299,48 @@ Eg. if CURRENT-MAPPING is currently \\='info-artist, return
    ((eq current-mapping 'info-album) 'info-title)
    ((eq current-mapping 'info-genre) 'info-artist)
    ((eq current-mapping 'info-year) 'info-artist)))
+
+(defun emms-info-mpd-process (track info)
+  (dolist (data info)
+    (let ((name (car data))
+	  (value (cdr data)))
+      (setq name (cond ((string= name "albumartist") 'info-albumartist)
+		       ((string= name "artist") 'info-artist)
+		       ((string= name "composer") 'info-composer)
+		       ((string= name "performer") 'info-performer)
+		       ((string= name "title") 'info-title)
+		       ((string= name "album") 'info-album)
+		       ((string= name "track") 'info-tracknumber)
+		       ((string= name "disc") 'info-discnumber)
+		       ((string= name "date") 'info-year)
+		       ((string= name "genre") 'info-genre)
+		       ((string= name "time")
+			(setq value (string-to-number value))
+			'info-playing-time)
+		       (t nil)))
+      (when name
+	(emms-track-set track name value)))))
+
+(defun emms-tag-editor-tag-flac (track)
+  "Commit changes to an FLAC file according to TRACK."
+  (require 'emms-info-metaflac)
+  (with-temp-buffer
+    (let ((tags '("albumartist" "artist" "composer" "performer" "title" "album" "tracknumber" "discnumber" "date" "genre" "note" "comment"))
+	  val)
+      (mapc (lambda (tag)
+              (let ((info-tag (intern (concat "info-" tag))))
+                (when (> (length (setq val (emms-track-get track info-tag))) 0)
+                  (insert (upcase tag) "=" val "\n"))))
+            tags)
+      (when (buffer-string)
+	(apply #'call-process-region (point-min) (point-max)
+	       emms-info-metaflac-program-name nil
+	       (get-buffer-create emms-tag-editor-log-buffer)
+	       nil
+	       (append
+		(mapcar (lambda (tag)
+			  (concat "--remove-tag=" tag))
+			tags)
+		'("--import-tags-from=-")
+		'("--")
+		(list (emms-track-name track))))))))
