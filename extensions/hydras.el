@@ -735,23 +735,28 @@ _t_: translate sentence & point       _T_: Translate
 (defhydra hydra-emms (:color teal
                              :hint nil)
   "
-    _P_:laylist  _b_:rowse  _R_:eset  _C_:onnect
-    _K_:ill      _U_:pdate  _S_:tart  _M_:pd cache sync
+    Windows         MPD          Cache
+-------------------------------------------------
+    _p_: Playlist  _C_: Connect  _R_: Reset
+    _b_: Browse    _K_: Kill
+                   _S_: Start    _M_: Cache set from mpd
+                   _U_: Update   _A_: Add Dir Tree
 
-    _p_:lay     _s_:top
+    _P_:lay start    _s_:top
   "
-  ("q" nil "quit")
-  ("p" emms)
+  ("q" nil)
+  ("P" emms-start)
   ("b" emms-browse)
+  ("p" emms-playlist-mode-go)
   ("R" emms-player-mpd-update-all-reset-cache)
+  ("M" emms-cache-set-from-mpd-all)
+  ("A" emms-add-directory-tree)
   ("C" emms-player-mpd-connect)
   ("S" mpd/start-music-daemon)
   ("K" mpd/kill-music-daemon)
   ("U" mpd/update-database)
-  ("P" emms-playlist-mode-go)
   ;;("p" emms-player-mpd-play)
   ("s" emms-stop)
-  ("M" emms-cache-set-from-mpd-all)
   )
 
 (defun exwm-async-run (name)
