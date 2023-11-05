@@ -2,10 +2,7 @@
 (require 'emms-soundcloud)
 (require 'emms-mode-line)
 
-(require 'emms-player-simple)
 (require 'emms-info-mediainfo)
-(require 'emms-source-file)
-(require 'emms-source-playlist)
 
 (emms-all)
 (emms-mode-line 1)
@@ -17,11 +14,6 @@
 ;; ;; notifications
 ;; (require 'emms-dbus)
 ;; (emms-dbus-enable)
-
-;;(emms-default-players)
-;; (require 'emms-player-mplayer)
-;; (require 'emms-player-vlc)
-;; (require 'emms-player-mpv)
 
 
 ;; (add-to-list 'emms-player-list '(emms-player-mpg321
