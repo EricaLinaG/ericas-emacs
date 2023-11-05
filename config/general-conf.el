@@ -34,12 +34,6 @@
 (general-def 'normal emacs-lisp-mode-map
   "K" 'elisp-slime-nav-describe-elisp-thing-at-point)
 
-;; ;; put t
-;; (general-def 'emacs emms-playlist-mode-map
-;;   "h" 'hydra-emms/body)
-;; (general-def 'emacs emms-browser-mode-map
-;;
-;;)
 (general-define-key
  ;; NOTE: keymaps specified with :keymaps must be quoted
  :keymaps 'emms-playlist-mode-map
@@ -59,17 +53,26 @@
 
 (general-create-definer my-leader-def
   ;; :prefix my-leader
-  :prefix "SPC")
+  :keymaps '(normal insert emacs)
+  :prefix "SPC"
+  :non-normal-prefix "C-c SPC"
+  :global-prefix "C-c SPC"
+  )
 
 (general-create-definer my-local-leader-def
   ;; :prefix my-local-leader
   :prefix "SPC m")
 
+;; `general-create-definer' creates wrappers around `general-def,, so
+;; `evil-global-set-key'-like syntax is also supported
+;; (my-leader-def '(normal insert emacs) mykeys)
+
 ;; ** Global Keybindings
 (my-leader-def
-  :keymaps 'normal
-  ;; bind "SPC a"
-  "a" 'org-agenda
+  "A" 'org-agenda
+  ;; "a" 'org-agenda
+  ;; "b" 'counsel-bookmark
+  ;; "c" 'org-capture
   "B" 'counsel-bookmark
   "b" 'helm-buffer
   "t" 'hydra-persp/body
@@ -121,34 +124,32 @@
   "1" 'delete-other-windows
   "2" 'split-window-below
   "3" 'split-window-right
-
   )
 
-;; `general-create-definer' creates wrappers around `general-def,, so
-;; `evil-global-set-key'-like syntax is also supported
-(my-leader-def 'normal
-               "a" 'org-agenda
-               "b" 'counsel-bookmark
-               "c" 'org-capture)
+;; (my-global-leader-def
+;;   ;; bind "C-c SPC a"
+;;   mykeys
+;;   )
 
-;; to prevent your leader keybindings from ever being overridden (e.g. an evil
-;; package may bind "SPC"), use :keymaps 'override
-(my-leader-def
- :states 'normal
- :keymaps 'override
- "a" 'org-agenda)
-;; or
-(my-leader-def 'normal 'override
-               "a" 'org-agenda)
+
+;; ;; to prevent your leader keybindings from ever being overridden (e.g. an evil
+;; ;; package may bind "SPC"), use :keymaps 'override
+;; (my-leader-def
+;;  :states 'normal
+;;  :keymaps 'override
+;;  "a" 'org-agenda)
+;; ;; or
+;; (my-leader-def 'normal 'override
+;;                "a" 'org-agenda)
 
 ;; ** Mode Keybindings
 (my-local-leader-def
- :states 'normal
- :keymaps 'org-mode-map
- "y" 'org-store-link
- "p" 'org-insert-link
- ;; ...
- )
+  :states 'normal
+  :keymaps 'org-mode-map
+  "y" 'org-store-link
+  "p" 'org-insert-link
+  ;; ...
+  )
 ;; `general-create-definer' creates wrappers around `general-def', so
 ;; `evil-define-key'-like syntax is also supported
 (my-local-leader-def 'normal org-mode-map
