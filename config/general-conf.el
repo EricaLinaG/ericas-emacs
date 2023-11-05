@@ -69,6 +69,7 @@
 
 ;; ** Global Keybindings
 (my-leader-def
+  "SPC" 'persp-switch
   "A" 'org-agenda
   ;; "a" 'org-agenda
   ;; "b" 'counsel-bookmark
