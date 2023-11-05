@@ -1,10 +1,15 @@
 (require 'emms-setup)
 (require 'emms-soundcloud)
-(require 'emms-info-mediainfo)
+(require 'emms-mode-line)
 
 (require 'emms-player-simple)
-(require 'emms-player-mpd)
+(require 'emms-info-mediainfo)
+(require 'emms-source-file)
+(require 'emms-source-playlist)
+
 (emms-all)
+(emms-mode-line 1)
+(emms-playing-time 1)
 
 ;; libre-fm
 ;;(emms-librefm-scrobbler-enable)
@@ -18,8 +23,6 @@
 ;; (require 'emms-player-vlc)
 ;; (require 'emms-player-mpv)
 
-(require 'emms-source-file)
-(require 'emms-source-playlist)
 
 ;; (add-to-list 'emms-player-list '(emms-player-mpg321
 ;;                                  emms-player-ogg123
@@ -35,18 +38,21 @@
       emms-info-functions '(emms-info-mpd))
 
 ;; Attempt to get some reasonable tag data
-(require 'emms-info-metaflac)
-(add-hook 'emms-info-methods-list 'emms-info-metaflac)
+;; tell metaflac to give us everything
 (add-to-list 'emms-info-metaflac-options "--show-tag=ALBUMARTIST")
+(add-to-list 'emms-info-metaflac-options "--show-tag=ALBUMARTISTSORT")
 (add-to-list 'emms-info-metaflac-options "--show-tag=COMMENT")
 (add-to-list 'emms-info-metaflac-options "--show-tag=RATING")
 (add-to-list 'emms-info-metaflac-options "--show-tag=DESCRIPTION")
 (add-to-list 'emms-info-metaflac-options "--show-tag=COMPOSER")
 (add-to-list 'emms-info-metaflac-options "--show-all-tags")
 
-(add-to-list 'emms-info-functions 'emms-info-native)
+(add-to-list 'emms-info-functions 'emms-info-metaflac)
+(add-to-list 'emms-info-functions 'emms-info-mp3info)
+(add-to-list 'emms-info-functions 'emms-info-ogginfo)
+(add-to-list 'emms-info-functions 'emms-info-libtag)
 (add-to-list 'emms-info-functions 'emms-info-mediainfo)
-(add-to-list 'emms-info-functions 'emms-info-mpd)
+(add-to-list 'emms-info-functions 'emms-info-native)
 
 ;; presumably to get a browse-by-TYPE  - didnt really work/
 (emms-browser-add-category "albumartist" 'info-albumartist)

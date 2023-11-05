@@ -736,11 +736,17 @@ _t_: translate sentence & point       _T_: Translate
                              :hint nil)
   "
     Windows         MPD          Cache
--------------------------------------------------
+--------------------------------------------------------
     _p_: Playlist  _C_: Connect  _R_: Reset
     _b_: Browse    _K_: Kill
-                   _S_: Start    _M_: Cache set from mpd
-                   _U_: Update   _A_: Add Dir Tree
+    _m_: Meta pl   _S_: Start    _F_: Cache set From mpd
+    _s_: Streams   _U_: Update   _A_: Add Dir Tree
+
+    Temporal marks:
+    _a_: Add  _p_: Previous  _n_: Next  _c_: Clear
+
+    Volume:               Volume mode:  Use +/-
+    _u_: up  _d_: down    _M_: plus  _m_: minus
 
     _P_:lay start    _s_:top
   "
@@ -748,8 +754,10 @@ _t_: translate sentence & point       _T_: Translate
   ("P" emms-start)
   ("b" emms-browse)
   ("p" emms-playlist-mode-go)
+  ("m" emms-metaplaylist-mode-go)
+  ("s" emms-streams)
   ("R" emms-player-mpd-update-all-reset-cache)
-  ("M" emms-cache-set-from-mpd-all)
+  ("F" emms-cache-set-from-mpd-all)
   ("A" emms-add-directory-tree)
   ("C" emms-player-mpd-connect)
   ("S" mpd/start-music-daemon)
@@ -757,6 +765,14 @@ _t_: translate sentence & point       _T_: Translate
   ("U" mpd/update-database)
   ;;("p" emms-player-mpd-play)
   ("s" emms-stop)
+  ("a" emms-bookmarks-add)
+  ("p" emms-bookmarks-previous)
+  ("n" emms-bookmarks-next)
+  ("c" emms-bookmarks-clear)
+  ("d" emms-volume-lower)
+  ("u" emms-volume-raise)
+  ("M" emms-volume-mode-plus)
+  ("m" emms-volume-mode-minus)
   )
 
 (defun exwm-async-run (name)
