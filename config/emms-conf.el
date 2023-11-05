@@ -2,11 +2,9 @@
 (require 'emms-soundcloud)
 (require 'emms-mode-line)
 
-(require 'emms-info-mediainfo)
+;;(require 'emms-info-mediainfo)
 
 (emms-all)
-(emms-mode-line 1)
-(emms-playing-time 1)
 
 ;; libre-fm
 ;;(emms-librefm-scrobbler-enable)
@@ -15,16 +13,6 @@
 ;; (require 'emms-dbus)
 ;; (emms-dbus-enable)
 
-
-;; (add-to-list 'emms-player-list '(emms-player-mpg321
-;;                                  emms-player-ogg123
-;;                                  ;; emms-player-mplayer
-;;                                  ;; emms-player-vlc
-;;                                  ;; emms-player-mpv
-;;                                  emms-player-mpd))
-
-;; (setq emms-player-list '(emms-player-vlc)
-;;       emms-info-functions '(emms-info-native))
 
 (setq emms-player-list '(emms-player-mpd)
       emms-info-functions '(emms-info-mpd))
@@ -43,7 +31,7 @@
 (add-to-list 'emms-info-functions 'emms-info-mp3info)
 (add-to-list 'emms-info-functions 'emms-info-ogginfo)
 (add-to-list 'emms-info-functions 'emms-info-libtag)
-(add-to-list 'emms-info-functions 'emms-info-mediainfo)
+;;(add-to-list 'emms-info-functions 'emms-info-mediainfo)
 (add-to-list 'emms-info-functions 'emms-info-native)
 
 ;; presumably to get a browse-by-TYPE  - didnt really work/
@@ -117,12 +105,8 @@
   (message "MPD Killed!"))
 (global-set-key (kbd "s-m k") 'mpd/kill-music-daemon)
 
-(defun mpd/update-database ()
-  "Updates the MPD database synchronously."
-  (interactive)
-  (call-process "mpc" nil nil nil "update")
-  (message "MPD Database Updated!"))
-(global-set-key (kbd "s-m u") 'mpd/update-database)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; EMMS over rides to add album artist.
 
 ;; add album artist,  Over-riding emms code from here on.
 

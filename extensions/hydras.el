@@ -762,7 +762,7 @@ _t_: translate sentence & point       _T_: Translate
   ("C" emms-player-mpd-connect)
   ("S" mpd/start-music-daemon)
   ("K" mpd/kill-music-daemon)
-  ("U" mpd/update-database)
+  ("U" emms-player-mpd-update-all)
   ;;("p" emms-player-mpd-play)
   ("s" emms-stop)
   ("a" emms-bookmarks-add)
