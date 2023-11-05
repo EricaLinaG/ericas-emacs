@@ -1,6 +1,5 @@
-(require 'emms-setup)
+`(require 'emms-setup)
 (require 'emms-soundcloud)
-(require 'emms-mode-line)
 
 ;;(require 'emms-info-mediainfo)
 
@@ -14,8 +13,23 @@
 ;; (emms-dbus-enable)
 
 
-(setq emms-player-list '(emms-player-mpd)
-      emms-info-functions '(emms-info-mpd))
+;; (emms-default-players)  ;; doesnt work. Get error symbolp
+;; doing this because default players has errors
+(setq emms-player-list '(emms-player-mpd
+                         emms-player-mpg321
+                         emms-player-vlc
+                         emms-player-mpv
+                         emms-player-ogg123
+                         emms-player-mplayer))
+
+
+;; mpd-info sucks. Missing metadata. Metaflac and native are better.
+(add-to-list 'emms-info-functions 'emms-info-metaflac)
+(add-to-list 'emms-info-functions 'emms-info-mp3info)
+(add-to-list 'emms-info-functions 'emms-info-ogginfo)
+(add-to-list 'emms-info-functions 'emms-info-libtag)
+;;(add-to-list 'emms-info-functions 'emms-info-mediainfo)
+(add-to-list 'emms-info-functions 'emms-info-native)
 
 ;; Attempt to get some reasonable tag data
 ;; tell metaflac to give us everything
@@ -27,17 +41,13 @@
 (add-to-list 'emms-info-metaflac-options "--show-tag=COMPOSER")
 (add-to-list 'emms-info-metaflac-options "--show-all-tags")
 
-(add-to-list 'emms-info-functions 'emms-info-metaflac)
-(add-to-list 'emms-info-functions 'emms-info-mp3info)
-(add-to-list 'emms-info-functions 'emms-info-ogginfo)
-(add-to-list 'emms-info-functions 'emms-info-libtag)
-;;(add-to-list 'emms-info-functions 'emms-info-mediainfo)
-(add-to-list 'emms-info-functions 'emms-info-native)
-
 ;; presumably to get a browse-by-TYPE  - didnt really work/
 (emms-browser-add-category "albumartist" 'info-albumartist)
 
 (setq emms-volume-change-function #'emms-volume-mpd-change)
+(setq mms-volume-change-amount 2) ;; default is 2
+(global-set-key (kbd "C-c +") 'emms-volume-mode-plus)
+(global-set-key (kbd "C-c -") 'emms-volume-mode-minus)
 
 (setq emms-seek-seconds 5)
 (setq emms-player-mpd-server-name "localhost")
@@ -45,22 +55,6 @@
 (setq mpc-host "localhost:6600")
 (setq emms-player-mpd-music-directory "/home/Music/Music")
 
-;; covers
-(setq emms-browser-covers #'emms-browser-cache-thumbnail-async)
-(setq emms-browser-thumbnail-small-size 64)
-(setq emms-browser-thumbnail-medium-size 128)
-;; filters
-(emms-browser-make-filter "all" #'ignore)
-(emms-browser-make-filter "recent"
-                          (lambda (track) (< 30
-                                        (time-to-number-of-days
-                                         (time-subtract (current-time)
-                                                        (emms-info-track-file-mtime track))))))
-(emms-browser-set-filter (assoc "all" emms-browser-filters))
-
-(setq emms-browser-info-title-format "%i%n - %a - %A %y")
-(setq emms-browser-playlist-info-title-format
-      emms-browser-info-title-format)
 
 (setq-default
  emms-source-file-default-directory "/home/Music/Music"
@@ -76,6 +70,33 @@
 (require 'emms-history)
 (emms-history-load) ;; persistent playlists
 (require 'helm-emms)
+
+;; Formats
+(setq emms-browser-info-title-format "%i%n - %o, %a - %A %y")
+(setq emms-browser-playlist-info-title-format
+      emms-browser-info-title-format)
+
+;; covers
+(setq emms-browser-covers #'emms-browser-cache-thumbnail-async)
+(setq emms-browser-thumbnail-small-size 64)
+(setq emms-browser-thumbnail-medium-size 128)
+
+;; filters
+(emms-browser-make-filter "all" 'ignore)
+(emms-browser-make-filter "recent"
+                          (lambda (track) (< 30
+                                        (time-to-number-of-days
+                                         (time-subtract (current-time)
+                                                        (emms-info-track-file-mtime track))))))
+(emms-browser-set-filter (assoc "all" emms-browser-filters))
+
+(emms-browser-make-filter
+ "all-files" (emms-browser-filter-only-type 'file))
+
+(emms-browser-make-filter
+ "last-month" (emms-browser-filter-only-recent 30))
+
+
 
 ;; key bindings.
 ;; ("s-m p" . emms)
@@ -256,6 +277,8 @@
  "s o" 'emms-browser-search-by-albumartist
  "W o w" 'emms-browser-lookup-albumartist-on-wikipedia
  )
+
+
 (defun emms-browser-next-mapping-type (current-mapping)
   "Return the next sensible mapping.
 Eg. if CURRENT-MAPPING is currently \\='info-artist, return

@@ -732,6 +732,9 @@ _t_: translate sentence & point       _T_: Translate
   ("r" ispell-region)
   ("c" ispell-change-dictionary))
 
+(defun mympd-update-dir()
+  (emms-player-mpd-update-directory "/home/Music/Music"))
+
 (defhydra hydra-emms (:color teal
                              :hint nil)
   "
@@ -739,40 +742,60 @@ _t_: translate sentence & point       _T_: Translate
 --------------------------------------------------------
     _p_: Playlist  _C_: Connect  _R_: Reset
     _b_: Browse    _K_: Kill
-    _m_: Meta pl   _S_: Start    _F_: Cache set From mpd
-    _s_: Streams   _U_: Update   _A_: Add Dir Tree
+    _l_: p lists   _S_: Start    _F_: Cache set From mpd
+    _S_: Streams   _U_: Update   _A_: Add Dir Tree
+                 _D_: update dir
 
     Temporal marks:
-    _a_: Add  _p_: Previous  _n_: Next  _c_: Clear
+    _a_: Add  _<_: Previous  _>_: Next  _c_: Clear
 
-    Volume:               Volume mode:  Use +/-
-    _u_: up  _d_: down    _M_: plus  _m_: minus
+    Volume:           Volume mode:
+    _u_: up  _d_: down    _+_: plus  _-_: minus
 
-    _P_:lay start    _s_:top
+    Playlist mark mode:
+    _m_ enable       _M_ disable
+
+    Playlists:
+    _P_: Play start  _r_: Resume play  _s_: Stop
+    _W_: Save        _N_: New
+    _h_: Shuffle par hasard
+
+    Repeat:
+    _L_: List   _T_: Track
   "
   ("q" nil)
   ("P" emms-start)
   ("b" emms-browse)
   ("p" emms-playlist-mode-go)
-  ("m" emms-metaplaylist-mode-go)
+  ("l" emms-metaplaylist-mode-go)
   ("s" emms-streams)
   ("R" emms-player-mpd-update-all-reset-cache)
   ("F" emms-cache-set-from-mpd-all)
   ("A" emms-add-directory-tree)
+  ("D" my-mpd-update-dir)
+  ("U" emms-player-mrd-update-all)
+  ("m" emms-mark-mode)
+  ("M" emms-mark-mode-disable)
+  ("r" emms-player-mpd-play)
+  ("N" emms-playlist-new)
+  ("W" emms-playlist-save)
+  ("L" `emms-toggle-repeat-playlist)
+  ("T" `emms-toggle-repeat-track)
+  ("h" `emms-toggle-random-playlist)
+
   ("C" emms-player-mpd-connect)
   ("S" mpd/start-music-daemon)
   ("K" mpd/kill-music-daemon)
-  ("U" emms-player-mpd-update-all)
   ;;("p" emms-player-mpd-play)
   ("s" emms-stop)
   ("a" emms-bookmarks-add)
-  ("p" emms-bookmarks-previous)
-  ("n" emms-bookmarks-next)
+  ("<" emms-bookmarks-previous)
+  (">" emms-bookmarks-next)
   ("c" emms-bookmarks-clear)
   ("d" emms-volume-lower)
   ("u" emms-volume-raise)
-  ("M" emms-volume-mode-plus)
-  ("m" emms-volume-mode-minus)
+  ("+" emms-volume-mode-plus)
+  ("-" emms-volume-mode-minus)
   )
 
 (defun exwm-async-run (name)
