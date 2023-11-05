@@ -90,7 +90,7 @@
   "Start MPD, connects to it and syncs the metadata cache."
   (interactive)
   (shell-command "mpd")
-  (mpd/update-database)
+  ;;(emms-player-mpd-update-all)
   (emms-player-mpd-connect)
   ;;(emms-cache-set-from-mpd-all)
   (message "MPD Started!"))
