@@ -49,8 +49,15 @@
 (add-to-list 'emms-info-metaflac-options "--show-tag=COMPOSER")
 ;; (add-to-list 'emms-info-metaflac-options "--show-all-tags")
 
-;; presumably to get a browse-by-TYPE
+;; To get a browse-by-TYPE
 (emms-browser-add-category "albumartist" 'info-albumartist)
+
+(general-define-key
+ :keymaps 'emms-browser-mode-map
+ "b o" 'emms-browse-by-albumartist
+ "s o" 'emms-browser-search-by-albumartist
+ "W o w" 'emms-browser-lookup-albumartist-on-wikipedia
+ )
 
 (setq emms-volume-change-function #'emms-volume-mpd-change)
 (setq mms-volume-change-amount 2) ;; default is 2
@@ -63,6 +70,9 @@
 (setq mpc-host "localhost:6600")
 (setq emms-player-mpd-music-directory "/home/Music/Music")
 
+;; the default is album artist which combines them.
+;; simple, albumartist, use-directory-name
+(setq emms-browser-get-track-field-function 'emms-browser-get-track-field-albumartist)
 
 (setq-default
  emms-source-file-default-directory "/home/Music/Music"
@@ -80,7 +90,7 @@
 (require 'helm-emms)
 
 ;; Formats
-(setq emms-browser-info-title-format "%i%n - %o, %a - %A %y")
+(setq emms-browser-info-title-format "%i%n - %y")
 (setq emms-browser-playlist-info-title-format
       emms-browser-info-title-format)
 
@@ -103,8 +113,6 @@
 
 (emms-browser-make-filter
  "last-month" (emms-browser-filter-only-recent 30))
-
-
 
 ;; key bindings.
 ;; ("s-m p" . emms)
@@ -149,9 +157,9 @@
       (setq aartist (emms-track-get track 'info-albumartist))
       (setq artist (emms-track-get track 'info-artist))
       (setq title (emms-track-get track 'info-title))
-      (if (not (and aartist artist title))
+      (if (not (and artist title))
           key
-	(concat aartist " : " artist " - " title)))
+	(concat title "  \t\t" artist)))
      (t key))))
 
 (defun emms-browser-sort-alist (alist type)
@@ -277,15 +285,6 @@
                 ((eq type 'info-title) "track"))))
     (intern
      (concat "emms-browser-" name "-face"))))
-
-(general-define-key
- ;; NOTE: keymaps specified with :keymaps must be quoted
- :keymaps 'emms-browser-mode-map
- "b o" 'emms-browse-by-albumartist
- "s o" 'emms-browser-search-by-albumartist
- "W o w" 'emms-browser-lookup-albumartist-on-wikipedia
- )
-
 
 (defun emms-browser-next-mapping-type (current-mapping)
   "Return the next sensible mapping.
