@@ -22,13 +22,6 @@
                          emms-player-ogg123
                          emms-player-mplayer))
 
-
-;; mpd-info sucks. Missing metadata. Metaflac and native are better.
-
-;; But so far, nothing works. The metadata in the music files is not found.
-;; just metaflac and or native doesnt work. no album artist or date
-;; metaflac on the cli certainly works fine.
-
 ;; I modified the info-mpd to have album artist. Seems to have worked.
 ;; I dont see a reason metaflac or native wouldnt work, but they don't.
 (add-to-list 'emms-info-functions 'emms-info-metaflac)
@@ -112,11 +105,13 @@
 (require 'helm-emms)
 
 ;; Formats
+;; Need to be able to switch formats based on browse type.
 (setq emms-browser-info-title-format "%i%-30t %-8g %y %a")
 (setq emms-browser-playlist-info-title-format "%i%-30t %-8g %o : %a %y")
 
-;; (setq emms-browser-playlist-info-title-format
-;;       emms-browser-info-title-format)
+;; Sorting
+                                        ;(setq emms-browser-track-sort-function 'emms-browser-sort-by-year-or-name)
+
 
 ;; covers
 (setq emms-browser-covers #'emms-browser-cache-thumbnail-async)
@@ -127,10 +122,13 @@
 (setq emms-browser-current-filter-name nil)
 (emms-browser-make-filter "all" 'ignore)
 (emms-browser-make-filter "recent"
-                          (lambda (track) (< 30
-                                        (time-to-number-of-days
-                                         (time-subtract (current-time)
-                                                        (emms-info-track-file-mtime track))))))
+                          (lambda (track)
+                            (< 30
+                               (time-to-number-of-days
+                                (time-subtract
+                                 (current-time)
+                                 (emms-info-track-file-mtime track))))))
+
 (emms-browser-set-filter (assoc "all" emms-browser-filters))
 
 (emms-browser-make-filter
@@ -138,15 +136,6 @@
 
 (emms-browser-make-filter
  "last-month" (emms-browser-filter-only-recent 30))
-
-;; key bindings.
-;; ("s-m p" . emms)
-;; ("s-m b" . emms-smart-browse)
-;; ("s-m r" . emms-player-mpd-update-all-reset-cache)
-;; ("<XF86AudioPrev>" . emms-previous)
-;; ("<XF86AudioNext>" . emms-next)
-;; ("<XF86AudioPlay>" . emms-pause)
-;; ("<XF86AudioStop>" . emms-stop)
 
 (defun mpd/start-music-daemon ()
   "Start MPD, connects to it and syncs the metadata cache."
@@ -172,6 +161,7 @@
 
 ;; add album artist,  Over-riding emms code from here on.
 
+;; This should have a format Variable.
 (defun emms-browser-make-name (entry type)
   "Return a name for ENTRY, used for making a bdata object."
   (let ((key (car entry))
