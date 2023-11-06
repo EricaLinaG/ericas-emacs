@@ -1,7 +1,16 @@
+;;; setup.el --- hello                               -*- lexical-binding: t; -*-
+;;; Commentary
+;; Copyright (C) 2023
+
+;; Author: ;; <ericalinagebhart@gmail.com>
+;; Keywords:
 ;;
-;;
+
 ;;; Turn on Vi mode.
 (evil-mode t)
+
+;; Stupid Stallman, thinks two spaces come after a period.
+(setq sentence-end-double-space nil)
 
 (global-hl-line-mode 1)
 

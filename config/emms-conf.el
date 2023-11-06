@@ -49,14 +49,26 @@
 (add-to-list 'emms-info-metaflac-options "--show-tag=COMPOSER")
 ;; (add-to-list 'emms-info-metaflac-options "--show-all-tags")
 
-;; To get a browse-by-TYPE
+;; Start the browse tree with Album Artist
+(setq emms-browser-default-browse-type 'info-albumartist)
+;; To create a new browse-by-TYPE
 (emms-browser-add-category "albumartist" 'info-albumartist)
 
+;; Add to browser keymap
 (general-define-key
  :keymaps 'emms-browser-mode-map
  "b o" 'emms-browse-by-albumartist
  "s o" 'emms-browser-search-by-albumartist
  "W o w" 'emms-browser-lookup-albumartist-on-wikipedia
+ "h" 'hydra-emms/body
+ "P" 'hydra-persp/body
+ )
+
+(general-define-key
+ ;; NOTE: keymaps specified with :keymaps must be quoted
+ :keymaps 'emms-playlist-mode-map
+ "h" 'hydra-emms/body
+ "P" 'hydra-persp/body
  )
 
 (setq emms-volume-change-function #'emms-volume-mpd-change)
@@ -72,7 +84,7 @@
 
 ;; the default is album artist which combines them.
 ;; simple, albumartist, use-directory-name
-(setq emms-browser-get-track-field-function 'emms-browser-get-track-field-albumartist)
+(setq emms-browser-get-track-field-function 'emms-browser-get-track-field-simple)
 
 (setq-default
  emms-source-file-default-directory "/home/Music/Music"
@@ -90,8 +102,8 @@
 (require 'helm-emms)
 
 ;; Formats
-(setq emms-browser-info-title-format "%i%t \t  %g\t %a %y")
-(setq emms-browser-playlist-info-title-format "%i%t \t  %g\t %o : %a %y")
+(setq emms-browser-info-title-format "%i%-30t %-8g %y %a")
+(setq emms-browser-playlist-info-title-format "%i%-30t %-8g %o : %a %y")
 
 ;; (setq emms-browser-playlist-info-title-format
 ;;       emms-browser-info-title-format)
@@ -102,6 +114,7 @@
 (setq emms-browser-thumbnail-medium-size 128)
 
 ;; filters
+(setq emms-browser-current-filter-name nil)
 (emms-browser-make-filter "all" 'ignore)
 (emms-browser-make-filter "recent"
                           (lambda (track) (< 30
@@ -289,18 +302,33 @@
     (intern
      (concat "emms-browser-" name "-face"))))
 
+;; (defun emms-browser-next-mapping-type (current-mapping)
+;;   "Return the next sensible mapping.
+;; Eg. if CURRENT-MAPPING is currently \\='info-artist, return
+;;  \\='info-album."
+;;   (cond
+;;    ((eq current-mapping 'info-albumartist) 'info-artist)
+;;    ((eq current-mapping 'info-artist) 'info-album)
+;;    ((eq current-mapping 'info-composer) 'info-album)
+;;    ((eq current-mapping 'info-performer) 'info-album)
+;;    ((eq current-mapping 'info-album) 'info-title)
+;;    ((eq current-mapping 'info-genre) 'info-artist)
+;;    ((eq current-mapping 'info-year) 'info-artist)))
+
 (defun emms-browser-next-mapping-type (current-mapping)
   "Return the next sensible mapping.
 Eg. if CURRENT-MAPPING is currently \\='info-artist, return
  \\='info-album."
   (cond
-   ((eq current-mapping 'info-albumartist) 'info-artist)
-   ((eq current-mapping 'info-artist) 'info-album)
+   ((eq current-mapping 'info-albumartist) 'info-genre)
+   ((eq current-mapping 'info-artist) 'info-title)
    ((eq current-mapping 'info-composer) 'info-album)
    ((eq current-mapping 'info-performer) 'info-album)
    ((eq current-mapping 'info-album) 'info-title)
    ((eq current-mapping 'info-genre) 'info-artist)
-   ((eq current-mapping 'info-year) 'info-artist)))
+   ((eq current-mapping 'info-year) 'info-title)
+   ((eq current-mapping 'info-title) 'info-year)
+   ))
 
 (defun emms-info-mpd-process (track info)
   (dolist (data info)

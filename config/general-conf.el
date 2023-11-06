@@ -34,14 +34,6 @@
 (general-def 'normal emacs-lisp-mode-map
   "K" 'elisp-slime-nav-describe-elisp-thing-at-point)
 
-(general-define-key
- ;; NOTE: keymaps specified with :keymaps must be quoted
- :keymaps 'emms-playlist-mode-map
- "h" 'hydra-emms/body)
-(general-define-key
- ;; NOTE: keymaps specified with :keymaps must be quoted
- :keymaps 'emms-browser-mode-map
- "h" 'hydra-emms/body)
 
 
 ;; * Prefix Keybindings
