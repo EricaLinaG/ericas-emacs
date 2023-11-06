@@ -90,9 +90,11 @@
 (require 'helm-emms)
 
 ;; Formats
-(setq emms-browser-info-title-format "%i%n - %y")
-(setq emms-browser-playlist-info-title-format
-      emms-browser-info-title-format)
+(setq emms-browser-info-title-format "%i%t \t  %g\t %a %y")
+(setq emms-browser-playlist-info-title-format "%i%t \t  %g\t %o : %a %y")
+
+;; (setq emms-browser-playlist-info-title-format
+;;       emms-browser-info-title-format)
 
 ;; covers
 (setq emms-browser-covers #'emms-browser-cache-thumbnail-async)
@@ -159,7 +161,7 @@
       (setq title (emms-track-get track 'info-title))
       (if (not (and artist title))
           key
-	(concat title "  \t\t" artist)))
+	(concat title "\t\t" aartist " : " artist)))
      (t key))))
 
 (defun emms-browser-sort-alist (alist type)
@@ -222,6 +224,7 @@
             ("C" . ,(emms-track-get track 'info-composer))
             ("p" . ,(emms-track-get track 'info-performer))
             ("t" . ,(emms-track-get track 'info-title))
+            ("g" . ,(emms-track-get track 'info-genre))
 	    ("D" . ,(emms-browser-disc-number track))
             ("T" . ,(emms-browser-track-number track))
             ("d" . ,(emms-browser-track-duration track))))
