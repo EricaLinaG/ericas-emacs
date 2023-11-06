@@ -60,6 +60,16 @@
  "b o" 'emms-browse-by-albumartist
  "s o" 'emms-browser-search-by-albumartist
  "W o w" 'emms-browser-lookup-albumartist-on-wikipedia
+ "b a" 'emms-browse-by-albumartist
+
+ ;; fixing the default map. number choices suck.
+ "b A" 'emms-browse-by-artist
+ "b t" 'emms-browse-by-album
+ "b g" 'emms-browse-by-genre
+ "b y" 'emms-browse-by-year
+ "b c" 'emms-browse-by-composer
+ "b p" 'emms-browse-by-performer
+
  "h" 'hydra-emms/body
  "P" 'hydra-persp/body
  )
@@ -315,6 +325,15 @@
 ;;    ((eq current-mapping 'info-genre) 'info-artist)
 ;;    ((eq current-mapping 'info-year) 'info-artist)))
 
+
+
+;; Think of it like a chain.  render tree gives the initial browse by type.
+;; this goes from there and builds the appropriate tree.
+;;
+;; There needs to be a way to switch between tree mappings.
+;; it would be nice to have album artist above artist When
+;; browsing by genre.
+;; different trees for different browsing types.
 (defun emms-browser-next-mapping-type (current-mapping)
   "Return the next sensible mapping.
 Eg. if CURRENT-MAPPING is currently \\='info-artist, return
@@ -324,11 +343,9 @@ Eg. if CURRENT-MAPPING is currently \\='info-artist, return
    ((eq current-mapping 'info-artist) 'info-title)
    ((eq current-mapping 'info-composer) 'info-album)
    ((eq current-mapping 'info-performer) 'info-album)
-   ((eq current-mapping 'info-album) 'info-title)
+   ((eq current-mapping 'info-album) 'info-albumartist)
    ((eq current-mapping 'info-genre) 'info-artist)
-   ((eq current-mapping 'info-year) 'info-title)
-   ((eq current-mapping 'info-title) 'info-year)
-   ))
+   ((eq current-mapping 'info-year) 'info-album)))
 
 (defun emms-info-mpd-process (track info)
   (dolist (data info)
