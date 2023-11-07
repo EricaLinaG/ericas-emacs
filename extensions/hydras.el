@@ -760,8 +760,8 @@ _t_: translate sentence & point       _T_: Translate
     _W_: Save        _N_: New          _a_: Add/Load
     _h_: Shuffle par hasard
 
-    Repeat:
-    _L_: List   _T_: Track
+    Repeat:                  Queue Locking:
+    _L_: List   _T_: Track   _/_: Lock  _\\_: Unlock
   "
   ("q" nil)
   ("P" emms-start)
@@ -784,6 +784,8 @@ _t_: translate sentence & point       _T_: Translate
   ("L" `emms-toggle-repeat-playlist)
   ("T" `emms-toggle-repeat-track)
   ("h" `emms-toggle-random-playlist)
+  ("/" emms-lock-queue)
+  ("\\" emms-unlock-queue)
 
   ("C" emms-player-mpd-connect)
   ("S" mpd/start-music-daemon)

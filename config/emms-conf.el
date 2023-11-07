@@ -12,6 +12,8 @@
 ;; (require 'emms-dbus)
 ;; (emms-dbus-enable)
 
+(defvar emms-queue-lock nil
+  "The playlist the active queue is locked to, if any.")
 
 ;; (emms-default-players)  ;; doesnt work. Get error symbolp
 ;; doing this because default players has errors
@@ -188,12 +190,120 @@
       (goto-char (point-max))
       (emms-playlist-insert-track track))))
 
+
+;; Over ride in order to add active playlist locking.
+(defun emms-playlist-set-playlist-buffer (&optional buffer)
+  "Set the current playlist buffer if the queue is not locked to it's playlist."
+  (interactive
+   (if (not emms-queue-lock)
+       (list (let* ((buf-list (mapcar #'(lambda (buf)
+				          (list (buffer-name buf)))
+				      (emms-playlist-buffer-list)))
+		    (sorted-buf-list (sort buf-list
+				           #'(lambda (lbuf rbuf)
+					       (< (length (car lbuf))
+					          (length (car rbuf))))))
+		    (default (or (and emms-playlist-buffer-p
+				      ;; default to current buffer
+				      (buffer-name))
+			         ;; pick shortest buffer name, since it is
+			         ;; likely to be a shared prefix
+			         (car sorted-buf-list))))
+	       (emms-completing-read "Playlist buffer to make current: "
+				     sorted-buf-list nil t default)))))
+  (if (not emms-queue-lock)
+      (let ((buf (if buffer
+		     (get-buffer buffer)
+	           (current-buffer))))
+        (with-current-buffer buf
+          (emms-playlist-ensure-playlist-buffer))
+        (setq emms-playlist-buffer buf)
+        (when (called-interactively-p 'interactive)
+          (message "Set current EMMS playlist buffer"))
+        buf)
+    (message (concat "The active playlist queue is locked to " emms-queue-lock))))
+
+(defun emms-lock-queue ()
+  "Lock the current active playlist."
+  (interactive)
+  (setq emms-queue-lock (buffer-name emms-playlist-buffer))
+  (message (concat "Active queue playlist is locked to " emms-queue-lock)))
+
+(defun emms-unlock-queue ()
+  "Unlock the current active playlist."
+  (interactive)
+  (setq emms-queue-lock nil)
+  (message "Active queue playlist is unlocked."))
+
+(defun my-emms-start ()
+  "Start mpd, start emms,start playlist and lock it to the queue."
+  (mpd/start-music-daemon)
+  (split-window-right)
+  (emms-browser)
+  (turn-off-evil-mode)
+  (split-window-right)
+  (emms-playlist-mode-go)
+  (emms-lock-queue))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; The Browse Tree
+;; Build the Browse tree how I want.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Think of it like a chain.  render tree gives the initial browse by type.
+;; this goes from there and builds the appropriate tree.
+;;
+;; There needs to be a way to switch between tree mappings.
+;; it would be nice to have album artist above artist When
+;; browsing by genre.
+;; different trees for different browsing types. where one falls
+;; short in all browse bys.
+
+;; The default
+;; (defun emms-browser-next-mapping-type (current-mapping)
+;;   "Return the next sensible mapping.
+;; Eg. if CURRENT-MAPPING is currently \\='info-artist, return
+;;  \\='info-album."
+;;   (cond
+;;    ((eq current-mapping 'info-albumartist) 'info-artist)
+;;    ((eq current-mapping 'info-artist) 'info-album)
+;;    ((eq current-mapping 'info-composer) 'info-album)
+;;    ((eq current-mapping 'info-performer) 'info-album)
+;;    ((eq current-mapping 'info-album) 'info-title)
+;;    ((eq current-mapping 'info-genre) 'info-artist)
+;;    ((eq current-mapping 'info-year) 'info-artist)))
+
+;; The best one so far
+;; Follow them. Browse-by-TYPE where TYPE:
+;; Album Artist -> genre -> artist -> title
+;; Genre -> artist -> title    -- missing album artist as a node.
+;; Artist -> album -> album Artist -> ....
+;; Album -> album Artist -> ....
+;; Year -> album -> ...
+;; Composer -> album -> ...
+;; Performer -> album -> ...
+(defun emms-browser-next-mapping-type (current-mapping)
+  "Return the next sensible mapping.
+Eg. if CURRENT-MAPPING is currently \\='info-artist, return
+ \\='info-album."
+  (cond
+   ((eq current-mapping 'info-albumartist) 'info-genre)
+   ((eq current-mapping 'info-artist) 'info-title)
+   ((eq current-mapping 'info-composer) 'info-album)
+   ((eq current-mapping 'info-performer) 'info-album)
+   ((eq current-mapping 'info-album) 'info-albumartist)
+   ((eq current-mapping 'info-genre) 'info-artist)
+   ((eq current-mapping 'info-year) 'info-album)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EMMS over rides to add album artist.
 
 ;; add album artist,  Over-riding emms code from here on.
 
-;; This should have a format Variable.
+;; This should have a format Variable. Bad hacky design.
+;; This is %n. My solution is to not use it in any fromats.
+;; So really, I think this function is trash if it can be
+;; effectively avoided. Needs a format variable.
 (defun emms-browser-make-name (entry type)
   "Return a name for ENTRY, used for making a bdata object."
   (let ((key (car entry))
@@ -334,40 +444,6 @@
     (intern
      (concat "emms-browser-" name "-face"))))
 
-;; (defun emms-browser-next-mapping-type (current-mapping)
-;;   "Return the next sensible mapping.
-;; Eg. if CURRENT-MAPPING is currently \\='info-artist, return
-;;  \\='info-album."
-;;   (cond
-;;    ((eq current-mapping 'info-albumartist) 'info-artist)
-;;    ((eq current-mapping 'info-artist) 'info-album)
-;;    ((eq current-mapping 'info-composer) 'info-album)
-;;    ((eq current-mapping 'info-performer) 'info-album)
-;;    ((eq current-mapping 'info-album) 'info-title)
-;;    ((eq current-mapping 'info-genre) 'info-artist)
-;;    ((eq current-mapping 'info-year) 'info-artist)))
-
-
-
-;; Think of it like a chain.  render tree gives the initial browse by type.
-;; this goes from there and builds the appropriate tree.
-;;
-;; There needs to be a way to switch between tree mappings.
-;; it would be nice to have album artist above artist When
-;; browsing by genre.
-;; different trees for different browsing types.
-(defun emms-browser-next-mapping-type (current-mapping)
-  "Return the next sensible mapping.
-Eg. if CURRENT-MAPPING is currently \\='info-artist, return
- \\='info-album."
-  (cond
-   ((eq current-mapping 'info-albumartist) 'info-genre)
-   ((eq current-mapping 'info-artist) 'info-title)
-   ((eq current-mapping 'info-composer) 'info-album)
-   ((eq current-mapping 'info-performer) 'info-album)
-   ((eq current-mapping 'info-album) 'info-albumartist)
-   ((eq current-mapping 'info-genre) 'info-artist)
-   ((eq current-mapping 'info-year) 'info-album)))
 
 (defun emms-info-mpd-process (track info)
   (dolist (data info)

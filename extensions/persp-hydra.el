@@ -71,12 +71,7 @@
   ("T" (layout-3 "~/play/3D"     "3D"     "README.org"))
   ("Q" (layout-3 "~/play/myQMK" "myQMK" "README.org") :exit t)
   ("M" (progn (layout-0 "/home/Music"   "Music"  "README.org")
-              (mpd/start-music-daemon)
-              (split-window-right)
-              (emms-browser)
-              (turn-off-evil-mode)
-              (split-window-right)
-              (emms-playlist-mode-go)) :exit t)
+              (my-emms-start)) :exit t)
   ("D" (layout-3 "/home/BD"      "BD"     "README.org"))
   ("z" (layout-3 "~/play/SPR/"   "Emacsn" "README.org"))
 
