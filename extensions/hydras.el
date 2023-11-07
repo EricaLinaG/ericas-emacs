@@ -739,15 +739,15 @@ _t_: translate sentence & point       _T_: Translate
                              :hint nil)
   "
     Windows         MPD          Cache
---------------------------------------------------------
-    _p_: Playlist  _C_: Connect  _R_: Reset
-    _b_: Browse    _K_: Kill     _N_: Mpd Update & Reset
-    _l_: p lists   _S_: Start    _F_: Cache set From mpd
-    _S_: Streams   _U_: Update   _A_: Add Dir Tree
+---------------------------------------------------------
+    _p_: Playlist  _C_: Connect   _R_: Reset
+    _b_: Browse    _K_: Kill      _N_: Mpd Update & Reset
+    _l_: p lists   _S_: Start     _F_: Cache set From mpd
+    _s_: Streams   _U_: Update    _A_: Add Dir Tree
                  _D_: update dir
 
     Temporal marks:
-    _a_: Add  _<_: Previous  _>_: Next  _c_: Clear
+    _n_: Now Add   _<_: Previous  _>_: Next  _c_: Clear
 
     Volume:           Volume mode:
     _u_: up  _d_: down    _+_: plus  _-_: minus
@@ -757,7 +757,7 @@ _t_: translate sentence & point       _T_: Translate
 
     Playlists:
     _P_: Play start  _r_: Resume play  _s_: Stop
-    _W_: Save        _N_: New
+    _W_: Save        _N_: New          _a_: Add/Load
     _h_: Shuffle par hasard
 
     Repeat:
@@ -773,6 +773,7 @@ _t_: translate sentence & point       _T_: Translate
   ("N" emms-player-mpd-update-all-reset-cache)
   ("F" emms-cache-set-from-mpd-all)
   ("A" emms-add-directory-tree)
+  ("a" emms-add-playlist)
   ("D" my-mpd-update-dir)
   ("U" emms-player-mrd-update-all)
   ("m" emms-mark-mode)
@@ -789,7 +790,7 @@ _t_: translate sentence & point       _T_: Translate
   ("K" mpd/kill-music-daemon)
   ;;("p" emms-player-mpd-play)
   ("s" emms-stop)
-  ("a" emms-bookmarks-add)
+  ("n" emms-bookmarks-add)
   ("<" emms-bookmarks-previous)
   (">" emms-bookmarks-next)
   ("c" emms-bookmarks-clear)

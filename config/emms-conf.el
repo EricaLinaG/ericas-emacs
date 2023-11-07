@@ -64,15 +64,22 @@
  "b p" 'emms-browse-by-performer
 
  "h" 'hydra-emms/body
- "P" 'hydra-persp/body
- )
+ "P" 'hydra-persp/body)
 
 (general-define-key
  ;; NOTE: keymaps specified with :keymaps must be quoted
  :keymaps 'emms-playlist-mode-map
+ "A" 'emms-add-playlist
  "h" 'hydra-emms/body
  "P" 'hydra-persp/body
- )
+ "i" 'emms-playlist-playlist-insert-track)
+
+(general-define-key
+ :keymaps 'emms-metaplaylist-mode-map
+ "SPC" 'emms-metaplaylist-mode-goto
+ "c" 'emms-metaplaylist-mode-goto-current
+ "h" 'hydra-emms/body
+ "P" 'hydra-persp/body)
 
 (setq emms-volume-change-function #'emms-volume-mpd-change)
 (setq mms-volume-change-amount 2) ;; default is 2
@@ -92,7 +99,8 @@
 (setq-default
  emms-source-file-default-directory "/home/Music/Music"
 
- emms-source-playlist-default-format 'm3u
+ ;; native, m3u, pls, nil for prompt
+ emms-source-playlist-default-format nil
  emms-playlist-mode-center-when-go t
  emms-playlist-default-major-mode 'emms-playlist-mode
  emms-show-format "NP: %s"
@@ -164,7 +172,23 @@
   (message "MPD Killed!"))
 (global-set-key (kbd "s-m k") 'mpd/kill-music-daemon)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun emms-metaplaylist-mode-goto ()
+  "Go into the playlist without making it current."
+  (interactive)
+  (let ((buffer (get-buffer
+	         (buffer-substring (line-beginning-position)
+				   (line-end-position)))))
+    (switch-to-buffer buffer)))
+
+(defun emms-playlist-playlist-insert-track ()
+  "Insert a track in playlist at point into the current playlist buffer."
+  (interactive)
+  (let ((track (emms-playlist-track-at)))
+    (with-current-emms-playlist
+      (goto-char (point-max))
+      (emms-playlist-insert-track track))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EMMS over rides to add album artist.
 
 ;; add album artist,  Over-riding emms code from here on.
