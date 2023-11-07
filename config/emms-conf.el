@@ -110,8 +110,14 @@
 (setq emms-browser-playlist-info-title-format "%i%-30t %-8g %o : %a %y")
 
 ;; Sorting
-                                        ;(setq emms-browser-track-sort-function 'emms-browser-sort-by-year-or-name)
+;; For tango music we want eyerything in order by year.
+(defun emms-sort-year-p (a b)
+  "Sort two tracks by year."
+  (let ((year-a (string-to-number (or (emms-track-get a 'info-year) "0")))
+        (year-b (string-to-number (or (emms-track-get b 'info-year) "0"))))
+    (< year-a year-b)))
 
+(setq emms-browser-track-sort-function 'emms-sort-year-p)
 
 ;; covers
 (setq emms-browser-covers #'emms-browser-cache-thumbnail-async)
@@ -136,6 +142,8 @@
 
 (emms-browser-make-filter
  "last-month" (emms-browser-filter-only-recent 30))
+
+
 
 (defun mpd/start-music-daemon ()
   "Start MPD, connects to it and syncs the metadata cache."
