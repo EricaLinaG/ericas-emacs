@@ -1261,6 +1261,145 @@ _M_: markdown mode _m_: macros
   ("w" hydra-window-hydras/body)
   )
 
+;;                                         ;generate hydra
+;; (pretty-hydra-define eww-browser (:title eww-title :quit-key "q" :color pink )
+;;   ("A"
+;;    (
+;;     ("G" eww "Eww Open Browser")
+;;     ("g" eww-reload "Eww Reload")
+;;     ("6" eww-open-in-new-buffer "Open in new buffer")
+;;     ("l" eww-back-url "Back Url")
+;;     ("r" eww-forward-url "Forward Url")
+;;     ("N" eww-next-url "Next Url")
+;;     ("P" eww-previous-url "Previous Url")
+;;     ("u" eww-up-url "Up Url")
+;;     ("&" eww-browse-with-external-browser "Open in External Browser")
+;;     ("d" eww-download "Download")
+;;     ("w" eww-copy-page-url "Copy Url Page")
+;;     );end theme
+;;    "B"
+;;    (
+;;     ("T" endless/toggle-image-display "Toggle Image Display")
+;;     (">" shr-next-link "Shr Next Link")
+;;     ("<" shr-previous-link "Shr Previous Link")
+;;     ("n" scroll-down-command "Scroll Down")
+;;     ("C" url-cookie-list "Url Cookie List")
+;;     ("v" eww-view-source "View Source")
+;;     ("R" eww-readable "Make Readable")
+;;     ("H" eww-list-histories "List History")
+;;     ("E" eww-set-character-encoding "Character Encoding")
+;;     ("s" eww-switch-to-buffer "Switch to Buffer")
+;;     ("S" eww-list-buffers "List Buffers")
+;;     );end highlighting
+;;    "C"
+;;    (
+;;     ("1" hackernews "Hackernews")
+;;     ("2" hackernews-button-browse-internal "Hackernews browse link eww (t)")
+;;     ("3" hackernews-new-stories "Hackernews New Stories")
+;;     ("5" hackernews-switch-feed "Hackernews Switch Feed")
+;;     ("6" hackernews-best-stories "Hackernews Best Stories")
+;;     ("F" eww-toggle-fonts "Toggle Fonts")
+;;     ("D" eww-toggle-paragraph-direction "Toggle Paragraph Direction")
+;;     ("c" eww-toggle-colors "Toggle Colors")
+;;     ("b" eww-add-bookmark "Add Bookmark")
+;;     ("B" eww-list-bookmarks "List Bookmarks")
+;;     ("=" eww-next-bookmark "Next Bookmark")
+;;     ("-" eww-previous-bookmark "Previous Bookmark")
+;;     ("h" hydra-helm/body "Return To Helm" :color blue )
+;;     ("<SPC>" nil "Quit" :color pink)
+;;     );end other
+;;    );end hydra body
+;;   );end pretty-hydra-eww
+;; (bind-key "<C-m> z" 'eww-browser/body)
+
+;; just toe remember nice things to have.
+(defun my-emms-get-current-song-info ()
+  "Returns current song info plist"
+  (let* ((get-string-func '(lambda (regexp)
+                             (substring mpc-output
+                                        (string-match regexp mpc-output)
+                                        (match-end 0))))
+         (mpc-output (shell-command-to-string "mpc"))
+         (playing (if (eq (string-match "volume:" mpc-output) 0) nil t))
+         (title (if playing (substring mpc-output 0 (string-match "\n" mpc-output)) "-------------"))
+         (state (if playing (funcall get-string-func "\\[.*\\]") "Paused/Stopped"))
+         (position (if playing (funcall get-string-func "#[0-9]+\\/[0-9]+") "--"))
+         (time (if playing (funcall get-string-func "[0-9]+:[0-9]+/[0-9]+:[0-9]+") "--/--"))
+         (volume (funcall get-string-func "volume: +[0-9%]+"))
+         (repeat (funcall get-string-func "repeat: [a-z]+"))
+         (random (funcall get-string-func "random: [a-z]+"))
+         (single (funcall get-string-func "single: [a-z]+")))
+
+    `((title . ,title)
+      (state . ,state)
+      (position . ,position)
+      (time . ,time)
+      (volume . ,(cadr (split-string volume)))
+      (repeat . ,(cadr (split-string repeat)))
+      (random . ,(cadr (split-string random)))
+      (single . ,(cadr (split-string single))))))
+
+(defhydra hydra-pedro-emms (:hint nil)
+  "
+%s(cdr (assoc 'state (my-emms-get-current-song-info))): %s(cdr (assoc 'title (my-emms-get-current-song-info))) | %s(cdr (assoc 'time (pedro-emms-get-current-song-info)))
+-----------------------------------------------------------
+^Control^ ^Seek^ ^Volume[%s(car (split-string (cdr (assoc 'volume (my-emms-get-current-song-info))) \"%\"))]^ ^Modes^
+^^^^^^^^^-----------------------------------------------------------
+_<SPC>_: Play/Pause _h_: -10s _-_: +5 _R_: Repeat [%s(cdr (assoc 'repeat (my-emms-get-current-song-info)))]
+_p_: Previous _l_: +10s _+_: -5 _S_: Shuffle [%s(cdr (assoc 'random (my-emms-get-current-song-info)))]
+_n_: Next _j_: -1m _I_: Single [%s(cdr (assoc 'single (pedro-emms-get-current-song-info)))]
+_s_: Stop _k_: +1m
+-----------------------------------------------------------
+_b_: Browser _q_: Quit
+"
+  ("b" emms-smart-browse :exit t)
+  ("n" emms-next)
+  ("p" emms-previous)
+  ("<SPC>" emms-pause)
+  ("s" emms-player-mpd-stop)
+  ("-" (lambda () (interactive)
+         (call-process "mpc" nil nil nil "volume" "-5")))
+  ("+" (lambda () (interactive)
+         (call-process "mpc" nil nil nil "volume" "+5")))
+  ("m" (lambda () (interactive)
+         (let ((current-volume (string-to-number (car (split-string (cdr (assoc 'volume (pedro-emms-get-current-song-info))) "%")))))
+
+           (if (= current-volume 0)
+
+               (call-process "mpc" nil nil nil "volume" (or (number-to-string pedro-emms-mute-old-volume) 30))
+             (progn
+               ;; (shell-command "mpc volume 0" nil nil)
+               (call-process "mpc" nil nil nil "volume" "0")
+               (setq pedro-emms-mute-old-volume current-volume))))))
+  ("h" (lambda () (interactive)
+         (shell-command "mpc seek -10 ")
+         (message "%s" (cdr (assoc 'time (my-emms-get-current-song-info))))))
+  ("l" (lambda () (interactive)
+         (shell-command "mpc seek +10 ")
+         (message "%s" (cdr (assoc 'time (my-emms-get-current-song-info))))))
+  ("j" (lambda () (interactive)
+         (shell-command "mpc seek -60 ")
+         (message "%s" (cdr (assoc 'time (my-emms-get-current-song-info))))))
+  ("k" (lambda () (interactive)
+         (shell-command "mpc seek +60 ")
+         (message "%s" (cdr (assoc 'time (my-emms-get-current-song-info))))))
+  ("S" (lambda () (interactive)
+         (if (string= "on" (cdr (assoc 'random (my-emms-get-current-song-info))))
+             (shell-command "mpc random off")
+           (shell-command "mpc random on"))
+         (message "Shuffle: %s" (cdr (assoc 'random (my-emms-get-current-song-info))))))
+  ("R" (lambda () (interactive)
+         (if (string= "on" (cdr (assoc 'repeat (my-emms-get-current-song-info))))
+             (shell-command "mpc repeat off")
+           (shell-command "mpc repeat on"))
+         (message "Repeat: %s" (cdr (assoc 'repeat (my-emms-get-current-song-info))))))
+  ("I" (lambda () (interactive)
+         (if (string= "on" (cdr (assoc 'single (my-emms-get-current-song-info))))
+             (shell-command "mpc single off")
+           (shell-command "mpc single on"))
+         (message "Single: %s" (cdr (assoc 'single (my-emms-get-current-song-info))))))
+  ("q" nil :color blue)
+  )
 
 (provide 'hydras)
 ;;; hydras.el ends here
