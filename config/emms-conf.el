@@ -66,6 +66,7 @@
  "b p" 'emms-browse-by-performer
 
  "h" 'hydra-emms/body
+ "m" 'emms-metaplaylist-mode-go
  "P" 'hydra-persp/body)
 
 (general-define-key
@@ -73,13 +74,13 @@
  :keymaps 'emms-playlist-mode-map
  "A" 'emms-add-playlist
  "h" 'hydra-emms/body
- "P" 'hydra-persp/body
- "i" 'emms-playlist-playlist-insert-track)
+ "i" 'emms-playlist-playlist-insert-track
+ "m" 'emms-metaplaylist-mode-go
+ "P" 'hydra-persp/body)
 
 (general-define-key
  :keymaps 'emms-metaplaylist-mode-map
- "SPC" 'emms-metaplaylist-mode-goto
- "c" 'emms-metaplaylist-mode-goto-current
+ "SPC" 'emms-metaplaylist-mode-goto-current
  "h" 'hydra-emms/body
  "P" 'hydra-persp/body)
 
@@ -240,7 +241,7 @@
   (mpd/start-music-daemon)
   (split-window-right)
   (emms-browser)
-  (turn-off-evil-mode)
+  ;; (turn-off-evil-mode)
   (split-window-right)
   (emms-playlist-mode-go)
   (emms-lock-queue))
@@ -294,6 +295,27 @@ Eg. if CURRENT-MAPPING is currently \\='info-artist, return
    ((eq current-mapping 'info-album) 'info-albumartist)
    ((eq current-mapping 'info-genre) 'info-artist)
    ((eq current-mapping 'info-year) 'info-album)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; this fixes the problems with evil set-initial-state.
+;; the major mode was still fundamental, breaking the functionality.
+(defun emms-browser-mode (&optional no-update)
+  "A major mode for the Emms browser.
+\\{emms-browser-mode-map}"
+  ;; create a new buffer
+  (interactive)
+  (kill-all-local-variables)
+
+  (setq major-mode 'emms-browser-mode
+        mode-name "Emms-Browser")
+
+  (use-local-map emms-browser-mode-map)
+
+  (setq buffer-read-only t)
+  (unless no-update
+    (setq emms-browser-buffer (current-buffer)))
+
+  (run-hooks 'emms-browser-mode-hook))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EMMS over rides to add album artist.

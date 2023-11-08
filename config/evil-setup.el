@@ -33,6 +33,12 @@
 (evil-set-initial-state 'emms-browser-mode 'emacs)
 (evil-set-initial-state 'emms-playlist-mode 'emacs)
 (evil-set-initial-state 'emms-browser-search-mode 'emacs)
+(add-to-list 'evil-emacs-state-modes 'emms-mode)
+(add-to-list 'evil-emacs-state-modes 'emms-browser-mode)
+(add-to-list 'evil-emacs-state-modes 'emms-browser-search-mode)
+(add-to-list 'evil-emacs-state-modes 'emms-playlist-mode)
+(add-to-list 'evil-emacs-state-modes 'EMMS)
+(add-to-list 'evil-emacs-state-modes 'Emms-Browser)
 
 (require 'evil-surround)
 
