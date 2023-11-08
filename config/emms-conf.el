@@ -251,28 +251,20 @@
 ;; Build the Browse tree how I want.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; This changes node maps into data instead of code.
+
 ;; Think of it like a chain.  render tree gives the initial browse by type.
 ;; this goes from there and builds the appropriate tree.
-;;
-;; There needs to be a way to switch between tree mappings.
-;; it would be nice to have album artist above artist When
-;; browsing by genre.
-;; different trees for different browsing types. where one falls
-;; short in all browse bys.
 
 ;; The default
-(defun emms-browser-next-mapping-type-default (current-mapping)
-  "Return the next sensible mapping.
-Eg. if CURRENT-MAPPING is currently \\='info-artist, return
- \\='info-album."
-  (cond
-   ((eq current-mapping 'info-albumartist) 'info-artist)
-   ((eq current-mapping 'info-artist) 'info-album)
-   ((eq current-mapping 'info-composer) 'info-album)
-   ((eq current-mapping 'info-performer) 'info-album)
-   ((eq current-mapping 'info-album) 'info-title)
-   ((eq current-mapping 'info-genre) 'info-artist)
-   ((eq current-mapping 'info-year) 'info-artist)))
+(setq emms-browser-tree-node-map-default
+      '((info-albumartist . info-artist)
+        (info-artist      . info-album)
+        (info-composer    . info-album)
+        (info-performer   . info-album)
+        (info-album       . info-title)
+        (info-genre       . info-artist)
+        (info-year        . info-artist)))
 
 ;; The best one so far
 ;; Follow them. Browse-by-TYPE where TYPE:
@@ -283,40 +275,34 @@ Eg. if CURRENT-MAPPING is currently \\='info-artist, return
 ;; Year -> album -> ...
 ;; Composer -> album -> ...
 ;; Performer -> album -> ...
-(defun emms-browser-next-mapping-type-AAgAt (current-mapping)
-  "Return the next sensible mapping.
-Eg. if CURRENT-MAPPING is currently \\='info-artist, return
- \\='info-album."
-  (cond
-   ((eq current-mapping 'info-albumartist) 'info-genre)
-   ((eq current-mapping 'info-artist) 'info-title)
-   ((eq current-mapping 'info-composer) 'info-album)
-   ((eq current-mapping 'info-performer) 'info-album)
-   ((eq current-mapping 'info-album) 'info-albumartist)
-   ((eq current-mapping 'info-genre) 'info-artist)
-   ((eq current-mapping 'info-year) 'info-album)))
+(setq emms-browser-tree-node-map-AAgAt
+      '((info-albumartist . info-genre)
+        (info-artist      . info-title)
+        (info-composer    . info-album)
+        (info-performer   . info-album)
+        (info-album       . info-albumartist)
+        (info-genre       . info-artist)
+        (info-year        . info-album)))
 
 ;; Lisa says she has this. Ill have to look.
 ;; Album Artist -> artist -> genre -> title
-(defun emms-browser-next-mapping-type-AAaGt (current-mapping)
-  "Return the next sensible mapping.
-Eg. if CURRENT-MAPPING is currently \\='info-artist, return
- \\='info-album."
-  (cond
-   ((eq current-mapping 'info-albumartist) 'info-artist)
-   ((eq current-mapping 'info-artist) 'info-genre)
-   ((eq current-mapping 'info-composer) 'info-album)
-   ((eq current-mapping 'info-performer) 'info-album)
-   ((eq current-mapping 'info-album) 'info-albumartist)
-   ((eq current-mapping 'info-genre) 'info-title)
-   ((eq current-mapping 'info-year) 'info-album)))
+(setq emms-browser-tree-node-map-AAAgt
+      '((info-albumartist . info-artist)
+        (info-artist      . info-genre)
+        (info-composer    . info-album)
+        (info-performer   . info-album)
+        (info-album       . info-albumartist)
+        (info-genre       . info-title)
+        (info-year        . info-album)))
 
-;;
+(setq emms-browser-tree-node-map emms-browser-tree-node-map-AAgAt)
+
 (defun emms-browser-next-mapping-type (current-mapping)
   "Return the next sensible mapping.
 Eg. if CURRENT-MAPPING is currently \\='info-artist, return
  \\='info-album."
-  (emms-browser-next-mapping-type-AAgAt current-mapping))
+  ;;(debug)
+  (alist-get current-mapping emms-browser-tree-node-map))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; this fixes the problems with evil set-initial-state.
@@ -381,7 +367,7 @@ Eg. if CURRENT-MAPPING is currently \\='info-artist, return
            emms-browser-album-sort-function)
           ((eq type 'info-title)
            'emms-browser-sort-by-track)
-          (t (message "Can't sort unknown mapping!")))))
+          (t (message (concat "Can't sort unknown mapping!" type))))))
     (funcall sort-func alist)))
 
 (defun emms-browser-lookup-albumartist-on-wikipedia ()
