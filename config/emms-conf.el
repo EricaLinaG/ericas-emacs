@@ -261,18 +261,18 @@
 ;; short in all browse bys.
 
 ;; The default
-;; (defun emms-browser-next-mapping-type (current-mapping)
-;;   "Return the next sensible mapping.
-;; Eg. if CURRENT-MAPPING is currently \\='info-artist, return
-;;  \\='info-album."
-;;   (cond
-;;    ((eq current-mapping 'info-albumartist) 'info-artist)
-;;    ((eq current-mapping 'info-artist) 'info-album)
-;;    ((eq current-mapping 'info-composer) 'info-album)
-;;    ((eq current-mapping 'info-performer) 'info-album)
-;;    ((eq current-mapping 'info-album) 'info-title)
-;;    ((eq current-mapping 'info-genre) 'info-artist)
-;;    ((eq current-mapping 'info-year) 'info-artist)))
+(defun emms-browser-next-mapping-type-default (current-mapping)
+  "Return the next sensible mapping.
+Eg. if CURRENT-MAPPING is currently \\='info-artist, return
+ \\='info-album."
+  (cond
+   ((eq current-mapping 'info-albumartist) 'info-artist)
+   ((eq current-mapping 'info-artist) 'info-album)
+   ((eq current-mapping 'info-composer) 'info-album)
+   ((eq current-mapping 'info-performer) 'info-album)
+   ((eq current-mapping 'info-album) 'info-title)
+   ((eq current-mapping 'info-genre) 'info-artist)
+   ((eq current-mapping 'info-year) 'info-artist)))
 
 ;; The best one so far
 ;; Follow them. Browse-by-TYPE where TYPE:
@@ -283,7 +283,7 @@
 ;; Year -> album -> ...
 ;; Composer -> album -> ...
 ;; Performer -> album -> ...
-(defun emms-browser-next-mapping-type (current-mapping)
+(defun emms-browser-next-mapping-type-AAgAt (current-mapping)
   "Return the next sensible mapping.
 Eg. if CURRENT-MAPPING is currently \\='info-artist, return
  \\='info-album."
@@ -296,9 +296,33 @@ Eg. if CURRENT-MAPPING is currently \\='info-artist, return
    ((eq current-mapping 'info-genre) 'info-artist)
    ((eq current-mapping 'info-year) 'info-album)))
 
+;; Lisa says she has this. Ill have to look.
+;; Album Artist -> artist -> genre -> title
+(defun emms-browser-next-mapping-type-AAaGt (current-mapping)
+  "Return the next sensible mapping.
+Eg. if CURRENT-MAPPING is currently \\='info-artist, return
+ \\='info-album."
+  (cond
+   ((eq current-mapping 'info-albumartist) 'info-artist)
+   ((eq current-mapping 'info-artist) 'info-genre)
+   ((eq current-mapping 'info-composer) 'info-album)
+   ((eq current-mapping 'info-performer) 'info-album)
+   ((eq current-mapping 'info-album) 'info-albumartist)
+   ((eq current-mapping 'info-genre) 'info-title)
+   ((eq current-mapping 'info-year) 'info-album)))
+
+;;
+(defun emms-browser-next-mapping-type (current-mapping)
+  "Return the next sensible mapping.
+Eg. if CURRENT-MAPPING is currently \\='info-artist, return
+ \\='info-album."
+  (emms-browser-next-mapping-type-AAgAt current-mapping))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; this fixes the problems with evil set-initial-state.
 ;; the major mode was still fundamental, breaking the functionality.
+;; Ah. kill-all-local-variables is the fix. read its doc.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun emms-browser-mode (&optional no-update)
   "A major mode for the Emms browser.
 \\{emms-browser-mode-map}"
