@@ -40,7 +40,7 @@
      Perspectives
      Currently: %s(persp-names)
 
-  ^Navigation^       ^Actions^        ^Buffers^
+  ^Navigation^      ^Actions^        ^Buffers^
 --^-^---------------^-^--------------^-^---------------
   _n_: next         _s_: Switch      _a_: add
   _p_: previous     _r_: rename      _R_: Remove
@@ -49,31 +49,33 @@
     <-arrows->    _m_: merge       _B_: scratch
       1-9         _u_: unmerge     _g_: global add
                   _S_: save
-  _q_: quit       _l_: load
+  _q_: quit         _l_: load
 
   ^Windows^
   _v_: vert       _x_: horiz
 
-  ^Create new perspective.^
-  _c_: Custom
-  _e_: Emacs dev  _E_: Emacsn      _X_: Xmonad
-  _Q_: myQMK      _D_: BD          _M_: Music
-  _T_: 3D         _z_: SPR         _Z_: Emacsn stable
+  ^Create new perspective by topic.^
+  _t c_: Custom
+  _t E_: Emacsn      _t d_: Emacsn dev   _t s_: Emacsn stable
+  _t q_: myQMK       _t b_: BD           _t m_: Music
+  _t S_: Scad 3D     _t z_: SPR          _t x_: Xmonad
+  _t e_: Emms dev
 "
   ("q" nil)
   ("a" persp-add-buffer :exit t)
 
-  ("c" (layout-3 nil nil))
-  ("e" (layout-3 "~/Emacsn/dev/" "Emacsn dev" "README.org") :exit t)
-  ("Z" (layout-3 "~/Emacsn/stable/" "Emacsn stable" "README.org") :exit t)
-  ("X" (layout-3 "~/.xmonad/"    "Xmonad" "xmonad.hs") :exit t)
-  ("E" (layout-3 "~/Emacsn/"     "Emacsn" "README.org") :exit t)
-  ("T" (layout-3 "~/play/3D"     "3D"     "README.org"))
-  ("Q" (layout-3 "~/play/myQMK" "myQMK" "README.org") :exit t)
-  ("M" (progn (layout-0 "/home/Music"   "Music"  "README.org")
+  ("t c" (layout-3 nil nil))
+  ("t d" (layout-3 "~/Emacsn/dev/" "Emacsn dev" "README.org") :exit t)
+  ("t s" (layout-3 "~/Emacsn/stable/" "Emacsn stable" "README.org") :exit t)
+  ("t x" (layout-3 "~/.xmonad/"    "Xmonad" "xmonad.hs") :exit t)
+  ("t E" (layout-3 "~/Emacsn/"     "Emacsn" "README.org") :exit t)
+  ("t S" (layout-3 "~/play/3D"     "3D"     "README.org"))
+  ("t q" (layout-3 "~/play/myQMK" "myQMK" "README.org") :exit t)
+  ("t m" (progn (layout-0 "/home/Music"   "Music"  "README.org")
               (my-emms-start)) :exit t)
-  ("D" (layout-3 "/home/BD"      "BD"     "README.org"))
-  ("z" (layout-3 "~/play/SPR/"   "Emacsn" "README.org"))
+  ("t b" (layout-3 "/home/BD"       "BD"     "README.org"))
+  ("t z" (layout-3 "~/play/SPR/"    "Emacsn" "README.org"))
+  ("t e" (layout-3 "~/play/emms/" "Emms dev" "README"))
 
   ("v" split-window-right)
   ("x" split-window-below)
