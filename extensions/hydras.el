@@ -735,9 +735,33 @@ _t_: translate sentence & point       _T_: Translate
 (defun mympd-update-dir()
   (emms-player-mpd-update-directory "/home/Music/Music"))
 
+(defun emms-status ()
+  "Format information on the state of Emms."
+  (format "Queue locked: %s\nRandom: %s  Repeat: %s\nFilter: %s\n%s\n"
+          emms-queue-lock
+          emms-random-playlist
+          emms-repeat-track
+          emms-browser-current-filter-name
+          (mapconcat #'identity (emms-browser-search-crumbs) "\n")))
+
+(defun mystatus ()
+  "Message the status of emms."
+  (interactive)
+  (message (emms-status)))
+
+
+(defun crumb-text ()
+  (interactive)
+  (mapconcat #'identity (emms-browser-search-crumbs) "\n"))
+
 (defhydra hydra-emms (:color teal
                              :hint nil)
   "
+ Queue Lock: %`emms-queue-lock
+ Repeat: %`emms-repeat-track   Random: %`emms-random-playlist
+ Filter: %`emms-browser-current-filter-name
+ %(crumb-text)
+
     Windows         MPD          Cache
 ---------------------------------------------------------
     _p_: Playlist  _C_: Connect   _R_: Reset
@@ -1312,8 +1336,8 @@ _M_: markdown mode _m_: macros
 ;;   );end pretty-hydra-eww
 ;; (bind-key "<C-m> z" 'eww-browser/body)
 
-;; just toe remember nice things to have.
-(defun my-emms-get-current-song-info ()
+;; just to remember nice things to have.
+(defun my-emms-get-current-mpc-song-info ()
   "Returns current song info plist"
   (let* ((get-string-func '(lambda (regexp)
                              (substring mpc-output

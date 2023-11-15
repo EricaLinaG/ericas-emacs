@@ -117,9 +117,9 @@
 
 ;; Filters
 (setq emms-browser-current-filter-name nil)
-(emms-browser-set-filter (assoc "all" emms-browser-filters))
+;;(emms-browser-set-filter (assoc "all" emms-browser-filters))
 
-(emms-browser-make-filter "all" 'ignore)
+;;(emms-browser-make-filter "all" 'ignore)
 
 ;; (emms-browser-make-filter
 ;;  "all-files" (emms-browser-filter-only-type 'file))
@@ -232,6 +232,14 @@
  "h" 'hydra-emms/body
  "P" 'hydra-persp/body)
 
+;; a handy function
+(defun emms-browser-cache-to-tracks (cache)
+  "Return a list of tracks from the CACHE given."
+  (let (tracks)
+    (maphash (lambda (_k track)
+               (push track tracks))
+             cache)
+    tracks))
 
 ;;; Provides emms-conf.el
 ;;; emms-conf.el ends here

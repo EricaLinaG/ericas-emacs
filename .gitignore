@@ -5,3 +5,6 @@ elpa
 /projectile-bookmarks.eld
 /smex-items
 /transient/
+pubring.*
+*.kbx
+*.kbx*
