@@ -59,7 +59,7 @@
   _t E_: Emacsn      _t d_: Emacsn dev   _t s_: Emacsn stable
   _t q_: myQMK       _t b_: BD           _t m_: Music
   _t S_: Scad 3D     _t z_: SPR          _t x_: Xmonad
-  _t e_: Emms dev
+  _t e_: Emms dev    _t M_: Mail
 "
   ("q" nil)
   ("a" persp-add-buffer :exit t)
@@ -71,18 +71,16 @@
   ("t E" (layout-3 "~/Emacsn/"     "Emacsn" "README.org") :exit t)
   ("t S" (layout-3 "~/play/3D"     "3D"     "README.org"))
   ("t q" (layout-3 "~/play/myQMK" "myQMK" "README.org") :exit t)
+  ("t M" (progn (layout-3 "~/" "Email" nil) (mu4e) :exit t))
   ("t m" (progn (layout-0 "/home/Music"   "Music"  "README.org")
-              (my-emms-start)) :exit t)
+                (my-emms-start))
+   :exit t)
   ("t b" (layout-3 "/home/BD"       "BD"     "README.org"))
   ("t z" (layout-3 "~/play/SPR/"    "Emacsn" "README.org"))
   ("t e" (layout-3 "~/play/emms/" "Emms dev" "README"))
 
   ("v" split-window-right)
   ("x" split-window-below)
-  ;; ("t" transpose-frame "'")
-  ;; ("d" hfj/persp-kill-current)
-  ;; ("l" hfj/pick-layout :exit t)
-  ;; ("L" hfj/pick-predefined-layout :exit t)
 
   ("N" persp-next)
   ("r" persp-rename :exit t)
