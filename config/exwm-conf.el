@@ -415,7 +415,8 @@ If there are multiple, complete for them."
 
 (exwm-randr-enable)
 ;; Do not forget to enable EXWM. It will start by itself when things are ready.
-(exwm-enable)
+(when exwm-enabled
+  (exwm-enable))
 
 (when (not (get-buffer "*redshift*"))
   (start-process-shell-command "redshift" "*redshift*" "redshift"))
