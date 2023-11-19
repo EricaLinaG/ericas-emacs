@@ -1,24 +1,24 @@
 ;;; emms-metafilter.el --- A metafilter for Emms          -*- lexical-binding: t; -*-
-;;; Commentary:
 ;; Copyright (C) 2023
-
 ;; Author:  <ericalinagebhart@gmail.com> (Erica Gebhart)
 ;; Keywords:
-;;; Code:
 
-;; So when a new filter is set, we turn it into a meta filter
+;;; Commentary:
+;; So when we set a new filter on emms-browser, we turn it into a meta filter
 ;; and push it on a stack. We make a function from it and set it
 ;; to the current filter.
 ;; emms-browser-current-filter
 
-;; then, if anyone wants to add to the filter, there are ands and ors .
+;; Now we have powers over the current filter.
+
+;; Then, if anyone wants to add to the filter, there are ands and ors .
 ;; so we can manipulate the active filter and push changes to a stack
 ;; that we can quit out of.
 
-;; If someone wants to keep a filter we make a filter from it and it
-;; goes into the normal filter list.
+;; If someone wants to keep a filter we can make a session filter from it.
+;; It then goes into the normal filter list.
 
-;;; Vars
+;;; Code:
 
 (require 'emms-browser)
 
@@ -26,19 +26,96 @@
   "A history of multi-filters. Our working list.")
 
 (defvar emf-current-multi-filter nil
-  "The current multi-filter source list. ie. (cadr emf-stack)")
+  "The current multi-filter source list. ie. (cadr emf-stack).")
 
-;; add, del, change - filter,
-;; make new filter cons with constructed name.
-;; push to meta stack
-;; make function.
+;;(emms-browser-make-filter "all" 'ignore)
+;;(emms-browser-set-filter (assoc "all" emms-browser-filters))
+
+;;; Filters
+;; Here are some filter factories.
+;; genre.
+;; year-range
+;; multi-filter
+;; show only tracks not played in the last year
+
+;; emms-browser.el defines these filter factories.
+
+;; emms-browser-filter-only-dir
+;; emms-browser-filter-only-type
+;; emms-browser-filter-only-recent
+
+(defun emms-browser-make-filter-not-recent (days)
+  "Make a not played since DAYS filter."
+  (lambda (track)
+    (not (funcall (emms-browser-filter-only-recent days) track))))
+
+(defun emms-browser-make-filter-genre (genre)
+  "Make a filter by GENRE."
+  (lambda (track)
+    (let ((info (emms-track-get track 'info-genre)))
+      (not (and info (string-equal-ignore-case genre info))))))
+
+(defun emms-browser-make-filter-year-range (y1 y2)
+  "Make a date range filter from Y1 and Y2."
+  (lambda (track)
+    (let* ((year (emms-track-get track 'info-year))
+           (date (emms-track-get track 'info-date))
+           (year (or year (emms-format-date-to-year date)))
+           (year (and year (string-to-number year))))
+      (not (and
+            year
+            (<= y1 year)
+            (>= y2 year))))))
+
+;; multi-filter
+(defun reduce-filters-for-track (filters track)
+  "Reduce the result of FILTERS on TRACK, true with nil filter, or match."
+  (if filters
+      (cl-reduce
+       (lambda (result func)
+         (or result
+             (not (funcall func track))))
+       filters
+       :initial-value nil)
+    t))
+
+(defun emms-browser-multi-filter-funcs (filter-name-list)
+  "Return a list of functions for a FILTER-NAME-LIST."
+  (mapcar (lambda (filter-name)
+            (cdr (assoc filter-name
+                        emms-browser-filters)))
+          filter-name-list))
+
+(defun emms-browser-make-filter-multi-filter (multi-filters-list)
+  "Make a track filter function from MULTI-FILTERS-LIST.
+The function will take a track as a parameter and return t if the track
+does not match the filters.
+
+A multi-filter is a list of lists of filter names.
+The track is checked against each filter, each list of filters is
+reduced with or. The lists are reduced with and.
+Returns True if the track should be filtered out."
+  (let* ((multi-funcs
+          (mapcar 'emms-browser-multi-filter-funcs
+                  multi-filters-list)))
+    (lambda (track)
+      (not (cl-reduce
+            (lambda (result funclist)
+              (and result
+                   (reduce-filters-for-track funclist track)))
+            multi-funcs
+            :initial-value nil)))))
+
+
+;; The meta filter
+;; An interactive multi-filter.
 
 ;; not sure I need this.
 (defun emf-copy-meta-filter (filter)
   "Use FILTER, (name . filter) to create a meta filter.
-Copy multi-filters. (name . multi-filter)"
+Copy multi-filters. (name . multi-filter)
   ;; copy from the multi-filters-list into the current working current-multi-filter
-  ;;    (mapcar #'copy-sequence list-of-strings) So we dont modify them.
+  ;;    (mapcar #'copy-sequence list-of-strings) So we dont modify them."
   (cons (car filter)
         (mapcar
          (lambda (filter-list)
@@ -90,7 +167,6 @@ Make a filter function and set it."
    (emf-make-filter-cons-from-meta-filter filter)))
 
 ;;; base functions
-
 (defun emf-current-meta-filter-name ()
   "Give the constructed name of the current filter."
   (emf-make-name (car emf-stack)))
@@ -101,21 +177,25 @@ Make a filter function and set it."
 
 (defun  emf-quit/back/pop-meta-filter-stack ()
   "Pop the history stack, set the current filter function and re-render."
+  (interactive)
   (pop emf-stack)
   (emf-set-current-multi-filter-function))
 
 ;;; current state functions.
 (defun  emf-keep-meta-filter ()
-  "Import the current filter into the list of multi-filters for the session."
+  "Import the current filter into the list of filters for the session."
+  (interactive)
   (emf-set-current-meta-filter-function))
 
 (defun  emf-clear-filter ()
-  "Set to nil '((nil)) filter."
+  "Set current meta-filter (top of stack) to nil '((nil)) filter."
+  (interactive)
   (pop emf-stack)
   (emf-push-meta-filter '(("((nil))" nil))))
 
 (defun  emf-default ()
   "Set to default filter."
+  (interactive)
   (emf-push-meta-filter '((emms-browser-default-filter)) ))
 
 (defun emf-select-filter ()
@@ -129,6 +209,7 @@ Make a filter function and set it."
 
 (defun  emf-or-select ()
   "Add to current list. 'OR' new choice."
+  (interactive)
   (let* ((filter (car emf-stack))
          (filter-list (cdar filter))
          (filter-name
@@ -139,6 +220,7 @@ Make a filter function and set it."
 
 (defun  emf-and-select ()
   "Add to current filter, new list, new choice, select a filter to 'AND'."
+  (interactive)
   (let* ((filter-lists (cadr emf-stack))
          (filter-name
           (completing-read "Choose a filter:"
@@ -148,6 +230,7 @@ Make a filter function and set it."
 
 (defun  emf-delete-current-or-group ()
   "Delete the current/last 'OR' group."
+  (interactive)
   (let* ((filter (car emf-stack))
          (filter (cdr filter)))
     (emf-push-meta-filter filter)))

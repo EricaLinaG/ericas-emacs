@@ -8,6 +8,7 @@
 
 (require 'emms-setup)
 (require 'emms-browser)
+(require 'emms-filters)
 ;;(require 'emms-soundcloud)
 ;;(require 'emms-info-mediainfo)
 
@@ -117,22 +118,27 @@
 
 ;; Filters
 (setq emms-browser-current-filter-name nil)
-;;(emms-browser-set-filter (assoc "all" emms-browser-filters))
-
-;;(emms-browser-make-filter "all" 'ignore)
 
 ;; (emms-browser-make-filter
-;;  "all-files" (emms-browser-filter-only-type 'file))
+;;  "Files" (emms-browser-filter-only-type 'file))
 
+;; ;; specify filters in a list like so.
+;; '(
+;;   (name make-filter-function-call)
+;;   (name make-filter-function-call)
+;;   )
+
+;; then we can just say emf-make-filters blah....
+
+;; Recent
 (emms-browser-make-filter "last-month"
                           (emms-browser-filter-only-recent 30))
 
-(defun emms-browser-make-filter-genre (genre)
-  "Make a filter by GENRE."
-  (lambda (track)
-    (let ((info (emms-track-get track 'info-genre)))
-      (not (and info (string-equal-ignore-case genre info))))))
+;; Not Recent
+(emms-browser-make-filter "last-year"
+                          (emms-browser-make-filter-not-recent 365))
 
+;; Genre
 (emms-browser-make-filter "vals"
                           (emms-browser-make-filter-genre "vals"))
 (emms-browser-make-filter "tango"
@@ -140,18 +146,7 @@
 (emms-browser-make-filter "milonga"
                           (emms-browser-make-filter-genre "milonga"))
 
-(defun emms-browser-make-filter-year-range (y1 y2)
-  "Make a date range filter from Y1 and Y2."
-  (lambda (track)
-    (let* ((year (emms-track-get track 'info-year))
-           (date (emms-track-get track 'info-date))
-           (year (or year (emms-format-date-to-year date)))
-           (year (and year (string-to-number year))))
-      (not (and
-            year
-            (<= y1 year)
-            (>= y2 year))))))
-
+;; Year range
 (emms-browser-make-filter "1900-1929"
                           (emms-browser-make-filter-year-range 1900 1929))
 (emms-browser-make-filter "1929-1937"
@@ -165,46 +160,16 @@
 (emms-browser-make-filter "1958-"
                           (emms-browser-make-filter-year-range 1958 3000))
 
-(defun reduce-filters-for-track (filters track)
-  "Reduce the result of FILTERS on TRACK, true if we match."
-  (if filters
-      (cl-reduce
-       (lambda (result func)
-         (or result
-             (not (funcall func track))))
-       filters
-       :initial-value nil)
-    t))
+;; ;; specify multi-filters in a list like so.
+;; '(
+;;   (name (list) (list) (list))
+;;   (name (list) (list) (list))
+;;   )
+
+;; then we can just say emf-make-filters blah....
 
 
-(defun emms-browser-multi-filter-funcs (filter-name-list)
-  "Return a list of functions for a FILTER-NAME-LIST."
-  (mapcar (lambda (filter-name)
-            (cdr (assoc filter-name
-                        emms-browser-filters)))
-          filter-name-list))
-
-(defun emms-browser-make-filter-multi-filter (multi-filters-list)
-  "Make a track filter function from MULTI-FILTERS-LIST.
-The function will take a track as a parameter and return t if the track
-does not match the filters.
-
-A multi-filter is a list of lists of filter names.
-The track is checked against each filter, each list of filters is
-reduced with or. The lists are reduced with and.
-Returns True if the track should be filtered out."
-  (let* ((multi-funcs
-          (mapcar 'emms-browser-multi-filter-funcs
-                  multi-filters-list)))
-    (lambda (track)
-      (not (cl-reduce
-            (lambda (result funclist)
-              (and result
-                   (reduce-filters-for-track funclist track)))
-            multi-funcs
-            :initial-value nil)))))
-
-
+;; Multi-filter
 (emms-browser-make-filter
  "1900-1937"
  (emms-browser-make-filter-multi-filter '(("1900-1929" "1929-1937")) ))
@@ -222,11 +187,6 @@ Returns True if the track should be filtered out."
  (emms-browser-make-filter-multi-filter '(("1900-1929" "1929-1937")
                                           ("vals" "milonga"))))
 
-;; show only tracks not played in the last year
-(emms-browser-make-filter
- "not-played"
- (lambda (track)
-   (not (funcall (emms-browser-filter-only-recent 365) track))))
 
 ;; extras - start and stop mpd. A function to give to Perspective.
 (defun mpd/start-music-daemon ()
