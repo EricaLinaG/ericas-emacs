@@ -9,7 +9,7 @@
 ;;(setq evil-regexp-search t)
 
 ;; If this is true it breaks eshell. bad behavior anyway.
-(setq evil-backspace-join-lines nil)
+;; (setq evil-backspace-join-lines nil)
 ;;(setq evil-cross-lines nil)
 
 ;; Clear insert state bindings.
@@ -165,8 +165,6 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 
-;;; undo
-(setq evil-want-fine-undo t)
 
 
 ;;; make evil work better in more places. too much for me.

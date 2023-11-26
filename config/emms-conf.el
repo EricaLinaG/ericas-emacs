@@ -119,73 +119,39 @@
 ;; Filters
 (setq emms-browser-current-filter-name nil)
 
-;; (emms-browser-make-filter
-;;  "Files" (emms-browser-filter-only-type 'file))
+;;  function     Name        arguments
+(setq tango-filters
+      '(("Year range" "1900-1929" '(1900 1929))
+        ("Year range" "1929-1937" '(1929 1937))
+        ("Year range" "1937-1942" '(1937 1942))
+        ("Year range" "1940-1946" '(1940 1946))
+        ("Year range" "1946-1958" '(1946 1958))
+        ("Year range" "1958-"     '(1958 3000))
 
-;; ;; specify filters in a list like so.
-;; '(
-;;   (name make-filter-function-call)
-;;   (name make-filter-function-call)
-;;   )
+        ("Genre" "vals" '("vals"))
+        ("Genre" "tango" '("tango"))
+        ("Genre" "milonga" '("milonga"))))
 
-;; then we can just say emf-make-filters blah....
+(emf-make-filters tango-filters)
 
-;; Recent
-(emms-browser-make-filter "last-month"
-                          (emms-browser-filter-only-recent 30))
+(setq tango-multi-filters
+      '(("1900-1937"
+         (("1900-1929" "1929-1937")))
 
-;; Not Recent
-(emms-browser-make-filter "last-year"
-                          (emms-browser-make-filter-not-recent 365))
+        ("1937-1946"
+         (("1937-1942" "1940-1946")))
 
-;; Genre
-(emms-browser-make-filter "vals"
-                          (emms-browser-make-filter-genre "vals"))
-(emms-browser-make-filter "tango"
-                          (emms-browser-make-filter-genre "tango"))
-(emms-browser-make-filter "milonga"
-                          (emms-browser-make-filter-genre "milonga"))
+        ("Vals or milonga"
+         (("vals" "milonga")))
 
-;; Year range
-(emms-browser-make-filter "1900-1929"
-                          (emms-browser-make-filter-year-range 1900 1929))
-(emms-browser-make-filter "1929-1937"
-                          (emms-browser-make-filter-year-range 1929 1937))
-(emms-browser-make-filter "1937-1942"
-                          (emms-browser-make-filter-year-range 1937 1942))
-(emms-browser-make-filter "1940-1946"
-                          (emms-browser-make-filter-year-range 1940 1946))
-(emms-browser-make-filter "1946-1958"
-                          (emms-browser-make-filter-year-range 1946 1958))
-(emms-browser-make-filter "1958-"
-                          (emms-browser-make-filter-year-range 1958 3000))
+        ("Vals 1900-1929"
+         (("1900-1929") ("vals")))
 
-;; ;; specify multi-filters in a list like so.
-;; '(
-;;   (name (list) (list) (list))
-;;   (name (list) (list) (list))
-;;   )
+        ("Vals or milonga, 1900-1937"
+         (("1900-1929" "1929-1937")
+          ("vals" "milonga")))))
 
-;; then we can just say emf-make-filters blah....
-
-
-;; Multi-filter
-(emms-browser-make-filter
- "1900-1937"
- (emms-browser-make-filter-multi-filter '(("1900-1929" "1929-1937")) ))
-
-(emms-browser-make-filter
- "vals or milonga"
- (emms-browser-make-filter-multi-filter '(("vals" "milonga"))))
-
-(emms-browser-make-filter
- "vals 1900-1929"
- (emms-browser-make-filter-multi-filter '(("1900-1929") ("vals"))))
-
-(emms-browser-make-filter
- "vals or milonga, 1900-1937"
- (emms-browser-make-filter-multi-filter '(("1900-1929" "1929-1937")
-                                          ("vals" "milonga"))))
+(emf-make-multi-filters tango-multi-filters)
 
 
 ;; extras - start and stop mpd. A function to give to Perspective.

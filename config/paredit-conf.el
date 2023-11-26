@@ -25,6 +25,7 @@
 (add-hook 'esh-mode-hook #'smartparens-mode)
 (add-hook 'r-mode-hook #'smartparens-mode)
 (add-hook 'ruby-mode-hook #'smartparens-mode)
+(add-hook 'ielm-mode-hook #'smartparens-mode)
 
 
 ;; Too many years with paredit. Use those key bindings for smartparens.
