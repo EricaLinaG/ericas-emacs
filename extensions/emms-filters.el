@@ -62,10 +62,6 @@
   "Put our new FILTER function named FILTER-NAME in our filter list."
   (push (cons filter-name filter) emf-filters))
 
-(defun emf-clear-filters ()
-  "Clear the filter list."
-  (setq emf-filters nil))
-
 (defun emf-make-filter (factory filter-name factory-args)
   "Make a filter named FILTER-NAME using the FACTORY and FACTORY-ARGS.
 if factory is a function it is used directly. Otherwise, it will
@@ -101,10 +97,6 @@ filter-name factory-arguments)."
   "A nicer way to find NAME in our list of filters."
   (assoc name emf-filters))
 
-;; (emf-make-filter 'emf-make-filter-year-range "1929-1937" '(1929 1937))
-;; (emf-make-filter "Year range" "1929-1937" '(1929 1937))
-;; (emf-make-filters '(("Year range" "1900-1929" (1900 1929))))
-
 ;; Filter Factories
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -114,9 +106,10 @@ filter-name factory-arguments)."
 ;; Year-range
 ;; Year-greater
 ;; Year-less
-;; Not recent
+;; Not played since
 ;; Number field compare
 ;; String field compare
+;; duration/playing time ><
 ;; Multi-filter
 
 ;; Additionally; emms-browser.el defines these filter factories.
@@ -125,7 +118,7 @@ filter-name factory-arguments)."
 ;; emms-browser-filter-only-type
 ;; emms-browser-filter-only-recent
 
-;; Functions to make filters with.
+;; Factory Functions to make filter functions with.
 
 (defun emf-make-filter-not-recent (days)
   "Make a not played since DAYS filter."
@@ -210,7 +203,7 @@ Give it the shape: (name . (func . prompt-list))."
   (setq emf-filter-factories nil))
 
 ;; Not sure how I can prompt for this.
-;; Ill worry about it when I get there.
+;; I'll worry about it when I get there.
 (emf-register-filter-factory "Number compare"
                              'emf-make-filter-number-field-compare
                              '("field: " "compare to: " "operator:"))
@@ -219,10 +212,7 @@ Give it the shape: (name . (func . prompt-list))."
                              'emf-make-filter-string-field-compare
                              '("field: " "compare to: " "operator:"))
 
-;; Need comment filters
-;; Need rating filters  - number compare....
-
-;; by registering them, they go into the factory list
+;; by registering the factory functions, they go into the factory list
 ;; and become choices to make new filters from.
 ;; They can also be easily referenced by their Names
 ;; when creating new filters.
@@ -288,6 +278,8 @@ Give it the shape: (name . (func . prompt-list))."
             '("Genre" "Blues"      ("blues"))
             '("Genre" "Rock"       ("rock"))
             '("Genre" "Pop"        ("pop"))
+            '("Genre" "Rap"        ("rap"))
+            '("Genre" "Hip Hop"    ("hip hop"))
             '("Genre" "Classical"  ("classical"))
             '("Genre" "Baroque"    ("baroque"))
             '("Genre" "Chamber"    ("chamber"))
@@ -322,7 +314,7 @@ Give it the shape: (name . (func . prompt-list))."
 ;; Install some default filters.
 (emf-make-default-filters)
 
-;; Multi-filter
+;; Multi-filter  - Just another factory.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; A filter of filters. A list of lists of filter Names.
 ;; Each list is Ored together and then Anded with each other.
@@ -449,7 +441,6 @@ If name is nil, create a name from the META-FILTER."
 (defun  emf-refilter ()
   "Make a multi-filter function from the current meta-filter.
 Set it to be the current filter function and re-render."
-  ;; (debug)
   (emms-browser-refilter
    (cons
     (caar emf-stack)
@@ -471,7 +462,6 @@ or a filter-name.
 Make a filter function and set it. If it is a name,
 look it up in our filter list. If it is a function, make
 it a meta-filter, if it is a meta-filter use it."
-  ;; (debug)
   (push (emf-ensure-metafilter filter)
         emf-stack)
   (emf-refilter))
@@ -554,7 +544,6 @@ Creates a new 'AND' list of filters."
   "Print what we know."
   (message (Format "%s\nStack size: %s\nCurrent: %s"
                    (emf-print-stack)
-                   (emf-make-name)
                    (length emf-stack)
                    (emf-current-meta-filter))))
 
@@ -588,13 +577,13 @@ Creates a new 'AND' list of filters."
         (define-key map (kbd "f q") #'emf-pop)
         (define-key map (kbd "f >") #'emf-next)
         (define-key map (kbd "f <") #'emf-previous)
-        (define-key map (kbd "f s") #'emf-status)
-        (define-key map (kbd "f s") #'emf-select)
+        (define-key map (kbd "f r") #'emf-status)
         (define-key map (kbd "f c") #'emf-clear)
         (define-key map (kbd "f k") #'emf-keep)
+        (define-key map (kbd "f s") #'emf-select)
         (define-key map (kbd "f o") #'emf-or-select)
         (define-key map (kbd "f a") #'emf-and-select)
-        (define-key map (kbd "f n") #'emf-and-not-select)
+        ;; (define-key map (kbd "f n") #'emf-and-not-select)
         map))
 
 (provide 'emms-filters.el)

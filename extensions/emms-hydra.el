@@ -5,20 +5,22 @@
 
 (defun emms-status ()
   "Format information on the state of Emms."
-  (format "Queue locked: %s\nRandom: %s  Repeat: %s\nFilter: %s\n%s\n"
+  (format "Queue locked: %s\nRandom: %s  Repeat: %s\nFilter: %s\n%s\n%s\n"
           emms-queue-lock
           emms-random-playlist
           emms-repeat-track
-          emms-browser-current-filter-name
+          (emf-current-meta-filter)
+          (emf-print-stack)
           (mapconcat #'identity (emms-browser-search-crumbs) "\n")))
 
-(defun mystatus ()
+
+(defun my-emms-status ()
   "Message the status of emms."
   (interactive)
   (message (emms-status)))
 
-
 (defun crumb-text ()
+  "Format the search stack crumbs."
   (interactive)
   (mapconcat #'identity (emms-browser-search-crumbs) "\n"))
 
