@@ -35,6 +35,17 @@
                 "Find file: " nil default-directory
                 (confirm-nonexistent-file-or-buffer))) ))
 
+(defun emms-persp ()
+  "Start mpd, start emms,start playlist and lock it to the queue."
+  (interactive)
+  (mpd/start-music-daemon)
+  (split-window-right)
+  (emms-browser)
+  ;; (turn-off-evil-mode)
+  (split-window-right)
+  (emms-playlist-mode-go)
+  (emms-lock-queue))
+
 (defhydra hydra-persp (:hint nil)
   "
      Perspectives
@@ -73,7 +84,7 @@
   ("t q" (layout-3 "~/play/myQMK" "myQMK" "README.org") :exit t)
   ("t M" (progn (layout-3 "~/" "Email" nil) (mu4e) :exit t))
   ("t m" (progn (layout-0 "/home/Music"   "Music"  "README.org")
-                (my-emms-start))
+                (emms-persp))
    :exit t)
   ("t b" (layout-3 "/home/BD"       "BD"     "README.org"))
   ("t z" (layout-3 "~/play/SPR/"    "Emacsn" "README.org"))

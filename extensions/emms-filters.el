@@ -165,7 +165,7 @@ Returns a number"
             year
             (>= y1 year))))))
 
-(defun emf-make-filter-number-field-compare (field compare-number operator-func)
+(defun emf-make-filter-number-field-compare (operator-func field compare-number)
   "Make a filter for FIELD that compares it to COMPARE-NUMBER with OPERATOR-FUNC."
   (lambda (track)
     (let ((track-val (string-to-number (emms-track-get track field)))
@@ -173,7 +173,11 @@ Returns a number"
                 track-val
                 (funcall operator-func compare-number track-val)))))))
 
-(defun emf-make-filter-string-field-compare (field compare-string operator-func)
+;; (setq emf-make-filter-duration-less
+;;       (-partial emf-make-filter-number-field-compare
+;;                 '('<= 'info-playing-time)))
+
+(defun emf-make-filter-string-field-compare (operator-func field compare-string)
   "Make a filter for FIELD that compares it to COMPARE-STRING with OPERATOR-FUNC."
   (lambda (track)
     (let ((track-val (emms-track-get track field))
@@ -206,11 +210,11 @@ Give it the shape: (name . (func . prompt-list))."
 ;; I'll worry about it when I get there.
 (emf-register-filter-factory "Number compare"
                              'emf-make-filter-number-field-compare
-                             '("field: " "compare to: " "operator:"))
+                             '("operator: " "field: " "compare to: "))
 
 (emf-register-filter-factory "String compare"
                              'emf-make-filter-string-field-compare
-                             '("field: " "compare to: " "operator:"))
+                             '("operator: " "field: " "compare to: "))
 
 ;; by registering the factory functions, they go into the factory list
 ;; and become choices to make new filters from.
@@ -272,11 +276,12 @@ Give it the shape: (name . (func . prompt-list))."
       (list '("Genre" "Waltz"      ("waltz"))
             '("Genre" "Vals"       ("vals"))
             '("Genre" "Tango"      ("tango"))
-            '("Genre" "Salsa"      ("salsa"))
             '("Genre" "Milonga"    ("milonga"))
             '("Genre" "Condombe"   ("condombe"))
+            '("Genre" "Salsa"      ("salsa"))
             '("Genre" "Blues"      ("blues"))
             '("Genre" "Rock"       ("rock"))
+            '("Genre" "Swing"      ("swing"))
             '("Genre" "Pop"        ("pop"))
             '("Genre" "Rap"        ("rap"))
             '("Genre" "Hip Hop"    ("hip hop"))
@@ -298,10 +303,10 @@ Give it the shape: (name . (func . prompt-list))."
       (list '("Only type" "Only Files" ('file))))
 
 (setq emf-duration-filters
-      (list '("Number compare" "duration <60"    ('info-playing-time 60 '<=))
-            '("Number compare" "duration <5 min" ('info-playing-time 300 '<=))
-            '("Number compare" "duration >5 min" ('info-playing-time 300 '>=))
-            '("Number compare" "duration >10 min" ('info-playing-time 600 '>=))))
+      (list '("Number compare" "duration <60"    ('<= 'info-playing-time 60))
+            '("Number compare" "duration <5 min" ('<= 'info-playing-time 300))
+            '("Number compare" "duration >5 min" ('>= 'info-playing-time 300))
+            '("Number compare" "duration >10 min" ('>= 'info-playing-time 600))))
 
 (defun emf-make-default-filters()
   "Make some default filters anyone would not mind having."
@@ -586,5 +591,5 @@ Creates a new 'AND' list of filters."
         ;; (define-key map (kbd "f n") #'emf-and-not-select)
         map))
 
-(provide 'emms-filters.el)
+(provide 'emms-filters)
 ;;; emms-filters.el ends here.

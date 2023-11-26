@@ -128,9 +128,9 @@
         ("Year range" "1946-1958" '(1946 1958))
         ("Year range" "1958-"     '(1958 3000))
 
-        ("Genre" "vals" '("vals"))
-        ("Genre" "tango" '("tango"))
-        ("Genre" "milonga" '("milonga"))))
+        ("Genre" "vals"    ("vals"))
+        ("Genre" "tango"   ("tango"))
+        ("Genre" "milonga" ("milonga"))))
 
 (emf-make-filters tango-filters)
 
@@ -170,17 +170,6 @@
   (emms-stop)
   (call-process "killall" nil nil nil "mpd")
   (message "MPD Killed!"))
-
-(defun my-emms-start ()
-  "Start mpd, start emms,start playlist and lock it to the queue."
-  (interactive)
-  (mpd/start-music-daemon)
-  (split-window-right)
-  (emms-browser)
-  ;; (turn-off-evil-mode)
-  (split-window-right)
-  (emms-playlist-mode-go)
-  (emms-lock-queue))
 
 ;; Keymaps
 ;; Add to browser keymap
