@@ -136,17 +136,17 @@
 ;; (emf-make-filters tango-filters)
 
 ;; the emms-browser way.
-(emms-browser-make-filter "vals"
-                          (emf-make-filter-genre "vals"))
+(emb-make-filter "vals"
+                 (emf-make-filter-genre "vals"))
 
-(emms-browser-make-filter "milonga"
-                          (emf-make-filter-genre "milonga"))
+(emb-make-filter "milonga"
+                 (emf-make-filter-genre "milonga"))
 
-(emms-browser-make-filter "1900-1929"
-                          (emf-make-filter-year-range 1900 1929))
+(emb-make-filter "1900-1929"
+                 (emf-make-filter-year-range 1900 1929))
 
-(emms-browser-make-filter "1929-1937"
-                          (emf-make-filter-year-range 1930 1937))
+(emb-make-filter "1929-1937"
+                 (emf-make-filter-year-range 1930 1937))
 
 ;; ;; multi-filters
 ;; (emms-browser-make-filter "1900-1937"
@@ -155,15 +155,15 @@
 ;; (emms-browser-make-filter "multi-vals"
 ;;                           (emf-meta-filter->multi-filter '(("vals")) ))
 
-(emms-browser-make-filter
+(emb-make-filter
  "1900-1937"
  (emf-make-multi-filter '(("1900-1929" "1929-1937")) ))
 
-(emms-browser-make-filter
+(emb-make-filter
  "multi-vals"
  (emf-make-multi-filter '(("vals"))))
 
-(emms-browser-make-filter
+(emb-make-filter
  "vals or milonga"
  (emf-make-multi-filter '(("vals" "milonga"))))
 

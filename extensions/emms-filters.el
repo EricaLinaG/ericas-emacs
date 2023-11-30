@@ -58,11 +58,13 @@
 (defvar emf-filters '()
   "A list of available filters.")
 
+
 (defun emf-register-filter (filter-name filter)
   "Put our new FILTER function named FILTER-NAME in our filter list."
   (push (cons filter-name filter) emf-filters))
 
-(defmacro emf-make-filter (name func)
+;; The real registration and a fake closure.
+(defmacro emb-make-filter (name func)
   "Make a user-level filter function with NAME for filtering tracks with FUNC.
 This:
  - defines an interactive function emf-show-NAME.
@@ -74,12 +76,16 @@ This:
     `(progn
        (defvar ,var nil ,desc)
        (setq ,var (cons ,name ,func))
-       (add-to-list 'emf-filters ,var)
+       (add-to-list 'emms-browser-filters ,var)
        (defun ,funcnam ()
          ,desc
          (interactive)
          (emms-browser-refilter ,var)))))
 
+;; Filter Factories
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; this is the real filter maker - from factories.
 (defun emf-make-filter (factory filter-name factory-args)
   "Make a filter named FILTER-NAME using the FACTORY and FACTORY-ARGS.
 if factory is a function it is used directly. Otherwise, it will
@@ -117,9 +123,7 @@ filter-name factory-arguments)."
 
 (defun emf-find-filter-function (filter-name)
   "Find the Function for FILTER-NAME in emf-filters."
-  (cdr (assoc filter-name emf-filters)))
-;; Filter Factories
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (cdr (assoc filter-name emms-browser-filters)))
 
 ;;; Filters
 ;; Here are some filter factories.
@@ -359,7 +363,7 @@ Give it the shape: (name . (func . prompt-list))."
    (lambda (result filter-name)
      (or result
          (not
-          (funcall (cdr (assoc filter-name emms-browser-filters)) track))))
+          (funcall  (emf-find-filter-function filter-name) track))))
    or-group
    :initial-value nil))
 
