@@ -62,6 +62,24 @@
   "Put our new FILTER function named FILTER-NAME in our filter list."
   (push (cons filter-name filter) emf-filters))
 
+(defmacro emf-make-filter (name func)
+  "Make a user-level filter function with NAME for filtering tracks with FUNC.
+This:
+ - defines an interactive function emf-show-NAME.
+ - defines a variable emf-filter-NAME of (name . func).
+ - adds the filter to `emf-filters'."
+  (let ((funcnam (intern (concat "emf-show-" name)))
+        (var  (intern (concat "emf-filter-" name)))
+        (desc (concat "Filter the cache using rule: " name)))
+    `(progn
+       (defvar ,var nil ,desc)
+       (setq ,var (cons ,name ,func))
+       (add-to-list 'emf-filters ,var)
+       (defun ,funcnam ()
+         ,desc
+         (interactive)
+         (emms-browser-refilter ,var)))))
+
 (defun emf-make-filter (factory filter-name factory-args)
   "Make a filter named FILTER-NAME using the FACTORY and FACTORY-ARGS.
 if factory is a function it is used directly. Otherwise, it will
@@ -91,12 +109,15 @@ filter-name factory-arguments)."
   "Show the filters we have."
   (when emf-filters
     (message "Emf Filters:\n%s"
-             (mapconcat 'identity "\n" (emf-list-filters)))))
+             (mapconcat 'identity (emf-list-filters) "\n"))))
 
 (defun emf-find-filter (name)
   "A nicer way to find NAME in our list of filters."
   (assoc name emf-filters))
 
+(defun emf-find-filter-function (filter-name)
+  "Find the Function for FILTER-NAME in emf-filters."
+  (cdr (assoc filter-name emf-filters)))
 ;; Filter Factories
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -308,76 +329,100 @@ Give it the shape: (name . (func . prompt-list))."
             '("Number compare" "duration >5 min" ('>= 'info-playing-time 300))
             '("Number compare" "duration >10 min" ('>= 'info-playing-time 600))))
 
-(defun emf-make-default-filters()
-  "Make some default filters anyone would not mind having."
-  (emf-make-filters emf-decade-filters)
-  (emf-make-filters emf-genre-filters)
-  (emf-make-filters emf-misc-filters)
-  (emf-make-filters emf-last-played-filters)
-  (emf-make-filters emf-duration-filters))
+;; (defun emf-make-default-filters()
+;;   "Make some default filters anyone would not mind having."
+;;   (emf-make-filters emf-decade-filters)
+;;   (emf-make-filters emf-genre-filters)
+;;   (emf-make-filters emf-misc-filters)
+;;   (emf-make-filters emf-last-played-filters)
+;;   (emf-make-filters emf-duration-filters))
 
 ;; Install some default filters.
-(emf-make-default-filters)
+;; (emf-make-default-filters)
+
+
 
 ;; Multi-filter  - Just another factory.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; A filter of filters. A list of lists of filter Names.
 ;; Each list is Ored together and then Anded with each other.
 
-(defun reduce-filters-for-track (filters track)
-  "Reduce the result of FILTERS on TRACK, true with nil filter, or match."
-  (if filters
-      (cl-reduce
-       (lambda (result func)
-         (or result
-             (not (funcall func track))))
-       filters
-       :initial-value nil)
-    t))
+(defun emf-meta-filter->multi-funcs (filter-name-list)
+  "Return a list of functions from emf-filters for a FILTER-NAME-LIST."
+  (list (mapcar (lambda (filter-name)
+                  (cdr (assoc filter-name emf-filters)))
+                filter-name-list)))
 
-(defun emf-multi-filter-funcs (filter-name-list)
-  "Return a list of functions for a FILTER-NAME-LIST."
-  (mapcar (lambda (filter-name)
-            (cdr (emf-find-filter filter-name)))
-          filter-name-list))
+(defun emf-reduce-or-group (or-group track)
+  "Call an OR-GROUP list of filters with TRACK and reduce result with OR."
+  (cl-reduce
+   (lambda (result filter-name)
+     (or result
+         (not
+          (funcall (cdr (assoc filter-name emms-browser-filters)) track))))
+   or-group
+   :initial-value nil))
 
-(defun emf-meta-filter->multi-filter (multi-filters-list)
+(defun emf-make-multi-filter (multi-filters-list)
   "Make a track filter function from MULTI-FILTERS-LIST.
 The function will take a track as a parameter and return t if the track
-does not match the filters. We resolve the filter function calls here,
-on creation.
-
+does not match the filters.
 A multi-filter is a list of lists of filter names.
 The track is checked against each filter, each list of filters is
 reduced with or. The lists are reduced with and.
 Returns True if the track should be filtered out."
-  (if multi-filters-list
-      (let* ((multi-funcs
-              (mapcar 'emf-multi-filter-funcs
-                      multi-filters-list)))
-        (lambda (track)
-          (not (cl-reduce
-                (lambda (result funclist)
-                  (and result
-                       (reduce-filters-for-track funclist track)))
-                multi-funcs
-                :initial-value nil))))))
+  (lambda (track)
+    (not (cl-reduce
+          (lambda (result funclist)
+            (and result
+                 (emf-reduce-or-group funclist track)))
+          multi-filters-list
+          :initial-value t))))
 
-(defun emf-make-multi-filter (name meta-filter)
-  "Turn NAME and META-FILTER into a multi-filter function.
-Register the filter into the emf-filters list.
-If name is nil, create a name from the META-FILTER."
-  (emf-register-filter
-   (if name
-       name
-     (emf-make-name meta-filter))
-   (emf-meta-filter->multi-filter meta-filter)))
 
-(defun emf-make-multi-filters (meta-filters-list)
-  "Turn META-FILTERS-LIST into a multi-filter function."
-  (mapcar (lambda (meta-filter)
-            (emf-make-multi-filter (car meta-filter) (cdr meta-filter)))
-          meta-filters-list))
+;; (emf-multi-filter-funcs '("vals"))
+
+;; (defun emf-reduce-meta-filter (meta-filter track)
+;;   "Filter TRACK with filter functions from META-FILTER.
+;; Reduce the OR groups together with AND."
+;;   (let* ((multi-funcs (emf-meta-filter->multi-funcs meta-filter)))
+;;     (not (cl-reduce
+;;           (lambda (result or-group)
+;;             (and result
+;;                  (reduce-filters-with-track or-group track)))
+;;           multi-funcs
+;;           :initial-value t))))
+
+;; (defun emf-meta-filter->multi-filter (meta-filter)
+;;   "Make a track filter function from META-FILTER.
+;; The function will take a track as a parameter and return t if the track
+;; does not match the filters.
+
+;; A multi-filter is a list of lists of filter names.
+;; That is transformed into lists of functions.
+;; The track is checked against each filter, each list of filters is
+;; reduced with or. The lists are reduced with and.
+;; Returns True if the track should be filtered out."
+;;   (lambda (track)
+;;     (funcall 'emf-reduce-meta-filter meta-filter track)))
+
+;; (defun emf-make-multi-filter (name meta-filter)
+;;   "Turn NAME and META-FILTER into a multi-filter function.
+;; Register the filter into the emf-filters list.
+;; If name is nil, create a name from the META-FILTER."
+;;   (debug)
+;;   ;; emms-browser-make-filter
+;;   (emf-register-filter
+;;    (or name
+;;        (emf-make-name meta-filter))
+;;    (emf-meta-filter->multi-filter meta-filter)))
+
+;; (defun emf-make-multi-filters (meta-filters-list)
+;;   "Turn META-FILTERS-LIST into a multi-filter function."
+;;   (debug)
+;;   (mapcar (lambda (meta-filter)
+;;             (emf-make-multi-filter (car meta-filter) (cdr meta-filter)))
+;;           meta-filters-list))
 
 ;; Some multi-filters.
 (setq some-multi-filters
@@ -402,7 +447,7 @@ If name is nil, create a name from the META-FILTER."
           ("Vals | Milonga")))))
 
 
-(emf-make-multi-filters some-multi-filters)
+                                        ; (emf-make-multi-filters some-multi-filters)
 
 
 ;; The Meta filter
@@ -552,7 +597,7 @@ Creates a new 'AND' list of filters."
                    (length emf-stack)
                    (emf-current-meta-filter))))
 
-(defun emf-next-filter (&optional reverse)
+(defun emf-next (&optional reverse)
   "Redisplay with the next filter. Reverse the order if REVERSE is true."
   (interactive)
   (let* ((list (if reverse
@@ -565,17 +610,17 @@ Creates a new 'AND' list of filters."
       (setq next (car list)))
     (emf-push next)))
 
-(defun emf-previous-filter ()
+(defun emf-previous ()
   "Redisplay with the previous filter."
   (interactive)
   (emf-next-filter t))
 
-(setq emms-browser-mode-map
-      (let ((map emms-browser-mode-map))
-        (define-key map (kbd ">") #'emf-next)
-        (define-key map (kbd "<") #'emf-previous)
-        (define-key map (kbd "f s") #'emf-select)
-        map))
+;; (setq emms-browser-mode-map
+;;       (let ((map emms-browser-mode-map))
+;;         (define-key map (kbd ">") #'emf-next)
+;;         (define-key map (kbd "<") #'emf-previous)
+;;         (define-key map (kbd "f s") #'emf-select)
+;;         map))
 
 (setq emms-browser-mode-map
       (let ((map emms-browser-mode-map))

@@ -1,7 +1,7 @@
 (require 'backup-dir)
 
 (setq
- root-dir (file-name-as-directory "~/.emacs.d")
+ root-dir (file-name-as-directory "~/")
  tmp-dir (file-name-as-directory (concat root-dir "tmp"))
  autosaves-dir (file-name-as-directory (concat tmp-dir  "autosaves"))
  backups-dir  (file-name-as-directory (concat tmp-dir  "backups")))
@@ -10,6 +10,8 @@
 (make-directory autosaves-dir t)
 (make-directory backups-dir t)
 
+(setq backup-directory-alist
+      `(("." . ,(concat user-emacs-directory "backups"))))
 
 (make-variable-buffer-local 'backup-inhibited)
 (setq bkup-backup-directory-info
@@ -17,7 +19,8 @@
 
 (setq auto-save-file-name-transforms `((".*" ,(concat autosaves-dir "\\1") t)))
 (setq backup-by-copying t)
-(setq backup-directory-alist `((".*" . ,backups-dir)))
+;; (setq backup-directory-alist `((".*" . ,backups-dir)))
+(setq backup-directory-alist `(("." . ,backups-dir)))
 (setq auto-save-list-file-name (concat autosaves-dir "autosave-list"))
 
 (setq delete-old-versions t

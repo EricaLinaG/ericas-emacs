@@ -119,6 +119,7 @@
 ;; Filters
 (setq emms-browser-current-filter-name nil)
 
+
 ;;  function     Name        arguments
 (setq tango-filters
       '(("Year range" "1900-1929" '(1900 1929))
@@ -132,26 +133,56 @@
         ("Genre" "tango"   ("tango"))
         ("Genre" "milonga" ("milonga"))))
 
-(emf-make-filters tango-filters)
+;; (emf-make-filters tango-filters)
 
-(setq tango-multi-filters
-      '(("1900-1937"
-         (("1900-1929" "1929-1937")))
+;; the emms-browser way.
+(emms-browser-make-filter "vals"
+                          (emf-make-filter-genre "vals"))
 
-        ("1937-1946"
-         (("1937-1942" "1940-1946")))
+(emms-browser-make-filter "milonga"
+                          (emf-make-filter-genre "milonga"))
 
-        ("Vals or milonga"
-         (("vals" "milonga")))
+(emms-browser-make-filter "1900-1929"
+                          (emf-make-filter-year-range 1900 1929))
 
-        ("Vals 1900-1929"
-         (("1900-1929") ("vals")))
+(emms-browser-make-filter "1929-1937"
+                          (emf-make-filter-year-range 1930 1937))
 
-        ("Vals or milonga, 1900-1937"
-         (("1900-1929" "1929-1937")
-          ("vals" "milonga")))))
+;; ;; multi-filters
+;; (emms-browser-make-filter "1900-1937"
+;;                           (emf-meta-filter->multi-filter '(("1900-1929" "1929-1937"))))
 
-(emf-make-multi-filters tango-multi-filters)
+;; (emms-browser-make-filter "multi-vals"
+;;                           (emf-meta-filter->multi-filter '(("vals")) ))
+
+(emms-browser-make-filter
+ "1900-1937"
+ (emf-make-multi-filter '(("1900-1929" "1929-1937")) ))
+
+(emms-browser-make-filter
+ "multi-vals"
+ (emf-make-multi-filter '(("vals"))))
+
+(emms-browser-make-filter
+ "vals or milonga"
+ (emf-make-multi-filter '(("vals" "milonga"))))
+
+;; (setq tango-multi-filters
+;;       '(("1900-1937"
+;;          (("1900-1929" "1929-1937")))
+;; ("1937-1946"
+;;  (("1937-1942" "1940-1946")))
+;; ("Vals or milonga"
+;;  (("vals" "milonga")))
+;; ("Vals 1900-1929"
+;;  (("1900-1929") ("vals")))
+;; ;; ("Vals or milonga, 1900-1937"
+;; ;;  (("1900-1929" "1929-1937")
+;; ;;   ("vals" "milonga")))
+;; )
+;; )
+
+;; (emf-make-multi-filters tango-multi-filters)
 
 
 ;; extras - start and stop mpd. A function to give to Perspective.

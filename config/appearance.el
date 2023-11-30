@@ -67,8 +67,8 @@
 
 ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
 ;;(set-frame-parameter (selected-frame) 'alpha <both>)
-(set-frame-parameter (selected-frame) 'alpha '(85 . 70))
-(add-to-list 'default-frame-alist '(alpha . (85 . 70)))
+(set-frame-parameter (selected-frame) 'alpha '(85 . 80))
+(add-to-list 'default-frame-alist '(alpha . (85 . 80)))
 
 ;;get rid of clutter, menus, scrollbars, etc.
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
@@ -88,3 +88,6 @@
 ;;make fringe bigger
 (if (fboundp 'fringe-mode)
     (fringe-mode 10))
+
+(provide 'appearance)
+;;; appearance.el ends here.
