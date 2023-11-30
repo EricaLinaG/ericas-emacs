@@ -119,66 +119,43 @@
 ;; Filters
 (setq emms-browser-current-filter-name nil)
 
-
 ;;  function     Name        arguments
 (setq tango-filters
-      '(("Year range" "1900-1929" '(1900 1929))
-        ("Year range" "1929-1937" '(1929 1937))
-        ("Year range" "1937-1942" '(1937 1942))
-        ("Year range" "1940-1946" '(1940 1946))
-        ("Year range" "1946-1958" '(1946 1958))
-        ("Year range" "1958-"     '(1958 3000))
+      '(("Year range" "1900-1929" 1900 1929)
+        ("Year range" "1929-1937" 1929 1937)
+        ("Year range" "1937-1942" 1937 1942)
+        ("Year range" "1940-1946" 1940 1946)
+        ("Year range" "1946-1958" 1946 1958)
+        ("Year range" "1958-"     1958 3000)
 
-        ("Genre" "vals"    ("vals"))
-        ("Genre" "tango"   ("tango"))
-        ("Genre" "milonga" ("milonga"))))
+        ;; ("Genre" "vals"    "vals")
+        ;; ("Genre" "tango"   "tango")
+        ;; ("Genre" "milonga" "milonga")
 
-;; (emf-make-filters tango-filters)
+        ("Multi-filter"
+         "1900-1937"
+         (("1900-1929" "1929-1937")))
 
-(emf-make-filter "Genre" "vals" '("vals"))
-(emf-make-filter "Genre" "milonga" '("milonga"))
+        ("Multi-filter"
+         "1937-1946"
+         (("1937-1942" "1940-1946")))
 
-;; (emf-register-filter "vals"
-;;                      (emf-make-filter-genre "vals"))
+        ("Multi-filter"
+         "vals | milonga"
+         (("vals" "milonga")))
 
-(emf-make-filter "Year range" "1900-1929" '(1900 1929))
-(emf-make-filter "Year range" "1929-1937" '(1930 1937))
+        ("Multi-filter"
+         "vals 1900-1929"
+         (("vals") ("1900-1929")))
 
-;; ;; multi-filters
-;; (emms-browser-make-filter "1900-1937"
-;;                           (emf-meta-filter->multi-filter '(("1900-1929" "1929-1937"))))
+        ("Multi-filter"
+         "vals or milonga 1900-1937"
+         (("vals" "milonga")
+          ("1900-1929" "1929-1937")))
+        )
+      )
 
-;; (emms-browser-make-filter "multi-vals"
-;;                           (emf-meta-filter->multi-filter '(("vals")) ))
-
-(emf-register-filter
- "1900-1937"
- (emf-make-multi-filter '(("1900-1929" "1929-1937")) ))
-
-(emf-register-filter
- "multi-vals"
- (emf-make-multi-filter '(("vals"))))
-
-(emf-register-filter
- "vals or milonga"
- (emf-make-multi-filter '(("vals" "milonga"))))
-
-;; (setq tango-multi-filters
-;;       '(("1900-1937"
-;;          (("1900-1929" "1929-1937")))
-;; ("1937-1946"
-;;  (("1937-1942" "1940-1946")))
-;; ("Vals or milonga"
-;;  (("vals" "milonga")))
-;; ("Vals 1900-1929"
-;;  (("1900-1929") ("vals")))
-;; ;; ("Vals or milonga, 1900-1937"
-;; ;;  (("1900-1929" "1929-1937")
-;; ;;   ("vals" "milonga")))
-;; )
-;; )
-
-;; (emf-make-multi-filters tango-multi-filters)
+(emf-make-filters tango-filters)
 
 
 ;; extras - start and stop mpd. A function to give to Perspective.

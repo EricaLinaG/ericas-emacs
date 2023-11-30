@@ -96,15 +96,15 @@ look for the function in emf-filter-factories."
          (filter (apply func factory-args)))
     (emf-register-filter filter-name filter)))
 
-;; (defun emf-make-filters (filter-list)
-;;   "Make filters in FILTER-LIST into filter functions.
-;; The filter list holds entries specified as (factory-name
-;; filter-name factory-arguments)."
-;;   (mapcar (lambda (filter)
-;;             (emf-make-filter
-;;              (car filter)
-;;              (cadr filter) (cddr filter)))
-;;           filter-list))
+(defun emf-make-filters (filter-list)
+  "Make filters in FILTER-LIST into filter functions.
+The filter list holds entries specified as (factory-name
+filter-name factory-arguments)."
+  (mapcar (lambda (filter)
+            (emf-make-filter
+             (car filter)
+             (cadr filter) (cddr filter)))
+          filter-list))
 
 (defun emf-register-filter-factory (name func prompt-list)
   "Register FUNC as NAME with PROMPT-LIST into a filter choice.
@@ -300,75 +300,6 @@ Returns a number"
                              'emf-make-filter-string-field-compare
                              '("operator: " "field: " "compare to: "))
 
-;; A simple not a filter, So we have a default of no filters to choose/return to.
-(emf-register-filter "No Filter" 'ignore)
-
-;; Some simple filters.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;             factory      name        factory arg
-(setq emf-decade-filters
-      (list '("Year range" "1900s"     '(1900 1909))
-            '("Year range" "1910s"     '(1910 1919))
-            '("Year range" "1920s"     '(1920 1929))
-            '("Year range" "1930s"     '(1930 1939))
-            '("Year range" "1940s"     '(1940 1949))
-            '("Year range" "1950s"     '(1950 1959))
-            '("Year range" "1960s"     '(1960 1969))
-            '("Year range" "1970s"     '(1970 1979))
-            '("Year range" "1980s"     '(1980 1989))
-            '("Year range" "1990s"     '(1990 1999))
-            '("Year range" "2000s"     '(2000 2009))
-            '("Year range" "2010s"     '(2010 2019))
-            '("Year range" "2020s"     '(2020 2029))))
-
-(setq emf-genre-filters
-      (list '("Genre" "Waltz"      ("waltz"))
-            '("Genre" "Vals"       ("vals"))
-            '("Genre" "Tango"      ("tango"))
-            '("Genre" "Milonga"    ("milonga"))
-            '("Genre" "Condombe"   ("condombe"))
-            '("Genre" "Salsa"      ("salsa"))
-            '("Genre" "Blues"      ("blues"))
-            '("Genre" "Rock"       ("rock"))
-            '("Genre" "Swing"      ("swing"))
-            '("Genre" "Pop"        ("pop"))
-            '("Genre" "Rap"        ("rap"))
-            '("Genre" "Hip Hop"    ("hip hop"))
-            '("Genre" "Classical"  ("classical"))
-            '("Genre" "Baroque"    ("baroque"))
-            '("Genre" "Chamber"    ("chamber"))
-            '("Genre" "Reggae"     ("reggae"))
-            '("Genre" "Folk"       ("folk"))
-            '("Genre" "World"      ("world"))
-            '("Genre" "Metal"      ("metal"))
-            '("Genre" "Fusion"     ("fusion"))
-            '("Genre" "Jazz"       ("jazz"))))
-
-(setq emf-last-played-filters
-      (list '("Played Since" "Played in the last month" (30))
-            '("Not Played Since" "Not played since a year" (365))))
-
-(setq emf-misc-filters
-      (list '("Only type" "Only Files" ('file))))
-
-(setq emf-duration-filters
-      (list '("Number compare" "duration <60"    ('<= 'info-playing-time 60))
-            '("Number compare" "duration <5 min" ('<= 'info-playing-time 300))
-            '("Number compare" "duration >5 min" ('>= 'info-playing-time 300))
-            '("Number compare" "duration >10 min" ('>= 'info-playing-time 600))))
-
-;; (defun emf-make-default-filters()
-;;   "Make some default filters anyone would not mind having."
-;;   (emf-make-filters emf-decade-filters)
-;;   (emf-make-filters emf-genre-filters)
-;;   (emf-make-filters emf-misc-filters)
-;;   (emf-make-filters emf-last-played-filters)
-;;   (emf-make-filters emf-duration-filters))
-
-;; Install some default filters.
-;; (emf-make-default-filters)
-
 ;; Multi-filter  - Just another factory.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; A filter of filters. A list of lists of filter Names.
@@ -409,12 +340,115 @@ Returns True if the track should be filtered out."
               local-meta-filter
               :initial-value t)))))
 
+(emf-register-filter-factory "Multi-filter"
+                             'emf-make-multi-filter
+                             '(nil))
+
 ;; patching together for now for the meta-filter stack.
+
 (defun emf-meta-filter->multi-filter (meta-filter)
   "The real META-FILTER deal."
   (emf-make-multi-filter meta-filter))
 
-;; (emf-multi-filter-funcs '("vals"))
+
+;; Some simple filters.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; A simple not a filter, So we have a default of no filters to choose/return to.
+(emf-register-filter "No Filter" 'ignore)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;             factory      name        factory arg
+(setq emf-decade-filters
+      '(("Year range" "1900s"     1900 1909)
+        ("Year range" "1910s"     1910 1919)
+        ("Year range" "1920s"     1920 1929)
+        ("Year range" "1930s"     1930 1939)
+        ("Year range" "1940s"     1940 1949)
+        ("Year range" "1950s"     1950 1959)
+        ("Year range" "1960s"     1960 1969)
+        ("Year range" "1970s"     1970 1979)
+        ("Year range" "1980s"     1980 1989)
+        ("Year range" "1990s"     1990 1999)
+        ("Year range" "2000s"     2000 2009)
+        ("Year range" "2010s"     2010 2019)
+        ("Year range" "2020s"     2020 2029)))
+
+(setq emf-genre-filters
+      '(("Genre" "Waltz"      "waltz")
+        ("Genre" "Vals"       "vals")
+        ("Genre" "Tango"      "tango")
+        ("Genre" "Milonga"    "milonga")
+        ("Genre" "Condombe"   "condombe")
+        ("Genre" "Salsa"      "salsa")
+        ("Genre" "Blues"      "blues")
+        ("Genre" "Rock"       "rock")
+        ("Genre" "Swing"      "swing")
+        ("Genre" "Pop"        "pop")
+        ("Genre" "Rap"        "rap")
+        ("Genre" "Hip Hop"    "hip hop")
+        ("Genre" "Classical"  "classical")
+        ("Genre" "Baroque"    "baroque")
+        ("Genre" "Chamber"    "chamber")
+        ("Genre" "Reggae"     "reggae")
+        ("Genre" "Folk"       "folk")
+        ("Genre" "World"      "world")
+        ("Genre" "Metal"      "metal")
+        ("Genre" "Fusion"     "fusion")
+        ("Genre" "Jazz"       "jazz")))
+
+(setq emf-last-played-filters
+      '(("Played Since" "Played in the last month" 30)
+        ("Not Played Since" "Not played since a year" 365)))
+
+(setq emf-misc-filters
+      '(("Only type" "Only Files" ('file))))
+
+(setq emf-duration-filters
+      '(("Number compare" "duration <60"     '<= 'info-playing-time 60)
+        ("Number compare" "duration <5 min"  '<= 'info-playing-time 300)
+        ("Number compare" "duration >5 min"  '>= 'info-playing-time 300)
+        ("Number compare" "duration >10 min" '>= 'info-playing-time 600)))
+
+(setq some-multi-filters
+      '(("Multi-filter"
+         "1930-1949"
+         (("1930-1939" "1940-1949")) )
+
+        ("Multi-filter"
+         "Vals | Waltz"
+         (("Vals" "Waltz")))
+
+        ("Multi-filter"
+         "Milonga | Condombe"
+         (("Milonga" "Condombe")))
+
+        ("Multi-filter"
+         "Vals | Milonga"
+         (("Vals" "Milonga")))
+
+        ("Multi-filter"
+         "Vals && 1930-1949"
+         (("Vals")
+          ("1930-1949")))
+
+        ("Multi-filter"
+         "Vals or milonga, 1930-1959"
+         (("1930-1949" "1950-1959")
+          ("Vals | Milonga")))))
+
+(defun emf-make-default-filters()
+  "Make some default filters anyone would not mind having."
+  (emf-make-filters emf-decade-filters)
+  (emf-make-filters emf-genre-filters)
+  ;;  (emf-make-filters emf-misc-filters)
+  ;;  (emf-make-filters emf-last-played-filters)
+  ;;  (emf-make-filters emf-duration-filters)
+  )
+
+  ;; Install some default filters.
+  (emf-make-default-filters)
 
 ;; (defun emf-reduce-meta-filter (meta-filter track)
 ;;   "Filter TRACK with filter functions from META-FILTER.
@@ -481,7 +515,7 @@ Returns True if the track should be filtered out."
           ("Vals | Milonga")))))
 
 
-                                        ; (emf-make-multi-filters some-multi-filters)
+;; (emf-make-multi-filters some-multi-filters)
 
 
 ;; The Meta filter
