@@ -135,18 +135,14 @@
 
 ;; (emf-make-filters tango-filters)
 
+(emf-make-filter "Genre" "vals" '("vals"))
+(emf-make-filter "Genre" "milonga" '("milonga"))
 
-(emf-register-filter "vals"
-                     (emf-make-filter-genre "vals"))
+;; (emf-register-filter "vals"
+;;                      (emf-make-filter-genre "vals"))
 
-(emf-register-filter "milonga"
-                     (emf-make-filter-genre "milonga"))
-
-(emf-register-filter "1900-1929"
-                     (emf-make-filter-year-range 1900 1929))
-
-(emf-register-filter "1929-1937"
-                     (emf-make-filter-year-range 1930 1937))
+(emf-make-filter "Year range" "1900-1929" '(1900 1929))
+(emf-make-filter "Year range" "1929-1937" '(1930 1937))
 
 ;; ;; multi-filters
 ;; (emms-browser-make-filter "1900-1937"

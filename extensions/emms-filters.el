@@ -83,21 +83,18 @@
 ;; Filter Factories
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; These are not working yet, again, defmacro closure crap.
-;;
-;; ;; this is the real filter maker - from factories.
-;; ;; they still have to be registered to use them by natural language name.
-;; (defun emf-make-filter (factory fname factory-args)
-;;   "Make a filter named FNAME using the FACTORY and FACTORY-ARGS.
-;; if factory is a function it is used directly. Otherwise, it will
-;; look for the function in emf-filter-factories."
-;;   (let* ((filter-name (string fname))
-;;          (func (if (functionp factory)
-;;                    factory
-;;                  (cadr (assoc factory emf-filter-factories))))
-;;          ;; If we put them in lists, they're two deep here, car!.
-;;          (filter (apply func (car factory-args))))
-;;     (emb-register-filter filter-name filter)))
+;; this is the real filter maker - from factories.
+;; they still have to be registered to use them by natural language name.
+(defun emf-make-filter (factory filter-name factory-args)
+  "Make a filter named FNAME using the FACTORY and FACTORY-ARGS.
+if factory is a function it is used directly. Otherwise, it will
+look for the function in emf-filter-factories."
+  (let* ((func (if (functionp factory)
+                   factory
+                 (cadr (assoc factory emf-filter-factories))))
+         ;; If we put them in lists, they're two deep here, car!.
+         (filter (apply func factory-args)))
+    (emf-register-filter filter-name filter)))
 
 ;; (defun emf-make-filters (filter-list)
 ;;   "Make filters in FILTER-LIST into filter functions.
