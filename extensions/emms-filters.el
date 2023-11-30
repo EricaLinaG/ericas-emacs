@@ -63,7 +63,7 @@
   "Put our new FILTER function named FILTER-NAME in our filter list."
   (push (cons filter-name filter) emf-filters))
 
-;; The real registration and a fake closure.
+;; The real registration with a fake closure.
 (defmacro emb-make-filter (name func)
   "Make a user-level filter function with NAME for filtering tracks with FUNC.
 This:
@@ -76,16 +76,35 @@ This:
     `(progn
        (defvar ,var nil ,desc)
        (setq ,var (cons ,name ,func))
-       (add-to-list 'emms-browser-filters ,var)
+       (add-to-list 'emf-filters ,var)
        (defun ,funcnam ()
          ,desc
          (interactive)
          (emms-browser-refilter ,var)))))
 
+(defun emf-list-filters ()
+  "List the filters in our filter list."
+  (mapcar 'car emf-filters))
+
+(defun emf-show-filters ()
+  "Show the filters we have."
+  (when emf-filters
+    (message "Emf Filters:\n%s"
+             (mapconcat 'identity (emf-list-filters) "\n"))))
+
+(defun emf-find-filter (name)
+  "A nicer way to find NAME in our list of filters."
+  (assoc name emf-filters))
+
+(defun emf-find-filter-function (filter-name)
+  "Find the Function for FILTER-NAME in emf-filters."
+  (cdr (assoc filter-name emms-browser-filters)))
+
 ;; Filter Factories
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; this is the real filter maker - from factories.
+;; they still have to be registered to use them by natural language name.
 (defun emf-make-filter (factory filter-name factory-args)
   "Make a filter named FILTER-NAME using the FACTORY and FACTORY-ARGS.
 if factory is a function it is used directly. Otherwise, it will
@@ -106,109 +125,6 @@ filter-name factory-arguments)."
              (car filter)
              (cadr filter) (cddr filter)))
           filter-list))
-
-(defun emf-list-filters ()
-  "List the filters in our filter list."
-  (mapcar 'car emf-filters))
-
-(defun emf-show-filters ()
-  "Show the filters we have."
-  (when emf-filters
-    (message "Emf Filters:\n%s"
-             (mapconcat 'identity (emf-list-filters) "\n"))))
-
-(defun emf-find-filter (name)
-  "A nicer way to find NAME in our list of filters."
-  (assoc name emf-filters))
-
-(defun emf-find-filter-function (filter-name)
-  "Find the Function for FILTER-NAME in emf-filters."
-  (cdr (assoc filter-name emms-browser-filters)))
-
-;;; Filters
-;; Here are some filter factories.
-;; Genre.
-;; Year-range
-;; Year-greater
-;; Year-less
-;; Not played since
-;; Number field compare
-;; String field compare
-;; duration/playing time ><
-;; Multi-filter
-
-;; Additionally; emms-browser.el defines these filter factories.
-
-;; emms-browser-filter-only-dir
-;; emms-browser-filter-only-type
-;; emms-browser-filter-only-recent
-
-;; Factory Functions to make filter functions with.
-
-(defun emf-make-filter-not-recent (days)
-  "Make a not played since DAYS filter."
-  (lambda (track)
-    (not (funcall (emms-browser-filter-only-recent days) track))))
-
-(defun emf-make-filter-genre (genre)
-  "Make a filter by GENRE."
-  (lambda (track)
-    (let ((info (emms-track-get track 'info-genre)))
-      (not (and info (string-equal-ignore-case genre info))))))
-
-(defun emf-get-year (track)
-  "Get the year from a TRACK. Check year and date fields.
-Returns a number"
-  (let* ((year (emms-track-get track 'info-year))
-         (date (emms-track-get track 'info-date))
-         (year (or year (emms-format-date-to-year date)))
-         (year (and year (string-to-number year))))
-    year))
-
-(defun emf-make-filter-year-range (y1 y2)
-  "Make a date range filter from Y1 and Y2."
-  (lambda (track)
-    (let ((year (emf-get-year track)))
-      (not (and
-            year
-            (<= y1 year)
-            (>= y2 year))))))
-
-(defun emf-make-filter-year-greater (y1)
-  "Make a Greater than year filter from Y1."
-  (lambda (track)
-    (let ((year (emf-get-year track)))
-      (not (and
-            year
-            (<= y1 year))))))
-
-(defun emf-make-filter-year-less (y1)
-  "Make a Less than year filter from Y1."
-  (lambda (track)
-    (let ((year (emf-get-year track)))
-      (not (and
-            year
-            (>= y1 year))))))
-
-(defun emf-make-filter-number-field-compare (operator-func field compare-number)
-  "Make a filter for FIELD that compares it to COMPARE-NUMBER with OPERATOR-FUNC."
-  (lambda (track)
-    (let ((track-val (string-to-number (emms-track-get track field)))
-          (not (and
-                track-val
-                (funcall operator-func compare-number track-val)))))))
-
-;; (setq emf-make-filter-duration-less
-;;       (-partial emf-make-filter-number-field-compare
-;;                 '('<= 'info-playing-time)))
-
-(defun emf-make-filter-string-field-compare (operator-func field compare-string)
-  "Make a filter for FIELD that compares it to COMPARE-STRING with OPERATOR-FUNC."
-  (lambda (track)
-    (let ((track-val (emms-track-get track field))
-          (not (and
-                track-val
-                (funcall operator-func compare-string track-val)))))))
 
 (defun emf-register-filter-factory (name func prompt-list)
   "Register FUNC as NAME with PROMPT-LIST into a filter choice.
@@ -231,43 +147,32 @@ Give it the shape: (name . (func . prompt-list))."
   "Reset the filter factory list."
   (setq emf-filter-factories nil))
 
-;; Not sure how I can prompt for this.
-;; I'll worry about it when I get there.
-(emf-register-filter-factory "Number compare"
-                             'emf-make-filter-number-field-compare
-                             '("operator: " "field: " "compare to: "))
 
-(emf-register-filter-factory "String compare"
-                             'emf-make-filter-string-field-compare
-                             '("operator: " "field: " "compare to: "))
+;;; Filters
+;; Here are some filter factories.
+;; Genre.
+;; Year-range
+;; Year-greater
+;; Year-less
+;; Not played since
+;; Number field compare
+;; String field compare
+;; duration/playing time ><
+;; Multi-filter
+
+;; Additionally; emms-browser.el defines these filter factories.
+
+;; emms-browser-filter-only-dir
+;; emms-browser-filter-only-type
+;; emms-browser-filter-only-recent
 
 ;; by registering the factory functions, they go into the factory list
 ;; and become choices to make new filters from.
 ;; They can also be easily referenced by their Names
-;; when creating new filters.
-
-(emf-register-filter-factory "Year range"
-                             'emf-make-filter-year-range
-                             '("start-year: " "end-year: "))
-
-(emf-register-filter-factory "Greater than Year"
-                             'emf-make-filter-year-greater
-                             '("Year: "))
-
-(emf-register-filter-factory "Less than Year"
-                             'emf-make-filter-year-less
-                             '("Year: "))
-
-(emf-register-filter-factory "Genre"
-                             'emf-make-filter-genre
-                             '("genre: "))
+;; when creating new filters code.
 
 (emf-register-filter-factory "Played Since"
                              'emms-browser-filter-only-recent
-                             '("days: "))
-
-(emf-register-filter-factory "Not Played Since"
-                             'emf-make-filter-not-recent
                              '("days: "))
 
 (emf-register-filter-factory "Only Directory"
@@ -277,6 +182,104 @@ Give it the shape: (name . (func . prompt-list))."
 (emf-register-filter-factory "Only type"
                              'emms-browser-filter-only-type
                              '("Track Type: "))
+
+
+;; Factory Functions to make filter functions with.
+(defun emf-make-filter-not-recent (days)
+  "Make a not played since DAYS filter."
+  (lambda (track)
+    (not (funcall (emms-browser-filter-only-recent days) track))))
+
+(emf-register-filter-factory "Not Played Since"
+                             'emf-make-filter-not-recent
+                             '("days: "))
+
+(defun emf-make-filter-genre (genre)
+  "Make a filter by GENRE."
+  (lambda (track)
+    (let ((info (emms-track-get track 'info-genre)))
+      (not (and info (string-equal-ignore-case genre info))))))
+
+(emf-register-filter-factory "Genre"
+                             'emf-make-filter-genre
+                             '("genre: "))
+
+(defun emf-get-year (track)
+  "Get the year from a TRACK. Check year and date fields.
+Returns a number"
+  (let* ((year (emms-track-get track 'info-year))
+         (date (emms-track-get track 'info-date))
+         (year (or year (emms-format-date-to-year date)))
+         (year (and year (string-to-number year))))
+    year))
+
+(defun emf-make-filter-year-range (y1 y2)
+  "Make a date range filter from Y1 and Y2."
+  (lambda (track)
+    (let ((year (emf-get-year track)))
+      (not (and
+            year
+            (<= y1 year)
+            (>= y2 year))))))
+
+(emf-register-filter-factory "Year range"
+                             'emf-make-filter-year-range
+                             '("start-year: " "end-year: "))
+
+(defun emf-make-filter-year-greater (y1)
+  "Make a Greater than year filter from Y1."
+  (lambda (track)
+    (let ((year (emf-get-year track)))
+      (not (and
+            year
+            (<= y1 year))))))
+
+(emf-register-filter-factory "Greater than Year"
+                             'emf-make-filter-year-greater
+                             '("Year: "))
+
+(defun emf-make-filter-year-less (y1)
+  "Make a Less than year filter from Y1."
+  (lambda (track)
+    (let ((year (emf-get-year track)))
+      (not (and
+            year
+            (>= y1 year))))))
+
+(emf-register-filter-factory "Less than Year"
+                             'emf-make-filter-year-less
+                             '("Year: "))
+
+(defun emf-make-filter-number-field-compare (operator-func field compare-number)
+  "Make a filter for FIELD that compares it to COMPARE-NUMBER with OPERATOR-FUNC."
+  (lambda (track)
+    (let ((track-val (string-to-number (emms-track-get track field)))
+          (not (and
+                track-val
+                (funcall operator-func compare-number track-val)))))))
+
+;; parameter order is good for making partials.
+;; (setq emf-make-filter-duration-less
+;;       (-partial emf-make-filter-number-field-compare
+;;                 '('<= 'info-playing-time)))
+
+;; Not sure how I can prompt for this.
+;; I'll worry about it when I get there.
+(emf-register-filter-factory "Number compare"
+                             'emf-make-filter-number-field-compare
+                             '("operator: " "field: " "compare to: "))
+
+(defun emf-make-filter-string-field-compare (operator-func field compare-string)
+  "Make a filter for FIELD that compares it to COMPARE-STRING with OPERATOR-FUNC."
+  (lambda (track)
+    (let ((track-val (emms-track-get track field))
+          (not (and
+                track-val
+                (funcall operator-func compare-string track-val)))))))
+
+(emf-register-filter-factory "String compare"
+                             'emf-make-filter-string-field-compare
+                             '("operator: " "field: " "compare to: "))
 
 ;; Some simple filters.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -344,17 +347,17 @@ Give it the shape: (name . (func . prompt-list))."
 ;; Install some default filters.
 ;; (emf-make-default-filters)
 
-
-
 ;; Multi-filter  - Just another factory.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; A filter of filters. A list of lists of filter Names.
 ;; Each list is Ored together and then Anded with each other.
 
+;; should try integrating multi-func resolution at function creation.
+
 (defun emf-meta-filter->multi-funcs (filter-name-list)
   "Return a list of functions from emf-filters for a FILTER-NAME-LIST."
   (list (mapcar (lambda (filter-name)
-                  (cdr (assoc filter-name emf-filters)))
+                  (emf-find-filter-function filter-name))
                 filter-name-list)))
 
 (defun emf-reduce-or-group (or-group track)
@@ -383,6 +386,10 @@ Returns True if the track should be filtered out."
           multi-filters-list
           :initial-value t))))
 
+;; patching together for now for the meta-filter stack.
+(defun emf-meta-filter->multi-filter (meta-filter)
+  "The real META-FILTER deal."
+  (emf-make-multi-filter meta-filter))
 
 ;; (emf-multi-filter-funcs '("vals"))
 
