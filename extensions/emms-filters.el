@@ -350,7 +350,6 @@ Returns True if the track should be filtered out."
   "The real META-FILTER deal."
   (emf-make-multi-filter meta-filter))
 
-
 ;; Some simple filters.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -376,34 +375,34 @@ Returns True if the track should be filtered out."
         ("Year range" "2020s"     2020 2029)))
 
 (setq emf-genre-filters
-      '(("Genre" "Waltz"      "waltz")
-        ("Genre" "Vals"       "vals")
-        ("Genre" "Tango"      "tango")
-        ("Genre" "Milonga"    "milonga")
-        ("Genre" "Condombe"   "condombe")
-        ("Genre" "Salsa"      "salsa")
-        ("Genre" "Blues"      "blues")
-        ("Genre" "Rock"       "rock")
-        ("Genre" "Swing"      "swing")
-        ("Genre" "Pop"        "pop")
-        ("Genre" "Rap"        "rap")
-        ("Genre" "Hip Hop"    "hip hop")
-        ("Genre" "Classical"  "classical")
-        ("Genre" "Baroque"    "baroque")
-        ("Genre" "Chamber"    "chamber")
-        ("Genre" "Reggae"     "reggae")
-        ("Genre" "Folk"       "folk")
-        ("Genre" "World"      "world")
-        ("Genre" "Metal"      "metal")
-        ("Genre" "Fusion"     "fusion")
-        ("Genre" "Jazz"       "jazz")))
+      '(("Genre" "waltz"      "waltz")
+        ("Genre" "vals"       "vals")
+        ("Genre" "tango"      "tango")
+        ("Genre" "milonga"    "milonga")
+        ("Genre" "condombe"   "condombe")
+        ("Genre" "salsa"      "salsa")
+        ("Genre" "blues"      "blues")
+        ("Genre" "rock"       "rock")
+        ("Genre" "swing"      "swing")
+        ("Genre" "pop"        "pop")
+        ("Genre" "rap"        "rap")
+        ("Genre" "hip hop"    "hip hop")
+        ("Genre" "classical"  "classical")
+        ("Genre" "baroque"    "baroque")
+        ("Genre" "chamber"    "chamber")
+        ("Genre" "reggae"     "reggae")
+        ("Genre" "folk"       "folk")
+        ("Genre" "world"      "world")
+        ("Genre" "metal"      "metal")
+        ("Genre" "fusion"     "fusion")
+        ("Genre" "jazz"       "jazz")))
 
 (setq emf-last-played-filters
       '(("Played Since" "Played in the last month" 30)
         ("Not Played Since" "Not played since a year" 365)))
 
 (setq emf-misc-filters
-      '(("Only type" "Only Files" ('file))))
+      '(("Only type" "only files" ('file))))
 
 (setq emf-duration-filters
       '(("Number compare" "duration <60"     '<= 'info-playing-time 60)
@@ -417,26 +416,26 @@ Returns True if the track should be filtered out."
          (("1930-1939" "1940-1949")) )
 
         ("Multi-filter"
-         "Vals | Waltz"
-         (("Vals" "Waltz")))
+         "vals | waltz"
+         (("vals" "waltz")))
 
         ("Multi-filter"
-         "Milonga | Condombe"
-         (("Milonga" "Condombe")))
+         "milonga | condombe"
+         (("milonga" "condombe")))
 
         ("Multi-filter"
-         "Vals | Milonga"
-         (("Vals" "Milonga")))
+         "vals | milonga"
+         (("vals" "milonga")))
 
         ("Multi-filter"
-         "Vals && 1930-1949"
-         (("Vals")
+         "vals && 1930-1949"
+         (("vals")
           ("1930-1949")))
 
         ("Multi-filter"
-         "Vals or milonga, 1930-1959"
+         "vals or milonga, 1930-1959"
          (("1930-1949" "1950-1959")
-          ("Vals | Milonga")))))
+          ("vals | milonga")))))
 
 (defun emf-make-default-filters()
   "Make some default filters anyone would not mind having."
@@ -447,50 +446,8 @@ Returns True if the track should be filtered out."
   ;;  (emf-make-filters emf-duration-filters)
   )
 
-  ;; Install some default filters.
-  (emf-make-default-filters)
-
-;; (defun emf-reduce-meta-filter (meta-filter track)
-;;   "Filter TRACK with filter functions from META-FILTER.
-;; Reduce the OR groups together with AND."
-;;   (let* ((multi-funcs (emf-meta-filter->multi-funcs meta-filter)))
-;;     (not (cl-reduce
-;;           (lambda (result or-group)
-;;             (and result
-;;                  (reduce-filters-with-track or-group track)))
-;;           multi-funcs
-;;           :initial-value t))))
-
-;; (defun emf-meta-filter->multi-filter (meta-filter)
-;;   "Make a track filter function from META-FILTER.
-;; The function will take a track as a parameter and return t if the track
-;; does not match the filters.
-
-;; A multi-filter is a list of lists of filter names.
-;; That is transformed into lists of functions.
-;; The track is checked against each filter, each list of filters is
-;; reduced with or. The lists are reduced with and.
-;; Returns True if the track should be filtered out."
-;;   (lambda (track)
-;;     (funcall 'emf-reduce-meta-filter meta-filter track)))
-
-;; (defun emf-make-multi-filter (name meta-filter)
-;;   "Turn NAME and META-FILTER into a multi-filter function.
-;; Register the filter into the emf-filters list.
-;; If name is nil, create a name from the META-FILTER."
-;;   (debug)
-;;   ;; emms-browser-make-filter
-;;   (emf-register-filter
-;;    (or name
-;;        (emf-make-name meta-filter))
-;;    (emf-meta-filter->multi-filter meta-filter)))
-
-;; (defun emf-make-multi-filters (meta-filters-list)
-;;   "Turn META-FILTERS-LIST into a multi-filter function."
-;;   (debug)
-;;   (mapcar (lambda (meta-filter)
-;;             (emf-make-multi-filter (car meta-filter) (cdr meta-filter)))
-;;           meta-filters-list))
+;; Install some default filters.
+(emf-make-default-filters)
 
 ;; Some multi-filters.
 (setq some-multi-filters
