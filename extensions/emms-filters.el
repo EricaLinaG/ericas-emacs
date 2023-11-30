@@ -209,7 +209,7 @@ If the track is not of TYPE, return t."
         (let ((info (emms-track-get track 'info-genre)))
           (not (and info (string-equal-ignore-case local-genre info)))))))
 
-(emf-register-filter-factory "Genre"
+(emf-register-filter-factory "genre"
                              'emf-make-filter-genre
                              '("genre: "))
 
@@ -233,7 +233,7 @@ Returns a number"
                 (<= local-y1 year)
                 (>= local-y2 year)))))))
 
-(emf-register-filter-factory "Year range"
+(emf-register-filter-factory "year range"
                              'emf-make-filter-year-range
                              '("start-year: " "end-year: "))
 
@@ -246,7 +246,7 @@ Returns a number"
                 year
                 (<= local-year year)))))))
 
-(emf-register-filter-factory "Greater than Year"
+(emf-register-filter-factory "greater than Year"
                              'emf-make-filter-year-greater
                              '("Year: "))
 
@@ -259,7 +259,7 @@ Returns a number"
                 year
                 (>= local-year year)))))))
 
-(emf-register-filter-factory "Less than Year"
+(emf-register-filter-factory "less than Year"
                              'emf-make-filter-year-less
                              '("Year: "))
 
@@ -281,7 +281,7 @@ Returns a number"
 
   ;; Not sure how I can prompt for this.
   ;; I'll worry about it when I get there.
-  (emf-register-filter-factory "Number compare"
+  (emf-register-filter-factory "number compare"
                                'emf-make-filter-number-field-compare
                                '("operator: " "field: " "compare to: ")))
 
@@ -296,7 +296,7 @@ Returns a number"
                     track-val
                     (funcall local-operator local-compare-val track-val))))))))
 
-(emf-register-filter-factory "String compare"
+(emf-register-filter-factory "string compare"
                              'emf-make-filter-string-field-compare
                              '("operator: " "field: " "compare to: "))
 
@@ -307,19 +307,25 @@ Returns a number"
 
 ;; should try integrating multi-func resolution at function creation.
 
-(defun emf-meta-filter->multi-funcs (filter-name-list)
+(defun emf-or-group->multi-funcs (filter-name-list)
   "Return a list of functions from emf-filters for a FILTER-NAME-LIST."
-  (list (mapcar (lambda (filter-name)
-                  (emf-find-filter-function filter-name))
-                filter-name-list)))
+  (mapcar (lambda (filter-name)
+            (emf-find-filter-function filter-name))
+          filter-name-list))
+
+(defun emf-meta-filter->multi-funcs (meta-filter)
+  "Return a list of functions from emf-filters for a META-FILTER."
+  (mapcar (lambda (or-group)
+            (emf-or-group->multi-funcs or-group))
+          meta-filter))
 
 (defun emf-reduce-or-group (or-group track)
   "Call an OR-GROUP list of filters with TRACK and reduce result with OR."
   (cl-reduce
-   (lambda (result filter-name)
+   (lambda (result filter-func)
      (or result
          (not
-          (funcall  (emf-find-filter-function filter-name) track))))
+          (funcall filter-func track))))
    or-group
    :initial-value nil))
 
@@ -331,16 +337,17 @@ A multi-filter is a list of lists of filter names.
 The track is checked against each filter, each list of filters is
 reduced with or. The lists are reduced with and.
 Returns True if the track should be filtered out."
-  (lexical-let ((local-meta-filter meta-filter))
+  (lexical-let ((local-multi-funcs
+                 (emf-meta-filter->multi-funcs meta-filter)))
     #'(lambda (track)
         (not (cl-reduce
               (lambda (result funclist)
                 (and result
                      (emf-reduce-or-group funclist track)))
-              local-meta-filter
+              local-multi-funcs
               :initial-value t)))))
 
-(emf-register-filter-factory "Multi-filter"
+(emf-register-filter-factory "multi-filter"
                              'emf-make-multi-filter
                              '(nil))
 
@@ -360,79 +367,75 @@ Returns True if the track should be filtered out."
 
 ;;             factory      name        factory arg
 (setq emf-decade-filters
-      '(("Year range" "1900s"     1900 1909)
-        ("Year range" "1910s"     1910 1919)
-        ("Year range" "1920s"     1920 1929)
-        ("Year range" "1930s"     1930 1939)
-        ("Year range" "1940s"     1940 1949)
-        ("Year range" "1950s"     1950 1959)
-        ("Year range" "1960s"     1960 1969)
-        ("Year range" "1970s"     1970 1979)
-        ("Year range" "1980s"     1980 1989)
-        ("Year range" "1990s"     1990 1999)
-        ("Year range" "2000s"     2000 2009)
-        ("Year range" "2010s"     2010 2019)
-        ("Year range" "2020s"     2020 2029)))
+      '(("year range" "1900s"     1900 1909)
+        ("year range" "1910s"     1910 1919)
+        ("year range" "1920s"     1920 1929)
+        ("year range" "1930s"     1930 1939)
+        ("year range" "1940s"     1940 1949)
+        ("year range" "1950s"     1950 1959)
+        ("year range" "1960s"     1960 1969)
+        ("year range" "1970s"     1970 1979)
+        ("year range" "1980s"     1980 1989)
+        ("year range" "1990s"     1990 1999)
+        ("year range" "2000s"     2000 2009)
+        ("year range" "2010s"     2010 2019)
+        ("year range" "2020s"     2020 2029)))
 
 (setq emf-genre-filters
-      '(("Genre" "waltz"      "waltz")
-        ("Genre" "vals"       "vals")
-        ("Genre" "tango"      "tango")
-        ("Genre" "milonga"    "milonga")
-        ("Genre" "condombe"   "condombe")
-        ("Genre" "salsa"      "salsa")
-        ("Genre" "blues"      "blues")
-        ("Genre" "rock"       "rock")
-        ("Genre" "swing"      "swing")
-        ("Genre" "pop"        "pop")
-        ("Genre" "rap"        "rap")
-        ("Genre" "hip hop"    "hip hop")
-        ("Genre" "classical"  "classical")
-        ("Genre" "baroque"    "baroque")
-        ("Genre" "chamber"    "chamber")
-        ("Genre" "reggae"     "reggae")
-        ("Genre" "folk"       "folk")
-        ("Genre" "world"      "world")
-        ("Genre" "metal"      "metal")
-        ("Genre" "fusion"     "fusion")
-        ("Genre" "jazz"       "jazz")))
+      '(("genre" "waltz"      "waltz")
+        ("genre" "vals"       "vals")
+        ("genre" "tango"      "tango")
+        ("genre" "milonga"    "milonga")
+        ("genre" "condombe"   "condombe")
+        ("genre" "salsa"      "salsa")
+        ("genre" "blues"      "blues")
+        ("genre" "rock"       "rock")
+        ("genre" "swing"      "swing")
+        ("genre" "pop"        "pop")
+        ("genre" "rap"        "rap")
+        ("genre" "hip hop"    "hip hop")
+        ("genre" "classical"  "classical")
+        ("genre" "baroque"    "baroque")
+        ("genre" "chamber"    "chamber")
+        ("genre" "reggae"     "reggae")
+        ("genre" "folk"       "folk")
+        ("genre" "world"      "world")
+        ("genre" "metal"      "metal")
+        ("genre" "fusion"     "fusion")
+        ("genre" "jazz"       "jazz")))
 
 (setq emf-last-played-filters
       '(("Played Since" "Played in the last month" 30)
         ("Not Played Since" "Not played since a year" 365)))
 
 (setq emf-misc-filters
-      '(("Only type" "only files" ('file))))
+      '(("only type" "only files" ('file))))
 
 (setq emf-duration-filters
-      '(("Number compare" "duration <60"     '<= 'info-playing-time 60)
-        ("Number compare" "duration <5 min"  '<= 'info-playing-time 300)
-        ("Number compare" "duration >5 min"  '>= 'info-playing-time 300)
-        ("Number compare" "duration >10 min" '>= 'info-playing-time 600)))
+      '(("number compare" "duration <60"     '<= 'info-playing-time 60)
+        ("number compare" "duration <5 min"  '<= 'info-playing-time 300)
+        ("number compare" "duration >5 min"  '>= 'info-playing-time 300)
+        ("number compare" "duration >10 min" '>= 'info-playing-time 600)))
 
 (setq some-multi-filters
-      '(("Multi-filter"
+      '(("multi-filter"
          "1930-1949"
          (("1930-1939" "1940-1949")) )
 
-        ("Multi-filter"
+        ("multi-filter"
          "vals | waltz"
          (("vals" "waltz")))
 
-        ("Multi-filter"
+        ("multi-filter"
          "milonga | condombe"
          (("milonga" "condombe")))
 
-        ("Multi-filter"
-         "vals | milonga"
-         (("vals" "milonga")))
-
-        ("Multi-filter"
+        ("multi-filter"
          "vals && 1930-1949"
          (("vals")
           ("1930-1949")))
 
-        ("Multi-filter"
+        ("multi-filter"
          "vals or milonga, 1930-1959"
          (("1930-1949" "1950-1959")
           ("vals | milonga")))))
