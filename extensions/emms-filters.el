@@ -98,33 +98,33 @@ This:
 
 (defun emf-find-filter-function (filter-name)
   "Find the Function for FILTER-NAME in emf-filters."
-  (cdr (assoc filter-name emms-browser-filters)))
+  (cdr (assoc filter-name emf-filters)))
 
 ;; Filter Factories
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; this is the real filter maker - from factories.
-;; they still have to be registered to use them by natural language name.
-(defun emf-make-filter (factory filter-name factory-args)
-  "Make a filter named FILTER-NAME using the FACTORY and FACTORY-ARGS.
-if factory is a function it is used directly. Otherwise, it will
-look for the function in emf-filter-factories."
-  (let* ((func (if (functionp factory)
-                   factory
-                 (cadr (assoc factory emf-filter-factories))))
-         ;; If we put them in lists, they're two deep here, car!.
-         (filter (apply func (car factory-args))))
-    (emf-register-filter filter-name filter)))
+;; ;; this is the real filter maker - from factories.
+;; ;; they still have to be registered to use them by natural language name.
+;; (defun emf-make-filter (factory filter-name factory-args)
+;;   "Make a filter named FILTER-NAME using the FACTORY and FACTORY-ARGS.
+;; if factory is a function it is used directly. Otherwise, it will
+;; look for the function in emf-filter-factories."
+;;   (let* ((func (if (functionp factory)
+;;                    factory
+;;                  (cadr (assoc factory emf-filter-factories))))
+;;          ;; If we put them in lists, they're two deep here, car!.
+;;          (filter (apply func (car factory-args))))
+;;     (emf-register-filter filter-name filter)))
 
-(defun emf-make-filters (filter-list)
-  "Make filters in FILTER-LIST into filter functions.
-The filter list holds entries specified as (factory-name
-filter-name factory-arguments)."
-  (mapcar (lambda (filter)
-            (emf-make-filter
-             (car filter)
-             (cadr filter) (cddr filter)))
-          filter-list))
+;; (defun emf-make-filters (filter-list)
+;;   "Make filters in FILTER-LIST into filter functions.
+;; The filter list holds entries specified as (factory-name
+;; filter-name factory-arguments)."
+;;   (mapcar (lambda (filter)
+;;             (emf-make-filter
+;;              (car filter)
+;;              (cadr filter) (cddr filter)))
+;;           filter-list))
 
 (defun emf-register-filter-factory (name func prompt-list)
   "Register FUNC as NAME with PROMPT-LIST into a filter choice.
@@ -280,6 +280,9 @@ Returns a number"
 (emf-register-filter-factory "String compare"
                              'emf-make-filter-string-field-compare
                              '("operator: " "field: " "compare to: "))
+
+;; So we have a default of no filters to return to.
+(emb-make-filter "all" 'ignore)
 
 ;; Some simple filters.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -547,8 +550,12 @@ it a meta-filter, if it is a meta-filter use it."
 (defun  emf-keep ()
   "Register the current filter into the list of filters for the session."
   (interactive)
-  (emf-register-filter (caar emf-stack)
-                       (emf-meta-filter->multi-filter (cdar emf-stack))))
+  (pass)
+
+  ;;(if (and emf-stack (consp (car emf-stack)))
+  ;; (emf-register-filter (caar emf-stack)
+  ;; (emf-meta-filter->multi-filter (cdar emf-stack))))
+  )
 
 (defun  emf-default ()
   "Set to default filter."

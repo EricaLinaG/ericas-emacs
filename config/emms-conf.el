@@ -135,6 +135,8 @@
 
 ;; (emf-make-filters tango-filters)
 
+(emb-make-filter "all" 'ignore)
+
 ;; the emms-browser way.
 (emb-make-filter "vals"
                  (emf-make-filter-genre "vals"))
