@@ -304,9 +304,6 @@ Returns a number"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; A filter of filters. A list of lists of filter Names.
 ;; Each list is Ored together and then Anded with each other.
-
-;; should try integrating multi-func resolution at function creation.
-
 (defun emf-or-group->multi-funcs (filter-name-list)
   "Return a list of functions from emf-filters for a FILTER-NAME-LIST."
   (mapcar (lambda (filter-name)
@@ -564,12 +561,9 @@ it a meta-filter, if it is a meta-filter use it."
 (defun  emf-keep ()
   "Register the current filter into the list of filters for the session."
   (interactive)
-  (pass)
-
-  ;;(if (and emf-stack (consp (car emf-stack)))
-  ;; (emf-register-filter (caar emf-stack)
-  ;; (emf-meta-filter->multi-filter (cdar emf-stack))))
-  )
+  (if (and emf-stack (consp (car emf-stack)))
+      (emf-register-filter (caar emf-stack)
+                           (emf-meta-filter->multi-filter (cdar emf-stack)))))
 
 (defun  emf-default ()
   "Set to default filter."
@@ -620,11 +614,11 @@ Creates a new 'AND' list of filters."
 (defun emf-print-stack()
   "Print the stack."
   ;; (message (format "%s" emf-stack))
-  (message (format "%s" (mapconcat 'car emf-stack "\n"))))
+  (format  "\t%s" (mapconcat 'car emf-stack "\n\t")))
 
 (defun emf-status ()
   "Print what we know."
-  (message (Format "%s\nStack size: %s\nCurrent: %s"
+  (message (format "%s\nStack size: %s\nCurrent: %s"
                    (emf-print-stack)
                    (length emf-stack)
                    (emf-current-meta-filter))))

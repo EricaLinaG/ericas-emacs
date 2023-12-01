@@ -22,15 +22,17 @@
 (defun crumb-text ()
   "Format the search stack crumbs."
   (interactive)
-  (mapconcat #'identity (emms-browser-search-crumbs) "\n"))
+  (format "\t%s" (mapconcat #'identity (emms-browser-search-crumbs) "\n\t")))
 
 (defhydra hydra-emms (:color teal
                              :hint nil)
   "
- Queue Lock: %`emms-queue-lock
+ Queue Lock: %s`emms-queue-lock
  Repeat: %`emms-repeat-track   Random: %`emms-random-playlist
- Filter: %`emms-browser-current-filter-name
- %(crumb-text)
+ Filter stack:
+ %s(emf-print-stack)
+ Search stack:
+ %s(crumb-text)
 
     Windows         MPD          Cache
 ---------------------------------------------------------
