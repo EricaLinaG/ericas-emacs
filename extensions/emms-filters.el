@@ -77,8 +77,11 @@
   (assoc name emf-filters))
 
 (defun emf-find-filter-function (filter-name)
-  "Find the Function for FILTER-NAME in emf-filters."
-  (cdr (assoc filter-name emf-filters)))
+  "Find the Function for FILTER-NAME in emf-filters.
+Pass functions through untouched."
+  (if (eq filter-name :not)
+      :not
+    (cdr (assoc filter-name emf-filters))))
 
 ;; Filter Factories
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -302,7 +305,8 @@ operator function and comparison function"
 ;; A filter of filters. A list of lists of filter Names.
 ;; Each list is Ored together and then Anded with each other.
 (defun emf-or-group->multi-funcs (filter-name-list)
-  "Return a list of functions from emf-filters for a FILTER-NAME-LIST."
+  "Return a list of functions from emf-filters for a FILTER-NAME-LIST.
+Functions already in the list will be passed through."
   (mapcar (lambda (filter-name)
             (emf-find-filter-function filter-name))
           filter-name-list))
@@ -314,7 +318,7 @@ operator function and comparison function"
           meta-filter))
 
 (defun emf-reduce-or-group (or-group track)
-  "Call an OR-GROUP list of filters with TRACK and reduce result with OR."
+  "Reduce OR-GROUP for TRACK."
   (cl-reduce
    (lambda (result filter-func)
      (or result
@@ -322,6 +326,16 @@ operator function and comparison function"
           (funcall filter-func track))))
    or-group
    :initial-value nil))
+
+(defun emf-reduce-invert-or-group (or-group track)
+  "Call an OR-GROUP list of filters with TRACK and reduce result with OR.
+If the first function is 'not then invert the result from the reduction."
+  (let* ((invert (eq (car or-group) :not))
+         (group (if invert
+                    (cdr or-group)
+                  or-group))
+         (result (emf-reduce-or-group group track)))
+    (if invert (not result) result)))
 
 (defun emf-make-multi-filter (meta-filter)
   "Make a track filter function from META-FILTER.
@@ -337,7 +351,7 @@ Returns True if the track should be filtered out."
         (not (cl-reduce
               (lambda (result funclist)
                 (and result
-                     (emf-reduce-or-group funclist track)))
+                     (emf-reduce-invert-or-group funclist track)))
               local-multi-funcs
               :initial-value t)))))
 
@@ -498,7 +512,7 @@ Returns True if the track should be filtered out."
 
 (defun emf-format-meta-filter-groups (filter-list)
   "Format the FILTER-LIST contents to a list of strings."
-  (mapconcat 'identity filter-list " | "))
+  (mapconcat (lambda (fname) (format "%s " fname)) filter-list " | "))
 
 (defun emf-make-name (meta-filter)
   "Construct a name from the META-FILTER contents."
@@ -607,6 +621,17 @@ Creates a new 'AND' list of filters."
      (emf-make-filter-cons-from-meta-filter
       (emf-push-and fname (emf-copy-meta-filter (cdar emf-stack)))))))
 
+(defun  emf-and-not-select ()
+  "Select a filter to start a new list of filters.
+Creates a new 'AND' list of filters."
+  (interactive)
+  (let ((fname (emf-choose-filter)))
+    (emf-push
+     (emf-make-filter-cons-from-meta-filter
+      (emf-push-or fname
+                   (emf-push-and ':not (emf-copy-meta-filter (cdar emf-stack))))
+      ))))
+
 (defun emf-print-stack()
   "Print the stack."
   ;; (message (format "%s" emf-stack))
@@ -637,6 +662,7 @@ Creates a new 'AND' list of filters."
   (interactive)
   (emf-next-filter t))
 
+;; over-rides of browser specific filter functions.
 ;; (setq emms-browser-mode-map
 ;;       (let ((map emms-browser-mode-map))
 ;;         (define-key map (kbd ">") #'emf-next)
@@ -655,7 +681,7 @@ Creates a new 'AND' list of filters."
         (define-key map (kbd "f s") #'emf-select)
         (define-key map (kbd "f o") #'emf-or-select)
         (define-key map (kbd "f a") #'emf-and-select)
-        ;; (define-key map (kbd "f n") #'emf-and-not-select)
+        (define-key map (kbd "f n") #'emf-and-not-select)
         map))
 
 (provide 'emms-filters)

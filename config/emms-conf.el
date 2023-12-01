@@ -150,6 +150,10 @@
          (("vals") ("1900-1929")))
 
         ("multi-filter"
+         "not vals"
+         ((:not "vals")))
+
+        ("multi-filter"
          "vals or milonga 1900-1937"
          (("vals" "milonga")
           ("1900-1929" "1929-1937")))
