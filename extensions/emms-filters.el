@@ -156,7 +156,8 @@ Give it the shape: (name . (func . prompt-list))."
 ;; Factory Functions to make filter functions with.
 (defun emf-filter-only-dir (dirname)
   "Generate a function to check if a track is in DIRNAME.
-If the track is not in DIRNAME, return t."
+If the track is not in DIRNAME, return t.
+Uses a regex anchoring dirname to the beginning of the expanded path."
   (lexical-let ((re (concat "^" (expand-file-name dirname))))
     #'(lambda (track)
         (not (string-match re (emms-track-get track 'name))))))
@@ -164,17 +165,6 @@ If the track is not in DIRNAME, return t."
 (emf-register-filter-factory "only directory"
                              'emf-filter-only-dir
                              '("Directory: "))
-
-(defun emf-filter-only-type (type)
-  "Generate a function to check a track's type.
-If the track is not of TYPE, return t."
-  (lexical-let ((local-type type))
-    #'(lambda (track)
-        (not (eq local-type (emms-track-get track 'type))))))
-
-(emf-register-filter-factory "only type"
-                             'emf-filter-only-type
-                             '("Track Type: "))
 
 ;; seconds in a day (* 60 60 24) = 86400
 (defun emf-filter-played-within (days)
@@ -202,17 +192,7 @@ If the track is not of TYPE, return t."
                              'emf-make-filter-not-played-within
                              '("days: "))
 
-(defun emf-make-filter-genre (genre)
-  "Make a filter by GENRE."
-  (lexical-let ((local-genre genre))
-    #'(lambda (track)
-        (let ((info (emms-track-get track 'info-genre)))
-          (not (and info (string-equal-ignore-case local-genre info)))))))
-
-(emf-register-filter-factory "genre"
-                             'emf-make-filter-genre
-                             '("genre: "))
-
+;; Getting the year is special. It might be in year or date.
 (defun emf-get-year (track)
   "Get the year from a TRACK. Check year and date fields.
 Returns a number"
@@ -263,44 +243,59 @@ Returns a number"
                              'emf-make-filter-year-less
                              '("Year: "))
 
+(defun emf-make-filter-field-compare (operator-func field compare-val)
+  "Make a filter that compares FIELD to COMPARE-VALUE with OPERATOR-FUNC.
+Works for number fields and string fields provided the appropriate
+operator function and comparison function"
+  (lexical-let ((local-operator operator-func)
+                (local-field field)
+                (local-compare-val compare-val))
+    #'(lambda (track)
+        (let ((track-val (emms-track-get track local-field)))
+          (not (and
+                track-val
+                (funcall local-operator track-val local-compare-val)))))))
+
+(emf-register-filter-factory "field compare"
+                             'emf-make-filter-field-compare
+                             '("operator: " "field: " "compare to: "))
+
+(require 'dash)
 ;; Generic field comparison factories.
 ;; parameter order is good for making partials.
-;; (setq emf-make-filter-duration-less
-;;       (-partial emf-make-filter-number-field-compare
-;;                 '('<= 'info-playing-time)))
 
-(defun emf-make-filter-number-field-compare (operator-func field compare-number)
-  "Make a filter that compares FIELD as a number to COMPARE-NUMBER with OPERATOR-FUNC."
-  (lexical-let ((local-operator operator-func)
-                (local-field field)
-                (local-compare-val compare-number))
-    #'(lambda (track)
-        (let* ((track-val-string (emms-track-get track local-field))
-               (track-val (if track-val-string
-                              (string-to-number track-val-string)
-                            0))
-               (not (and
-                     track-val
-                     (funcall local-operator local-compare-val track-val))))))))
+(setq emf-make-filter-duration-less
+      (-partial 'emf-make-filter-field-compare
+                '<= 'info-playing-time))
 
-(emf-register-filter-factory "number compare"
-                             'emf-make-filter-number-field-compare
-                             '("operator: " "field: " "compare to: "))
+(emf-register-filter-factory "duration-less"
+                             emf-make-filter-duration-less
+                             '("duration: " ))
 
-(defun emf-make-filter-string-field-compare (operator-func field compare-string)
-  "Make a filter that compares FIELD as a string to COMPARE-STRING with OPERATOR-FUNC."
-  (lexical-let ((local-operator operator-func)
-                (local-field field)
-                (local-compare-val compare-string))
-    #'(lambda (track)
-        (let ((track-val (emms-track-get track local-field))
-              (not (and
-                    track-val
-                    (funcall local-operator local-compare-val track-val))))))))
+(setq emf-make-filter-duration-greater
+      (-partial 'emf-make-filter-field-compare
+                '>= 'info-playing-time))
 
-(emf-register-filter-factory "string compare"
-                             'emf-make-filter-string-field-compare
-                             '("operator: " "field: " "compare to: "))
+(emf-register-filter-factory "duration-greater"
+                             emf-make-filter-duration-greater
+                             '("duration: " ))
+
+(setq emf-make-filter-genre
+      (-partial 'emf-make-filter-field-compare
+                'string-equal-ignore-case 'info-genre))
+
+(emf-register-filter-factory "genre"
+                             emf-make-filter-genre
+                             '("genre: " ))
+
+(setq emf-make-filter-type
+      (-partial 'emf-make-filter-field-compare
+                'eq 'type))
+
+(emf-register-filter-factory "track type"
+                             emf-make-filter-type
+                             '("track type: "))
+
 
 ;; Multi-filter  - Just another factory.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -407,13 +402,13 @@ Returns True if the track should be filtered out."
         ("Not Played Since" "Not played since a year" 365)))
 
 (setq emf-misc-filters
-      '(("only type" "only files" 'file)))
+      '(("track type" "only files" file)))
 
 (setq emf-duration-filters
-      '(("number compare" "duration <60"     <= 'info-playing-time 60)
-        ("number compare" "duration <5 min"  <= 'info-playing-time 300)
-        ("number compare" "duration >5 min"  >= 'info-playing-time 300)
-        ("number compare" "duration >10 min" >= 'info-playing-time 600)))
+      '(("field compare" "duration <60"     <= info-playing-time 60)
+        ("field compare" "duration <5 min"  <= info-playing-time 300)
+        ("field compare" "duration >5 min"  >= info-playing-time 300)
+        ("field compare" "duration >10 min" >= info-playing-time 600)))
 
 (setq some-multi-filters
       '(("multi-filter"
