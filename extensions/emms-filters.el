@@ -161,7 +161,7 @@ If the track is not in DIRNAME, return t."
     #'(lambda (track)
         (not (string-match re (emms-track-get track 'name))))))
 
-(emf-register-filter-factory "Only Directory"
+(emf-register-filter-factory "only directory"
                              'emf-filter-only-dir
                              '("Directory: "))
 
@@ -172,12 +172,12 @@ If the track is not of TYPE, return t."
     #'(lambda (track)
         (not (eq local-type (emms-track-get track 'type))))))
 
-(emf-register-filter-factory "Only type"
+(emf-register-filter-factory "only type"
                              'emf-filter-only-type
                              '("Track Type: "))
 
 ;; seconds in a day (* 60 60 24) = 86400
-(defun emf-filter-only-recent (days)
+(defun emf-filter-played-within (days)
   "Show only tracks played within the last number of DAYS."
   (lexical-let ((seconds-to-time (seconds-to-time (* days 86400))))
     #'(lambda (track)
@@ -190,16 +190,16 @@ If the track is not of TYPE, return t."
                     (time-less-p min-date last-played)))))))
 
 (emf-register-filter-factory "Played Since"
-                             'emf-filter-only-recent
+                             'emf-filter-played-within
                              '("days: "))
 
-(defun emf-make-filter-not-recent (days)
+(defun emf-make-filter-not-played-within (days)
   "Make a not played since DAYS filter."
   (lambda (track)
-    (not (funcall (emms-browser-filter-only-recent days) track))))
+    (not (funcall (emf-filter-played-within days) track))))
 
 (emf-register-filter-factory "Not Played Since"
-                             'emf-make-filter-not-recent
+                             'emf-make-filter-not-played-within
                              '("days: "))
 
 (defun emf-make-filter-genre (genre)
@@ -263,27 +263,29 @@ Returns a number"
                              'emf-make-filter-year-less
                              '("Year: "))
 
+;; Generic field comparison factories.
+;; parameter order is good for making partials.
+;; (setq emf-make-filter-duration-less
+;;       (-partial emf-make-filter-number-field-compare
+;;                 '('<= 'info-playing-time)))
+
 (defun emf-make-filter-number-field-compare (operator-func field compare-number)
   "Make a filter that compares FIELD as a number to COMPARE-NUMBER with OPERATOR-FUNC."
   (lexical-let ((local-operator operator-func)
                 (local-field field)
                 (local-compare-val compare-number))
     #'(lambda (track)
-        (let ((track-val (string-to-number (emms-track-get track field)))
-              (not (and
-                    track-val
-                    (funcall operator-func compare-number track-val)))))))
+        (let* ((track-val-string (emms-track-get track local-field))
+               (track-val (if track-val-string
+                              (string-to-number track-val-string)
+                            0))
+               (not (and
+                     track-val
+                     (funcall local-operator local-compare-val track-val))))))))
 
-  ;; parameter order is good for making partials.
-  ;; (setq emf-make-filter-duration-less
-  ;;       (-partial emf-make-filter-number-field-compare
-  ;;                 '('<= 'info-playing-time)))
-
-  ;; Not sure how I can prompt for this.
-  ;; I'll worry about it when I get there.
-  (emf-register-filter-factory "number compare"
-                               'emf-make-filter-number-field-compare
-                               '("operator: " "field: " "compare to: ")))
+(emf-register-filter-factory "number compare"
+                             'emf-make-filter-number-field-compare
+                             '("operator: " "field: " "compare to: "))
 
 (defun emf-make-filter-string-field-compare (operator-func field compare-string)
   "Make a filter that compares FIELD as a string to COMPARE-STRING with OPERATOR-FUNC."
@@ -327,7 +329,7 @@ Returns a number"
    :initial-value nil))
 
 (defun emf-make-multi-filter (meta-filter)
-  "Make a track filter function from MULTI-FILTERS-LIST.
+  "Make a track filter function from META-FILTER.
 The function will take a track as a parameter and return t if the track
 does not match the filters.
 A multi-filter is a list of lists of filter names.
@@ -348,8 +350,7 @@ Returns True if the track should be filtered out."
                              'emf-make-multi-filter
                              '(nil))
 
-;; patching together for now for the meta-filter stack.
-
+;; better name for this use.
 (defun emf-meta-filter->multi-filter (meta-filter)
   "The real META-FILTER deal."
   (emf-make-multi-filter meta-filter))
@@ -406,13 +407,13 @@ Returns True if the track should be filtered out."
         ("Not Played Since" "Not played since a year" 365)))
 
 (setq emf-misc-filters
-      '(("only type" "only files" ('file))))
+      '(("only type" "only files" 'file)))
 
 (setq emf-duration-filters
-      '(("number compare" "duration <60"     '<= 'info-playing-time 60)
-        ("number compare" "duration <5 min"  '<= 'info-playing-time 300)
-        ("number compare" "duration >5 min"  '>= 'info-playing-time 300)
-        ("number compare" "duration >10 min" '>= 'info-playing-time 600)))
+      '(("number compare" "duration <60"     <= 'info-playing-time 60)
+        ("number compare" "duration <5 min"  <= 'info-playing-time 300)
+        ("number compare" "duration >5 min"  >= 'info-playing-time 300)
+        ("number compare" "duration >10 min" >= 'info-playing-time 600)))
 
 (setq some-multi-filters
       '(("multi-filter"
@@ -441,9 +442,9 @@ Returns True if the track should be filtered out."
   "Make some default filters anyone would not mind having."
   (emf-make-filters emf-decade-filters)
   (emf-make-filters emf-genre-filters)
-  ;;  (emf-make-filters emf-misc-filters)
-  ;;  (emf-make-filters emf-last-played-filters)
-  ;;  (emf-make-filters emf-duration-filters)
+  (emf-make-filters emf-misc-filters)
+  (emf-make-filters emf-last-played-filters)
+  (emf-make-filters emf-duration-filters)
   )
 
 ;; Install some default filters.

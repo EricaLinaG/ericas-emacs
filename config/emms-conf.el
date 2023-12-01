@@ -127,6 +127,7 @@
         ("year range" "1940-1946" 1940 1946)
         ("year range" "1946-1958" 1946 1958)
         ("year range" "1958-"     1958 3000)
+        ("only directory" "tangotunes" "tangotunesflac")
 
         ;; ("genre" "vals"    "vals")
         ;; ("genre" "tango"   "tango")
