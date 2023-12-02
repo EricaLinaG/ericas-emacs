@@ -58,9 +58,26 @@
 (defvar emf-filters '()
   "A list of available filters.")
 
+(defvar emf-filter-menu '()
+  "A list of available filters by factory category and name.")
+
 (defun emf-register-filter (filter-name filter)
   "Put our new FILTER function named FILTER-NAME in our filter list."
   (push (cons filter-name filter) emf-filters))
+
+(defun emf-add-filter-menu (folder-name filter-list)
+  "Add a list of FILTER-LIST as another FOLDER-NAME in the filter selection menu."
+  (setq emf-filter-menu
+        (cons (list folder-name filter-list)
+              emf-filter-menu)))
+
+(defun emf-add-to-filter-menu (folder-name filter-name)
+  "Add FILTER-NAME to menu tree by FOLDER-NAME. "
+  (if (assoc folder-name emf-filter-menu)
+      (push filter-name (cadr (assoc folder-name emf-filter-menu)))
+    (setq emf-filter-menu
+          (cons (list folder-name (list filter-name))
+                emf-filter-menu))))
 
 (defun emf-list-filters ()
   "List the filters in our filter list."
@@ -95,8 +112,8 @@ look for the function in emf-filter-factories."
   (let* ((func (if (functionp factory)
                    factory
                  (cadr (assoc factory emf-filter-factories))))
-         ;; If we put them in lists, they're two deep here, car!.
          (filter (apply func factory-args)))
+    (emf-add-to-filter-menu factory filter-name)
     (emf-register-filter filter-name filter)))
 
 (defun emf-make-filters (filter-list)
@@ -157,7 +174,7 @@ Give it the shape: (name . (func . prompt-list))."
 ;; when creating new filters code.
 
 ;; Factory Functions to make filter functions with.
-(defun emf-filter-only-dir (dirname)
+(defun emf-make-filter-directory (dirname)
   "Generate a function to check if a track is in DIRNAME.
 If the track is not in DIRNAME, return t.
 Uses a regex anchoring dirname to the beginning of the expanded path."
@@ -165,12 +182,12 @@ Uses a regex anchoring dirname to the beginning of the expanded path."
     #'(lambda (track)
         (not (string-match re (emms-track-get track 'name))))))
 
-(emf-register-filter-factory "only directory"
-                             'emf-filter-only-dir
+(emf-register-filter-factory "directory"
+                             'emf-make-filter-directory
                              '("Directory: "))
 
 ;; seconds in a day (* 60 60 24) = 86400
-(defun emf-filter-played-within (days)
+(defun emf-make-filter-played-within (days)
   "Show only tracks played within the last number of DAYS."
   (lexical-let ((seconds-to-time (seconds-to-time (* days 86400))))
     #'(lambda (track)
@@ -183,7 +200,7 @@ Uses a regex anchoring dirname to the beginning of the expanded path."
                     (time-less-p min-date last-played)))))))
 
 (emf-register-filter-factory "Played Since"
-                             'emf-filter-played-within
+                             'emf-make-filter-played-within
                              '("days: "))
 
 (defun emf-make-filter-not-played-within (days)
@@ -263,37 +280,35 @@ operator function and comparison function"
                              'emf-make-filter-field-compare
                              '("operator: " "field: " "compare to: "))
 
-(require 'dash)
 ;; Generic field comparison factories.
 ;; parameter order is good for making partials.
-
 (setq emf-make-filter-duration-less
-      (-partial 'emf-make-filter-field-compare
-                '<= 'info-playing-time))
+      (apply-partially 'emf-make-filter-field-compare
+                       '<= 'info-playing-time))
 
-(emf-register-filter-factory "duration-less"
+(emf-register-filter-factory "duration less"
                              emf-make-filter-duration-less
                              '("duration: " ))
 
-(setq emf-make-filter-duration-greater
-      (-partial 'emf-make-filter-field-compare
-                '>= 'info-playing-time))
+(setq emf-make-filter-duration-more
+      (apply-partially 'emf-make-filter-field-compare
+                       '>= 'info-playing-time))
 
-(emf-register-filter-factory "duration-greater"
-                             emf-make-filter-duration-greater
+(emf-register-filter-factory "duration more"
+                             emf-make-filter-duration-more
                              '("duration: " ))
 
 (setq emf-make-filter-genre
-      (-partial 'emf-make-filter-field-compare
-                'string-equal-ignore-case 'info-genre))
+      (apply-partially 'emf-make-filter-field-compare
+                       'string-equal-ignore-case 'info-genre))
 
 (emf-register-filter-factory "genre"
                              emf-make-filter-genre
                              '("genre: " ))
 
 (setq emf-make-filter-type
-      (-partial 'emf-make-filter-field-compare
-                'eq 'type))
+      (apply-partially 'emf-make-filter-field-compare
+                       'eq 'type))
 
 (emf-register-filter-factory "track type"
                              emf-make-filter-type
@@ -419,10 +434,10 @@ Returns True if the track should be filtered out."
       '(("track type" "only files" file)))
 
 (setq emf-duration-filters
-      '(("field compare" "duration <60"     <= info-playing-time 60)
-        ("field compare" "duration <5 min"  <= info-playing-time 300)
-        ("field compare" "duration >5 min"  >= info-playing-time 300)
-        ("field compare" "duration >10 min" >= info-playing-time 600)))
+      '(("duration less" "duration <1 min"  60)
+        ("duration less" "duration <5 min"  300)
+        ("duration more" "duration >5 min"  300)
+        ("duration more" "duration >10 min" 600)))
 
 (setq some-multi-filters
       '(("multi-filter"
@@ -488,11 +503,15 @@ Returns True if the track should be filtered out."
 ;; The Meta filter
 ;; An interactive multi-filter stack.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Basically the current filter is the top of a meta-filter stack.
-;; we can add to the current filter which pushes a new filter to
+;; The current filter is the top of a meta-filter stack.
+;; We can add to the current filter which pushes a new filter to
 ;; the stack. emf-pop pops the stack.
-;; Another filter can be chosen or the stack can be cleared.
+;; Other filters can be added to the current filter
+;; with 'and', 'or' as well as 'and not' filter selections.
+;; A filter can be popped, another filter can be chose
+;; or the stack can be cleared.
 ;; A filter may be kept for the session with keep.
+;; emf-status will print the stack and the current filter.
 
 ;; Any time it changes it makes a new multi-filter filter function with
 ;; what is on top of the stack, and we tell the browser to re-render.
@@ -581,10 +600,28 @@ it a meta-filter, if it is a meta-filter use it."
   (emf-push
    (emf-make-filter-cons-from-meta-filter '((emf-default-filter)))))
 
+(defun emf-choose-filter-recursive (&optional choices)
+  "Choose a filter from emf-filter-menu tree or the alist given as CHOICES.
+Requires that the lists of filter names be lists of cons (name . name).
+Allows for tree structures of any depth."
+  (let* ((choices (or choices emf-filter-menu))
+         (choice (assoc (completing-read
+                         "Choose a filter or group:" choices nil t)
+                        choices)))
+    (message "%s %s" choice (type-of choice))
+    (if (consp choice)
+        (emf-choose-filter (cadr choice))
+      choice)))
+
 (defun emf-choose-filter ()
-  "Choose a filter from our filter list."
-  (completing-read "Choose a filter:"
-                   emf-filters nil t))
+  "Choose a filter from our filter menu tree.
+Stupid, Assumes our tree is an alist of lists of strings."
+  (completing-read
+   "Choose a filter:"
+   (cadr (assoc (completing-read
+                 "Choose a filter group:" emf-filter-menu nil t)
+                emf-filter-menu))
+   nil t))
 
 (defun emf-select ()
   "Select a filter from the list of filter functions."
@@ -676,6 +713,7 @@ Creates a new 'AND' list of filters."
         (define-key map (kbd "f >") #'emf-next)
         (define-key map (kbd "f <") #'emf-previous)
         (define-key map (kbd "f r") #'emf-status)
+        (define-key map (kbd "f S") #'emf-status)
         (define-key map (kbd "f c") #'emf-clear)
         (define-key map (kbd "f k") #'emf-keep)
         (define-key map (kbd "f s") #'emf-select)

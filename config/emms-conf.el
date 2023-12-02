@@ -127,7 +127,7 @@
         ("year range" "1940-1946" 1940 1946)
         ("year range" "1946-1958" 1946 1958)
         ("year range" "1958-"     1958 3000)
-        ("only directory" "tangotunes" "tangotunesflac")
+        ("directory" "tangotunes" "tangotunesflac")
 
         ;; ("genre" "vals"    "vals")
         ;; ("genre" "tango"   "tango")
@@ -157,10 +157,13 @@
          "vals or milonga 1900-1937"
          (("vals" "milonga")
           ("1900-1929" "1929-1937")))
-        ))
+        )
+      )
 
 (emf-make-filters tango-filters)
 
+;; Add my own filter selection menu with tango filters in it.
+(emf-add-filter-menu "Tango" (mapcar 'cadr tango-filters))
 
 ;; extras - start and stop mpd. A function to give to Perspective.
 (defun mpd/start-music-daemon ()
