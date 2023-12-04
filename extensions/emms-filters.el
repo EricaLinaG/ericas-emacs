@@ -660,6 +660,9 @@ it a meta-filter, if it is a meta-filter use it."
 (defun  emf-keep ()
   "Register the current filter into the list of filters for the session."
   (interactive)
+  (message "Registering the current meta-filter as a filter for the session")
+  (emf-status)
+
   (if (and emf-stack (consp (car emf-stack)))
       (emf-register-filter (caar emf-stack)
                            (emf-meta-filter->multi-filter (cdar emf-stack)))))
@@ -744,16 +747,23 @@ Creates a new 'AND' list of filters."
       (emf-push-or fname
                    (emf-push-and ':not (emf-copy-meta-filter (cdar emf-stack))))))))
 
-(defun emf-print-stack()
+(defun emf-format-stack()
   "Print the stack."
   (format  "\t%s" (mapconcat 'car emf-stack "\n\t")))
 
+(defun emf-format-search-stack ()
+  "Format the search stack."
+  (interactive)
+  (format "\t%s" (mapconcat #'identity (emms-browser-search-crumbs) "\n\t")))
+
 (defun emf-status ()
   "Print what we know."
-  (message (format "%s\nStack size: %s\nCurrent: %s"
-                   (emf-print-stack)
-                   (length emf-stack)
-                   (emf-current-meta-filter))))
+  (message (format "Ring: %s\nCurrent: %s\nSearch: %s"
+                   (emf-current-ring-filter-name)
+                   (emf-current-meta-filter)
+                   (emf-format-stack)
+                   (emf-format-search-stack)
+                   )))
 
 (defun emf-set-ring-filter (filter)
   "Given a FILTER set the current ring filter and re-render."
@@ -780,6 +790,7 @@ Creates a new 'AND' list of filters."
     ;; wrapped
     (unless next
       (setq next (car list)))
+    ;; why oh why, can I not use next directly ?
     (emf-set-ring-filter (assoc (car next) emf-filters))))
 
 (defun emf-previous-ring-filter ()

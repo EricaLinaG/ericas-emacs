@@ -199,7 +199,8 @@
  "b p" 'emms-browse-by-performer
  "s g" 'emms-browser-search-by-albumartist-artist-genre
 
- "h" 'hydra-emms/body
+ "h" 'hydra-emms-compact/body
+ "H" 'hydra-emms/body
  "m" 'emms-metaplaylist-mode-go
  "P" 'hydra-persp/body)
 
@@ -207,7 +208,8 @@
  ;; NOTE: keymaps specified with :keymaps must be quoted
  :keymaps 'emms-playlist-mode-map
  "A" 'emms-add-playlist
- "h" 'hydra-emms/body
+ "h" 'hydra-emms-compact/body
+ "H" 'hydra-emms/body
  "m" 'emms-metaplaylist-mode-go
  "P" 'hydra-persp/body)
 
@@ -215,7 +217,8 @@
  :keymaps 'emms-metaplaylist-mode-map
  "SPC" 'emms-metaplaylist-mode-goto
  "c" 'emms-metaplaylist-mode-goto-current
- "h" 'hydra-emms/body
+ "h" 'hydra-emms-compact/body
+ "H" 'hydra-emms/body
  "P" 'hydra-persp/body)
 
 ;; a handy function
