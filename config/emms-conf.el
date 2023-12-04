@@ -165,6 +165,9 @@
 ;; Add my own filter selection menu with tango filters in it.
 (emf-add-filter-menu "Tango" (mapcar 'cadr tango-filters))
 
+;; need silence and cortinas...
+(emf-make-filter-ring '("tango" "vals" "milonga"))
+
 ;; extras - start and stop mpd. A function to give to Perspective.
 (defun mpd/start-music-daemon ()
   "Start MPD, connects to it and syncs the metadata cache."

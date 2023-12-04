@@ -13,6 +13,13 @@
           (emf-print-stack)
           (mapconcat #'identity (emms-browser-search-crumbs) "\n")))
 
+;; (("↑" . "<up>")
+;;  ("↓" . "<down>")
+;;  ("→" . "<right>")
+;;  ("←" . "<left>")
+;;  ("⌫" . "DEL")
+;;  ("⌦" . "<deletechar>")
+;;  ("⏎" . "RET"))
 
 (defun my-emms-status ()
   "Message the status of emms."
@@ -24,16 +31,21 @@
   (interactive)
   (format "\t%s" (mapconcat #'identity (emms-browser-search-crumbs) "\n\t")))
 
-(defhydra hydra-emms (:color teal
-                             :hint nil)
+(defhydra hydra-emms (;; :color teal
+                      :hint nil)
   "
- Queue Lock: %s`emms-queue-lock
- Repeat: %`emms-repeat-track   Random: %`emms-random-playlist
+                         EMMS
+
+ _/_ :Lock: _\\_ Queue: %s`emms-queue-lock
+ Repeat _T_: Track: %`emms-repeat-track   _L_: List: %`emms-repeat-playlist
+ Random _?_ shuffle: %`emms-random-playlist
+---------------------------------------------------------
+ Filter ring:   _←_ %s(emf-current-ring-filter-name) _→_
  Filter stack:
  %s(emf-print-stack)
  Search stack:
  %s(crumb-text)
-
+---------------------------------------------------------
     Windows         MPD          Cache
 ---------------------------------------------------------
     _p_: Playlist  _C_: Connect   _R_: Reset
@@ -41,7 +53,20 @@
     _l_: p lists   _S_: Start     _F_: Cache set From mpd
     _s_: Streams   _U_: Update    _A_: Add Dir Tree
                  _D_: update dir
+---------------------------------------------------------
+    Filters: %s(emf-current-meta-filter-name)
+    Ring:   _←_ %s(emf-current-ring-filter-name) _→_
+    _f S_ Status     _f k_ keep current for session
 
+    Stack:
+    _f q_ pop/quit   _f r_ rotate/swap
+    _f c_ clear      _f R_ rotate/swap pop
+    _f f_ squash/flatten
+
+   Selection:
+    _f p_ push       _f s_ smash
+    _f o_ or         _f a_ and          _f n_ and Not
+---------------------------------------------------------
     Temporal marks:
     _n_: Now Add   _<_: Previous  _>_: Next  _c_: Clear
 
@@ -50,14 +75,11 @@
 
     Playlist mark mode:
     _m_ enable       _M_ disable
-
+---------------------------------------------------------
     Playlists:
     _P_: Play start  _r_: Resume play  _s_: Stop
     _W_: Save        _N_: New          _a_: Add/Load
-    _h_: Shuffle par hasard
 
-    Repeat:                  Queue Locking:
-    _L_: List   _T_: Track   _/_: Lock  _\\_: Unlock
   "
   ("q" nil)
   ("P" emms-start)
@@ -79,7 +101,7 @@
   ("W" emms-playlist-save)
   ("L" `emms-toggle-repeat-playlist)
   ("T" `emms-toggle-repeat-track)
-  ("h" `emms-toggle-random-playlist)
+  ("?" `emms-toggle-random-playlist)
   ("/" emms-lock-queue)
   ("\\" emms-unlock-queue)
 
@@ -96,4 +118,18 @@
   ("u" emms-volume-raise)
   ("+" emms-volume-mode-plus)
   ("-" emms-volume-mode-minus)
+  ("f S" emf-status)
+  ("f q" emf-pop)
+  ("f r" emf-swap) ; rotate ?
+  ("f R" emf-swap-pop) ; rotate-eject, ,pop-previous
+  ("f f" emf-squash)
+  ("f k" emf-keep)
+  ("f c" emf-clear)
+  ("<right>" emf-next-ring-filter)
+  ("<left>" emf-previous-ring-filter)
+  ("f p" emf-select-push)
+  ("f s" emf-select-smash)
+  ("f o" emf-select-or)
+  ("f a" emf-select-and)
+  ("f n" emf-select-and-not)
   )
