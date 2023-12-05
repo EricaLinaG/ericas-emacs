@@ -49,11 +49,13 @@
 (defvar  emf-stack nil
   "A history of multi-filters. Our working stack.")
 
-(defvar  emf-filter-ring emms-browser-filters
-  "A list of filters for quick access with next and previous.
-The list can be made of filter cons (name . function) or filter names..")
+(defvar  emf-filter-ring nil
+  "A ring of filter names for quick access with next and previous.")
 
-(defvar emf-current-ring-filter nil
+(defconst emf-no-filter nil ;; '("no filter" . 'ignore)
+  "A filter that turns filtering off, a better initial value than nil.")
+
+(defvar emf-current-ring-filter  emf-no-filter
   "The current ring filter, a filter cons, (name . func).")
 
 (defvar emf-filter-factories '()
@@ -62,14 +64,16 @@ The list can be made of filter cons (name . function) or filter names..")
 (defvar emf-filters '()
   "A list of available filters.")
 
-(defvar emf-current-filter nil
+(defvar emf-current-filter emf-no-filter
   "The current filter function")
 
 (defvar emf-filter-menu '()
   "A list of available filters grouped by factory.")
 
 (defun emf-browser-filter-hook (track)
-  "A hook function for the browser to give control for TRACK filtering."
+  "A hook function for the browser. Freewill here for TRACK filtering.
+First we test the track against the current ring filter, then we check
+the result with the result of the emf-current-filter."
   (not  ;; :-{} We invert them to combine them,
    ;; and determine if we dont want it. I'd rather filters be a keep=t.
    ;; repercussions of having a 'dont want this' true variable.
@@ -79,7 +83,7 @@ The list can be made of filter cons (name . function) or filter names..")
         (not (and emf-current-filter
                   (funcall (cdr emf-current-filter) track))))))
 
-(defvar emf-hook-filter (cons "emf-filter-hook" 'emf-browser-filter-hook)
+(defconst emf-hook-filter (cons "emf-filter-hook" 'emf-browser-filter-hook)
   "A filter cons with the filter hook to give to the browser.")
 
 (emms-browser-set-filter emf-hook-filter)
@@ -103,12 +107,31 @@ The list can be made of filter cons (name . function) or filter names..")
                 emf-filter-menu))))
 
 (defun emf-make-filter-ring (list-of-filter-names)
-  "Make a list of filter cons from the LIST-OF-FILTER-NAMES.
-Searches emf-filters for the filters listed and sets them to
-the emf-filter-ring. Appends the 'no filter' filter."
+  "Make a ring of filter names from the LIST-OF-FILTER-NAMES.
+Appends the 'no filter' filter."
   (setq emf-filter-ring
-        (mapcar (lambda (name) (assoc name emf-filters))
-                (cons "no filter" list-of-filter-names))))
+        (make-ring
+         (+ 1 (length list-of-filter-names))))
+  (mapcar (lambda (filter-name)
+            (ring-insert emf-filter-ring filter-name))
+          (cons "no filter" list-of-filter-names)))
+
+;; This should allow people to continue using the emms-browser
+;; filtering as they always have, reusing the filters they've already made.
+;; The browser filter is essentially nothing more than a ring of
+;; filters with no other interface.
+(defun emf-make-filter-ring-from-browser-filters ()
+  "Integrate Emms browser filters into emf-filters.
+Make a filter ring from the emms browser filter entry names,
+and add the filters to emf-filters to be used.
+Add the browser-filter-names to the filter selection
+menu in a folder named 'browser-filters'."
+  (debug)
+  (when emms-browser-filters
+    (let ((name-list (mapcar 'car emms-browser-filters)))
+      (emf-make-filter-ring name-list)
+      (emf-add-to-filter-menu "browser-filters" name-list)
+      (setq emf-filters (append emms-browser-filters emf-filters)))))
 
 (defun emf-list-filters ()
   "List the filters in our filter list."
@@ -130,6 +153,56 @@ Pass functions through untouched."
   (if (eq filter-name :not)
       :not
     (cdr (assoc filter-name emf-filters))))
+
+;; over-ride the one in browser...
+(defun emms-browser-format-search-list (search-list)
+  "Create a string format of a SEARCH-LIST."
+  (let ((infos (append (car (car search-list))))
+        (svalue (cdar search-list)))
+    (format "%s - %s"
+            (mapconcat
+             `(lambda (info)
+                (if (symbolp info)
+                    (substring (symbol-name info)  5)
+                  info))
+             infos " | ")
+            svalue)))
+
+(defun emf-hard-filter ()
+  "A hard save of filtered results.
+Build a cache of filtered tracks from the last search cache
+filtered by the current filters.
+Emulates a search, pushing a new cache on the search stack.
+This cache is the same as all the rest and emms-cache-db.
+The name is a munge to make the search list formatter happy."
+  (interactive)
+  ;; emulate a search list for the search name formatter.
+  ;; (((field1 field2) string))
+  (let* ((previous-search-name
+          (emms-browser-format-search-list
+           (car (emms-browser-get-search-keys))))
+
+         (search-name
+          (list (list (list previous-search-name "Filter")
+                      (concat (car emf-current-ring-filter) ":"
+                              (car emf-current-filter)))))
+
+         (search-cache (make-hash-table
+                        :test (if (fboundp 'define-hash-table-test)
+                                  'string-hash
+                                'equal))))
+    (maphash (lambda (path track)
+               (when (not (emf-browser-filter-hook track))
+                 (puthash path track search-cache)))
+             (emms-browser-last-search-cache))
+
+    (emms-browser-cache-search search-name search-cache))
+  (emms-browser-search-refilter))
+
+(defun emf-new-filter ()
+  "Build a new filter from a filter factory interactively."
+  (interactive)
+  nil)
 
 ;; Filter Factories
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -754,49 +827,43 @@ Creates a new 'AND' list of filters."
 (defun emf-format-search-stack ()
   "Format the search stack."
   (interactive)
-  (format "\t%s" (mapconcat #'identity (emms-browser-search-crumbs) "\n\t")))
+  (format "\t%s" (mapconcat #'identity (reverse (emms-browser-search-crumbs)) "\n\t")))
 
 (defun emf-status ()
   "Print what we know."
+  (interactive)
   (message (format "Ring: %s\nCurrent: %s\nSearch: %s"
-                   (emf-current-ring-filter-name)
+                   (car emf-current-ring-filter)
                    (emf-current-meta-filter)
                    (emf-format-stack)
                    (emf-format-search-stack)
                    )))
 
-(defun emf-set-ring-filter (filter)
-  "Given a FILTER set the current ring filter and re-render."
-  ;; (debug)
-  (setq emf-current-ring-filter filter)
+(defun emf-set-ring-filter (filter-name)
+  "Given a FILTER-NAME set the current ring filter and re-render."
+  (setq emf-current-ring-filter
+        (assoc filter-name emf-filters))
   (emf-browser-render))
 
 (defun emf-current-ring-filter-name ()
-  "Nicer than car everywhere."
-  (car emf-current-ring-filter))
+  "The current ring filter name, more descriptive than car."
+  (if emf-current-ring-filter
+      (car emf-current-ring-filter)
+    "no filter"))
 
-(defun emf-current-ring-filter-function ()
-  "Nicer than cdr everywhere."
-  (cdr emf-current-ring-filter))
-
-(defun emf-next-ring-filter (&optional reverse)
-  "Redisplay with the next filter. Reverse the order if REVERSE is true."
+(defun emf-next-ring-filter()
+  "Move to the next filter in the filter ring."
   (interactive)
-  (let* ((list (if reverse
-                   (reverse emf-filter-ring)
-                 emf-filter-ring))
-         (key (emf-current-ring-filter-name))
-         (next (cadr (member (assoc key list) list))))
-    ;; wrapped
-    (unless next
-      (setq next (car list)))
-    ;; why oh why, can I not use next directly ?
-    (emf-set-ring-filter (assoc (car next) emf-filters))))
+  (emf-set-ring-filter
+   (ring-next emf-filter-ring
+              (emf-current-ring-filter-name))))
 
-(defun emf-previous-ring-filter ()
-  "Redisplay with the previous filter."
+(defun emf-previous-ring-filter()
+  "Move to the previous filter in the filter ring."
   (interactive)
-  (emf-next-ring-filter t))
+  (emf-set-ring-filter
+   (ring-previous emf-filter-ring
+                  (emf-current-ring-filter-name))))
 
 (setq emms-browser-mode-map
       (let ((map emms-browser-mode-map))
@@ -806,9 +873,10 @@ Creates a new 'AND' list of filters."
         (define-key map (kbd "f R") #'emf-swap-pop) ; rotate-eject, ,pop-previous
         (define-key map (kbd "f f") #'emf-squash) ;flatten
         (define-key map (kbd "f k") #'emf-keep)
+        (define-key map (kbd "f h") #'emf-hard-filter)
         (define-key map (kbd "f c") #'emf-clear)
-        (define-key map (kbd "f >") #'emf-next)
-        (define-key map (kbd "f <") #'emf-previous)
+        (define-key map (kbd "f >") #'emf-next-ring-filter)
+        (define-key map (kbd "f <") #'emf-previous-ring-filter)
         (define-key map (kbd "f p") #'emf-select-push)
         (define-key map (kbd "f s") #'emf-select-smash)
         (define-key map (kbd "f o") #'emf-select-or)

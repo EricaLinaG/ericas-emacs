@@ -51,7 +51,7 @@
     Stack:
     _f q_ pop/quit   _f r_ rotate/swap
     _f c_ clear      _f R_ rotate/swap pop
-    _f S_ squash
+    _f S_ squash     _f h_ hard cache to search stack
 
    Selection:
     _f p_ push       _f s_ smash
@@ -114,6 +114,7 @@
   ("f R" emf-swap-pop) ; rotate-eject, ,pop-previous
   ("f S" emf-squash)
   ("f k" emf-keep)
+  ("f h" emf-hard-cache)
   ("f c" emf-clear)
   ("<right>" emf-next-ring-filter)
   ("<left>" emf-previous-ring-filter)
