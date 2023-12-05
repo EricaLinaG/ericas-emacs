@@ -49,7 +49,7 @@
     _f d_ dump     _f k_ keep current for session
 
     Stack:
-    _f q_ pop/quit   _f r_ rotate/swap
+    _f P_ pop/quit   _f r_ rotate/swap
     _f c_ clear      _f R_ rotate/swap pop
     _f S_ squash     _f h_ hard cache to search stack
 
@@ -109,7 +109,7 @@
   ("+" emms-volume-mode-plus)
   ("-" emms-volume-mode-minus)
   ("f d" emf-status)
-  ("f q" emf-pop)
+  ("f P" emf-pop)
   ("f r" emf-swap) ; rotate ?
   ("f R" emf-swap-pop) ; rotate-eject, ,pop-previous
   ("f S" emf-squash)
@@ -189,7 +189,7 @@
     _d_ dump     _k_ keep current for session
 
     Stack:
-    _q_ pop/quit           _r_ rotate/swap
+    _P_ pop/quit           _r_ rotate/swap
     _c_ clear              _R_ swap pop
     _S_ squash
 
@@ -197,9 +197,9 @@
     _p_ push       _s_ smash
     _o_ or         _a_ and          _n_ and Not
   "
-  ("<escape>" nil)
+  ("q" nil)
   ("d" emf-status)
-  ("q" emf-pop)
+  ("P" emf-pop)
   ("r" emf-swap) ; rotate ?
   ("R" emf-swap-pop) ; rotate-eject, ,pop-previous
   ("S" emf-squash)

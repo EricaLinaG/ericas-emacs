@@ -202,6 +202,7 @@ The name is a munge to make the search list formatter happy."
 (defun emf-new-filter ()
   "Build a new filter from a filter factory interactively."
   (interactive)
+
   nil)
 
 ;; Filter Factories
