@@ -121,41 +121,41 @@
 
 ;;        factory      Name        arguments
 (setq tango-filters
-      '(("year range" "1900-1929" 1900 1929)
-        ("year range" "1929-1937" 1929 1937)
-        ("year range" "1937-1942" 1937 1942)
-        ("year range" "1940-1946" 1940 1946)
-        ("year range" "1946-1958" 1946 1958)
-        ("year range" "1958-"     1958 3000)
-        ("directory" "tangotunes" "tangotunesflac")
+      '(("Year range" "1900-1929" 1900 1929)
+        ("Year range" "1929-1937" 1929 1937)
+        ("Year range" "1937-1942" 1937 1942)
+        ("Year range" "1940-1946" 1940 1946)
+        ("Year range" "1946-1958" 1946 1958)
+        ("Year range" "1958-"     1958 3000)
+        ("Directory" "tangotunes" "tangotunesflac")
 
         ;; ("genre" "vals"    "vals")
         ;; ("genre" "tango"   "tango")
         ;; ("genre" "milonga" "milonga")
 
-        ("multi-filter"
+        ("Multi-filter"
          "1900-1937"
          (("1900-1929" "1929-1937")))
 
-        ("multi-filter"
+        ("Multi-filter"
          "1937-1946"
          (("1937-1942" "1940-1946")))
 
-        ("multi-filter"
-         "vals | milonga"
-         (("vals" "milonga")))
+        ("Multi-filter"
+         "Vals | milonga"
+         (("Vals" "Milonga")))
 
-        ("multi-filter"
-         "vals 1900-1929"
-         (("vals") ("1900-1929")))
+        ("Multi-filter"
+         "Vals 1900-1929"
+         (("Vals") ("1900-1929")))
 
-        ("multi-filter"
-         "not vals"
-         ((:not "vals")))
+        ("Multi-filter"
+         "Not vals"
+         ((:not "Vals")))
 
-        ("multi-filter"
-         "vals or milonga 1900-1937"
-         (("vals" "milonga")
+        ("Multi-filter"
+         "Vals or milonga 1900-1937"
+         (("Vals" "Milonga")
           ("1900-1929" "1929-1937")))
         )
       )

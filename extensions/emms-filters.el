@@ -67,12 +67,12 @@
 (defvar emf-current-filter emf-no-filter
   "The current filter function")
 
-(defvar emf-filter-menu '()
+(defvar emf-filter-menu '("no filter" "new filter")
   "A list of available filters grouped by factory.")
 
 (defun emf-browser-filter-hook (track)
   "A hook function for the browser. Freewill here for TRACK filtering.
-First we test the track against the current ring filter, then we check
+First we test the track against the current ring filter, then we combine
 the result with the result of the emf-current-filter."
   (not  ;; :-{} We invert them to combine them,
    ;; and determine if we dont want it. I'd rather filters be a keep=t.
@@ -126,7 +126,6 @@ Make a filter ring from the emms browser filter entry names,
 and add the filters to emf-filters to be used.
 Add the browser-filter-names to the filter selection
 menu in a folder named 'browser-filters'."
-  (debug)
   (when emms-browser-filters
     (let ((name-list (mapcar 'car emms-browser-filters)))
       (emf-make-filter-ring name-list)
@@ -200,10 +199,18 @@ The name is a munge to make the search list formatter happy."
   (emms-browser-search-refilter))
 
 (defun emf-new-filter ()
-  "Build a new filter from a filter factory interactively."
+  "Build a new filter from a filter factory interactively.
+Prompts for a filter factory and its parameters, creates and registers
+a new filter then returns its name."
   (interactive)
+  (let* ((factory-name (emf-choose-factory))
+         (filter-name (read-string "filter name:"))
+         (parameters (emf-get-factory-parameters factory-name)))
 
-  nil)
+    (message "%s | %s parms %s" factory-name filter-name parameters)
+
+    (emf-make-filter factory-name filter-name parameters)
+    filter-name))
 
 ;; Filter Factories
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -252,6 +259,58 @@ Give it the shape: (name . (func . prompt-list))."
   "Reset the filter factory list."
   (setq emf-filter-factories nil))
 
+;;; Interactive factories.
+;;; This is just the part Where
+;;; we use the prompt data to interactively create new filters.
+;;; A prompt is  (prompt (type . select-list)) if there is no
+;;; select list we read a string and coerce the value to the correct
+;;; type as needed.  Just numbers....
+
+;;; Sample factory parameter declarations.
+;; '(("days:" (:number . nil)))
+
+;; '(("Compare Function:"
+;;    (:commandp . emf-compare-functions))
+;;   ("Field name:"
+;;    (:symbol . emf-field-names))
+;;   ("Compare to:"
+;;    (:string . nil)))
+
+(defun emf-coerce-prompt-value (prompt value)
+  "Coerce VALUE, a string, accordiing to the prompt type inside PROMPT.
+PROMPT should be in the form (prompt (type . <select-list>)).
+Types are :number, :symbol, :string and :function.
+Strings pass through."
+  (let ((type (car (cadr prompt))))
+    (cond
+     ((string= type :number) (string-to-number value))
+     ((string= type :symbol) (intern-soft value))
+     ((string= type :function) (intern-soft value))
+     (t value))))
+
+(defun emf-read-string-or-choose (prompt)
+  "Choose the method input using PROMPT.
+Do a string read or completing read if PROMPT has a list.
+A prompt should look like this; (prompt (type . <select-list>))."
+  (let* ((prompt-string (car prompt))
+         (selections (cdr (cadr prompt)))
+         (value (if selections
+                    (completing-read prompt-string selections nil t)
+                  (read-string prompt-string))))
+    (emf-coerce-prompt-value prompt value)))
+
+(defun emf-get-factory-parameters (factory-name)
+  "Prompt for the parameters needed by a factory identified by FACTORY-NAME.
+Coerce their types as indicated and return the list of parameters.
+
+A prompt should be of the form (prompt (type . <list>)) where prompt is a string
+and type is :number :function :symbol or :string"
+  (interactive)
+  (let ((prompts (cddr (assoc factory-name emf-filter-factories))))
+    (mapcar (lambda (prompt)
+              (emf-read-string-or-choose prompt))
+            prompts)))
+
 
 ;;; Filters
 ;; Here are some filter factories.
@@ -287,9 +346,9 @@ Uses a regex anchoring dirname to the beginning of the expanded path."
     #'(lambda (track)
         (not (string-match re (emms-track-get track 'name))))))
 
-(emf-register-filter-factory "directory"
+(emf-register-filter-factory "Directory"
                              'emf-make-filter-directory
-                             '("Directory: "))
+                             '(("Directory: " (:string . nil))))
 
 ;; seconds in a day (* 60 60 24) = 86400
 (defun emf-make-filter-played-within (days)
@@ -304,18 +363,19 @@ Uses a regex anchoring dirname to the beginning of the expanded path."
                           (emms-track-get track 'last-played nil))
                     (time-less-p min-date last-played)))))))
 
-(emf-register-filter-factory "Played Since"
+(emf-register-filter-factory "Played since"
                              'emf-make-filter-played-within
-                             '("days: "))
+                             '(("days: " (:number . nil)))
+                             )
 
 (defun emf-make-filter-not-played-within (days)
   "Make a not played since DAYS filter."
   (lambda (track)
     (not (funcall (emf-filter-played-within days) track))))
 
-(emf-register-filter-factory "Not Played Since"
+(emf-register-filter-factory "Not played since"
                              'emf-make-filter-not-played-within
-                             '("days: "))
+                             '(("days: " (:number . nil))))
 
 ;; Getting the year is special. It might be in year or date.
 (defun emf-get-year (track)
@@ -338,9 +398,10 @@ Returns a number"
                 (<= local-y1 year)
                 (>= local-y2 year)))))))
 
-(emf-register-filter-factory "year range"
+(emf-register-filter-factory "Year range"
                              'emf-make-filter-year-range
-                             '("start-year: " "end-year: "))
+                             '(("Start year:" (:number . nil))
+                               ("End year:" (:number . nil))))
 
 (defun emf-make-filter-year-greater (year)
   "Make a Greater than year filter from YEAR."
@@ -351,9 +412,9 @@ Returns a number"
                 year
                 (<= local-year year)))))))
 
-(emf-register-filter-factory "greater than Year"
+(emf-register-filter-factory "Greater than Year"
                              'emf-make-filter-year-greater
-                             '("Year: "))
+                             '(("Greater than year: " (:number . nil))))
 
 (defun emf-make-filter-year-less (year)
   "Make a Less than year filter from YEAR."
@@ -364,14 +425,79 @@ Returns a number"
                 year
                 (>= local-year year)))))))
 
-(emf-register-filter-factory "less than Year"
+(emf-register-filter-factory "Less than Year"
                              'emf-make-filter-year-less
-                             '("Year: "))
+                             '(("Less than year: " (:number . nil))))
+
+;;; I didnt put the not in, as I am going to take them all out next.
+;;; so it wont work yet.
+(defun emf-make-filter-fields-search (fields compare-value)
+  "Make a filter that can look in multiple track FIELDS for COMPARE-VALUE.
+This replaces the original emms-browser search match-p functionality."
+  (lexical-let ((local-fields fields)
+                (local-compare-value compare-value))
+    #'(lambda (track)
+        (cl-reduce
+         (lambda (result field)
+           (let ((track-value (emms-track-get track field "")))
+             (and result
+                  (and track-value
+                       (string-match track-value local-compare-value)))))
+         local-fields
+         :initial-value t))))
+
+(defvar emf-string-field-names
+  '(info-albumartist
+    info-artist
+    info-composer
+    info-performer
+    info-title
+    info-album
+    info-date
+    info-originaldate
+    info-note
+    info-genre)
+  "The list of track field names that are strings")
+
+(defvar emf-number-field-names
+  '(info-tracknumber
+    info-discnumber
+    info-year
+    info-originalyear
+    info-originaldate
+    info-playing-time)
+  "The list of track field names that are numbers.")
+
+(defvar emf-string-compare-functions
+  '(emf-match-string
+    string-equal-ignore-case
+    string=
+    string<
+    string>
+    string-match)
+  "Compare functions for filter creation.")
+
+(defvar emf-number-compare-functions
+  '(> >= = <= <)
+  "Compare functions for filter creation.")
+
+(defvar emf-track-types
+  '(file url stream streamlist playlist)
+  "Types of tracks we can have.")
+
+(defun emf-match-string (string1 string2)
+  "Check to see if STRING2 is in STRING1.
+
+This is the inverse of string-match.
+So we can continue with the language of
+'filter track where field contains string'
+'filter track where field > value'."
+  (string-match string2 string1))
 
 (defun emf-make-filter-field-compare (operator-func field compare-val)
   "Make a filter that compares FIELD to COMPARE-VALUE with OPERATOR-FUNC.
 Works for number fields and string fields provided the appropriate
-operator function and comparison function"
+type match between values and the comparison function"
   (lexical-let ((local-operator operator-func)
                 (local-field field)
                 (local-compare-val compare-val))
@@ -379,11 +505,30 @@ operator function and comparison function"
         (let ((track-val (emms-track-get track local-field)))
           (not (and
                 track-val
-                (funcall local-operator track-val local-compare-val)))))))
+                (funcall local-operator local-compare-val track-val)))))))
 
-(emf-register-filter-factory "field compare"
+
+;; not sure anyone will use these directly but you never know.
+;; Its a good test for the prompting system.
+(emf-register-filter-factory "Number field compare"
                              'emf-make-filter-field-compare
-                             '("operator: " "field: " "compare to: "))
+                             ;; prompts
+                             `(("Compare Function: "
+                                (:function . ,emf-number-compare-functions))
+                               ("Field name: "
+                                (:symbol . ,emf-number-field-names))
+                               ("Compare to: "
+                                (:foo . nil))))
+
+(emf-register-filter-factory "String field compare"
+                             'emf-make-filter-field-compare
+                             ;; prompts
+                             `(("Compare Function: "
+                                (:function . ,emf-string-compare-functions ))
+                               ("Field name: "
+                                (:symbol . ,emf-string-field-names))
+                               ("Compare to: "
+                                (:foo . nil))))
 
 ;; Generic field comparison factories.
 ;; parameter order is good for making partials.
@@ -391,33 +536,144 @@ operator function and comparison function"
       (apply-partially 'emf-make-filter-field-compare
                        '<= 'info-playing-time))
 
-(emf-register-filter-factory "duration less"
+(emf-register-filter-factory "Duration less"
                              emf-make-filter-duration-less
-                             '("duration: " ))
+                             '(("Duration: " (:number . nil))))
 
 (setq emf-make-filter-duration-more
       (apply-partially 'emf-make-filter-field-compare
                        '>= 'info-playing-time))
 
-(emf-register-filter-factory "duration more"
+(emf-register-filter-factory "Duration more"
                              emf-make-filter-duration-more
-                             '("duration: " ))
+                             '(("Duration: " (:number . nil))))
 
 (setq emf-make-filter-genre
       (apply-partially 'emf-make-filter-field-compare
                        'string-equal-ignore-case 'info-genre))
 
-(emf-register-filter-factory "genre"
+(emf-register-filter-factory "Genre"
                              emf-make-filter-genre
-                             '("genre: " ))
+                             '(("Genre: " (:string . nil))))
 
 (setq emf-make-filter-type
       (apply-partially 'emf-make-filter-field-compare
                        'eq 'type))
 
-(emf-register-filter-factory "track type"
+(emf-register-filter-factory "Track type"
                              emf-make-filter-type
-                             '("track type: "))
+                             '(("Track type: "
+                                (:string . '(file url stream streamlist playlist)))))
+
+;; Replace the emms browser searches with these.
+(setq emf-make-filter-album-artist
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-albumartist)))
+
+
+(emf-register-filter-factory "Album-artist"
+                             'emf-make-filter-album-artist
+                             '(("Search album artist: " (:string . nil))))
+
+(setq emf-make-filter-artist
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-artist)))
+
+(emf-register-filter-factory "Artist"
+                             'emf-make-filter-artist
+                             '(("Search artist: " (:string . nil))))
+
+(setq emf-make-filter-artists
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-artist info-albumartist)))
+
+(emf-register-filter-factory "Artists"
+                             'emf-make-filter-artists
+                             '(("Search artists: " (:string . nil))))
+
+(setq emf-make-filter-artists-composer
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-artist info-albumartist info-composer)))
+
+(emf-register-filter-factory "Artists and composer"
+                             'emf-make-filter-artists-composer
+                             '(("Search artists and composer: " (:string . nil))))
+
+(setq emf-make-filter-album
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-album)))
+
+(emf-register-filter-factory "Album"
+                             'emf-make-filter-album
+                             '(("Search album: " (:string . nil))))
+
+(setq emf-make-filter-title
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-title)))
+
+
+(emf-register-filter-factory "Title"
+                             'emf-make-filter-title
+                             '(("Search title: " (:string . nil))))
+
+(setq emf-make-filter-performer
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-performer)))
+
+
+(emf-register-filter-factory "Performer"
+                             'emf-make-filter-performer
+                             '(("Search performer: " (:string . nil))))
+
+(setq emf-make-filter-orchestra
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-orchestra)))
+
+
+(emf-register-filter-factory "Orchestra"
+                             'emf-make-filter-orchestra
+                             '(("Search orchestra: " (:string . nil))))
+
+(setq emf-make-filter-composer
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-composer)))
+
+
+(emf-register-filter-factory "Composer"
+                             'emf-make-filter-album-artist
+                             '(("Search composer: " (:string . nil))))
+
+(setq emf-make-filter-note
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-note)))
+
+(emf-register-filter-factory "Notes"
+                             'emf-make-filter-note
+                             '(("Search notes: " (:string . nil))))
+
+(setq emf-make-filter-names-and-titles
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-albumartist
+                         info-artist
+                         info-composer
+                         info-performer
+                         info-title
+                         info-album)))
+
+(emf-register-filter-factory "Names and titles"
+                             'emf-make-filter-names-and-titles
+                             '(("Search names and titles: " (:string . nil))))
+
+(setq emf-make-filter-names
+      (apply-partially 'emf-make-filter-field-search
+                       '(info-albumartist
+                         info-artist
+                         info-composer
+                         info-performer)))
+
+(emf-register-filter-factory "Names"
+                             'emf-make-filter-names
+                             '(("Search names: " (:string . nil))))
 
 
 ;; Multi-filter  - Just another factory.
@@ -475,7 +731,7 @@ Returns True if the track should be filtered out."
               local-multi-funcs
               :initial-value t)))))
 
-(emf-register-filter-factory "multi-filter"
+(emf-register-filter-factory "Multi-filter"
                              'emf-make-multi-filter
                              '(nil))
 
@@ -489,90 +745,94 @@ Simply turn a meta-filter into a multi-filter function."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; A simple not a filter, So we have a default of no filters to choose/return to.
-(emf-register-filter "no filter" 'ignore)
+(emf-register-filter "No filter" 'ignore)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;             factory      name        factory arg
 (setq emf-decade-filters
-      '(("year range" "1900s"     1900 1909)
-        ("year range" "1910s"     1910 1919)
-        ("year range" "1920s"     1920 1929)
-        ("year range" "1930s"     1930 1939)
-        ("year range" "1940s"     1940 1949)
-        ("year range" "1950s"     1950 1959)
-        ("year range" "1960s"     1960 1969)
-        ("year range" "1970s"     1970 1979)
-        ("year range" "1980s"     1980 1989)
-        ("year range" "1990s"     1990 1999)
-        ("year range" "2000s"     2000 2009)
-        ("year range" "2010s"     2010 2019)
-        ("year range" "2020s"     2020 2029)))
+      '(("Year range" "1900s"     1900 1909)
+        ("Year range" "1910s"     1910 1919)
+        ("Year range" "1920s"     1920 1929)
+        ("Year range" "1930s"     1930 1939)
+        ("Year range" "1940s"     1940 1949)
+        ("Year range" "1950s"     1950 1959)
+        ("Year range" "1960s"     1960 1969)
+        ("Year range" "1970s"     1970 1979)
+        ("Year range" "1980s"     1980 1989)
+        ("Year range" "1990s"     1990 1999)
+        ("Year range" "2000s"     2000 2009)
+        ("Year range" "2010s"     2010 2019)
+        ("Year range" "2020s"     2020 2029)))
 
 (setq emf-genre-filters
-      '(("genre" "waltz"      "waltz")
-        ("genre" "vals"       "vals")
-        ("genre" "tango"      "tango")
-        ("genre" "milonga"    "milonga")
-        ("genre" "condombe"   "condombe")
-        ("genre" "salsa"      "salsa")
-        ("genre" "blues"      "blues")
-        ("genre" "rock"       "rock")
-        ("genre" "swing"      "swing")
-        ("genre" "pop"        "pop")
-        ("genre" "rap"        "rap")
-        ("genre" "hip hop"    "hip hop")
-        ("genre" "classical"  "classical")
-        ("genre" "baroque"    "baroque")
-        ("genre" "chamber"    "chamber")
-        ("genre" "reggae"     "reggae")
-        ("genre" "folk"       "folk")
-        ("genre" "world"      "world")
-        ("genre" "metal"      "metal")
-        ("genre" "fusion"     "fusion")
-        ("genre" "jazz"       "jazz")))
+      '(("Genre" "Waltz"      "waltz")
+        ("Genre" "Vals"       "vals")
+        ("Genre" "Tango"      "tango")
+        ("Genre" "Milonga"    "milonga")
+        ("Genre" "Condombe"   "condombe")
+        ("Genre" "Salsa"      "salsa")
+        ("Genre" "Blues"      "blues")
+        ("Genre" "Rock"       "rock")
+        ("Genre" "Swing"      "swing")
+        ("Genre" "Pop"        "pop")
+        ("Genre" "Rap"        "rap")
+        ("Genre" "Hip hop"    "hip hop")
+        ("Genre" "Classical"  "classical")
+        ("Genre" "Baroque"    "baroque")
+        ("Genre" "Chamber"    "chamber")
+        ("Genre" "Reggae"     "reggae")
+        ("Genre" "Folk"       "folk")
+        ("Genre" "World"      "world")
+        ("Genre" "Metal"      "metal")
+        ("Genre" "Fusion"     "fusion")
+        ("Genre" "Jazz"       "jazz")))
 
 (setq emf-last-played-filters
-      '(("Played Since" "Played in the last month" 30)
-        ("Not Played Since" "Not played since a year" 365)))
+      '(("Played since" "Played in the last month" 30)
+        ("Not played since" "Not played since a year" 365)))
 
-(setq emf-misc-filters
-      '(("track type" "only files" file)))
+(setq emf-track-type-filters
+      '(("Track type" "File" file)
+        ("Track type" "Url" url)
+        ("Track type" "Stream" stream)
+        ("Track type" "Stream list" streamlist)
+        ("Track type" "Play list" playlist)))
 
 (setq emf-duration-filters
-      '(("duration less" "duration <1 min"  60)
-        ("duration less" "duration <5 min"  300)
-        ("duration more" "duration >5 min"  300)
-        ("duration more" "duration >10 min" 600)))
+      '(("Duration less" "Duration <1 min"  60)
+        ("Duration less" "Duration <5 min"  300)
+        ("Duration more" "Duration >5 min"  300)
+        ("Duration more" "Duration >10 min" 600)))
 
 (setq some-multi-filters
-      '(("multi-filter"
+      '(("Multi-filter"
          "1930-1949"
          (("1930-1939" "1940-1949")) )
 
-        ("multi-filter"
-         "vals | waltz"
-         (("vals" "waltz")))
+        ("Multi-filter"
+         "Vals | waltz"
+         (("Vals" "Waltz")))
 
-        ("multi-filter"
-         "milonga | condombe"
-         (("milonga" "condombe")))
+        ("Multi-filter"
+         "Milonga | condombe"
+         (("Milonga" "Condombe")))
 
-        ("multi-filter"
-         "vals && 1930-1949"
-         (("vals")
+        ("Multi-filter"
+         "Vals && 1930-1949"
+         (("Vals")
           ("1930-1949")))
 
-        ("multi-filter"
-         "vals or milonga, 1930-1959"
+        ("Multi-filter"
+         "Vals or milonga, 1930-1959"
          (("1930-1949" "1950-1959")
-          ("vals | milonga")))))
+          ("Vals | Milonga")))))
 
 (defun emf-make-default-filters()
   "Make some default filters anyone would not mind having."
   (emf-make-filters emf-decade-filters)
   (emf-make-filters emf-genre-filters)
-  (emf-make-filters emf-misc-filters)
+  (emf-make-filters emf-track-type-filters)
   (emf-make-filters emf-last-played-filters)
   (emf-make-filters emf-duration-filters)
   )
@@ -737,9 +997,10 @@ it a meta-filter, if it is a meta-filter use it."
   (message "Registering the current meta-filter as a filter for the session")
   (emf-status)
 
-  (if (and emf-stack (consp (car emf-stack)))
-      (emf-register-filter (caar emf-stack)
-                           (emf-meta-filter->multi-filter (cdar emf-stack)))))
+  (when (and emf-stack (consp (car emf-stack)))
+    (emf-register-filter (caar emf-stack)
+                         (emf-meta-filter->multi-filter (cdar emf-stack)))
+    (emf-add-to-filter-menu "Kept filters" (caar emf-stack))))
 
 (defun  emf-default ()
   "Set to default filter."
@@ -756,18 +1017,40 @@ Allows for tree structures of any depth."
                          "Choose a filter or group:" choices nil t)
                         choices)))
     (if (consp choice)
-        (emf-choose-filter (cadr choice))
+        (emf-choose-filter-recursive (cadr choice))
+      (if (string= "new filter" choice)
+          (emf-new-filter))
       choice)))
 
 (defun emf-choose-filter ()
   "Choose a filter from our filter menu tree.
 Stupid, Assumes our tree is an alist of lists of strings."
+  (let* ((choice (completing-read
+                  "Choose a filter group:" emf-filter-menu nil t))
+         (newlist (cadr (assoc choice emf-filter-menu))))
+    (if newlist
+        (completing-read "Choose a filter:" newlist nil t)
+      (if (string= "new filter" choice)
+          (emf-new-filter)
+        choice))))
+
+(defun emf-choose-factory ()
+  "Choose a filter factory from our list of factories."
   (completing-read
-   "Choose a filter:"
-   (cadr (assoc (completing-read
-                 "Choose a filter group:" emf-filter-menu nil t)
-                emf-filter-menu))
-   nil t))
+   "Choose a filter factory:" emf-filter-factories nil t))
+
+(defun emf-select-one-shot ()
+  "Select or create a filter from the list of filter functions.
+The filter will be used to create a new entry on the
+cache stack and will be added to the filter menu.
+Create or choose a filter, push filter, hard-filter with filter, pop filter.
+If a filter was created it will remain as a filter choice for the session.
+This effectively imitates the emms browser search and the search stack."
+  (interactive)
+  (let ((fname (emf-choose-filter)))
+    (emf-push fname)
+    (emf-hard-filter)
+    (emf-pop)))
 
 (defun emf-select-push ()
   "Select a filter from the list of filter functions."

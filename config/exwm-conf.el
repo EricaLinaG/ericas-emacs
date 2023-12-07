@@ -418,7 +418,7 @@ If there are multiple, complete for them."
 (when exwm-enabled
   (exwm-enable))
 
-(when (not (get-buffer "*redshift*"))
-  (start-process-shell-command "redshift" "*redshift*" "redshift"))
+;; (when (not (get-buffer "*redshift*"))
+;;   (start-process-shell-command "redshift" "*redshift*" "redshift"))
 
 (provide 'exwm-conf)
