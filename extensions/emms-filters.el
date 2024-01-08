@@ -1,11 +1,11 @@
 ;;; emms-filters.el --- Filter for Emms          -*- lexical-binding: t; -*-
-;; Copyright (C) 2023
+;; Copyright (C) 2023 2024
 ;; Author:  Erica Gebhart <e.a.gebhart@gmail.com> (Erica Gebhart)
-;; Keywords: emms, filter, search, cache
+;; Keywords: emms, filter, search, cache, stack
 
 ;;; Commentary:
 ;; This code allows you to filter and search the metadata cache.
-;; This replaces the search and filter functionalities of emms-browser.
+;; This manages the search and filter functionalities of emms-browser.
 
 ;; Usage
 ;; -------------------------------------------------------------------

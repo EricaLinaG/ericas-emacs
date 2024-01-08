@@ -222,7 +222,7 @@
   "
                     EMMS Filters
 ---------------------------------------------------------
- Ring:   _←_ %s(emf-current-ring-filter-name) _→_
+ Ring:             _←_ %s(emf-current-ring-filter-name) _→_
                    _!_ clear ring filter.
 
  Current:  %s(emf-current-meta-filter-name)
