@@ -1835,7 +1835,7 @@ and cache the results to the cache stack."
 
 (defun emf-search-by-album ()
   (interactive)
-  (emf-quick "Album"))
+  (emf-quick-one-shot "Album"))
 
 (defun emf-search-by-titles ()
   (interactive)
