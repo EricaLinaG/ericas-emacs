@@ -12,10 +12,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
+;; I used to start all sorts of stuff here.
+;; now I just want my "dashboard".
+;; perspectives are better for managing
+;; the shape of things.
 (defun main-window ()
   (interactive)
   (balance-windows)
-  (split-window-horizontally)
+  ;;(split-window-horizontally)
   ;;(split-window-below)
   ;;(cb-get-shell)
   )

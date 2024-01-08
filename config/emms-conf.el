@@ -106,18 +106,14 @@
 
 (setq emms-browser-track-sort-function 'emms-sort-year-p)
 
-;; Searches
-(defun emms-browser-search-by-albumartist-artist-genre ()
-  (interactive)
-  (emms-browser-search '(info-albumartist info-artist info-genre)))
-
 ;; Covers
 (setq emms-browser-covers #'emms-browser-cache-thumbnail-async)
 (setq emms-browser-thumbnail-small-size 64)
 (setq emms-browser-thumbnail-medium-size 128)
 
+
 ;; Filters
-(setq emms-browser-current-filter-name nil)
+(setq emf-multi-filter-save-file "~/emms-filters.el")
 
 ;;        factory      Name        arguments
 (setq tango-filters
@@ -129,9 +125,9 @@
         ("Year range" "1958-"     1958 3000)
         ("Directory" "tangotunes" "tangotunesflac")
 
-        ;; ("genre" "vals"    "vals")
-        ;; ("genre" "tango"   "tango")
-        ;; ("genre" "milonga" "milonga")
+        ;; ("genre" "Vals"    "vals")
+        ;; ("genre" "Tango"   "tango")
+        ;; ("genre" "Milonga" "milonga")
 
         ("Multi-filter"
          "1900-1937"
@@ -162,11 +158,17 @@
 
 (emf-make-filters tango-filters)
 
+;; Also need to add these to my tango filters since I
+;; didnt create them.
+(setq my-filter-ring '("Tango" "Vals" "Milonga"))
+
 ;; Add my own filter selection menu with tango filters in it.
-(emf-add-filter-menu "Tango" (mapcar 'cadr tango-filters))
+(emf-add-to-filter-menu-from-filter-list "Tango" tango-filters)
+(emf-add-to-filter-menu "Tango" my-filter-ring)
 
 ;; need silence and cortinas...
-(emf-make-filter-ring '("tango" "vals" "milonga"))
+(emf-make-filter-ring my-filter-ring)
+
 
 ;; extras - start and stop mpd. A function to give to Perspective.
 (defun mpd/start-music-daemon ()
@@ -199,8 +201,9 @@
  "b p" 'emms-browse-by-performer
  "s g" 'emms-browser-search-by-albumartist-artist-genre
 
- "h" 'hydra-emms-compact/body
- "H" 'hydra-emms/body
+ "t" 'hydra-persps/body
+ "h" 'hydra-emms/body
+ "H" 'hydra-emms-monolithic/body
  "m" 'emms-metaplaylist-mode-go
  "P" 'hydra-persp/body)
 
@@ -208,17 +211,19 @@
  ;; NOTE: keymaps specified with :keymaps must be quoted
  :keymaps 'emms-playlist-mode-map
  "A" 'emms-add-playlist
- "h" 'hydra-emms-compact/body
- "H" 'hydra-emms/body
+ "h" 'hydra-emms/body
+ "H" 'hydra-emms-monolithic/body
  "m" 'emms-metaplaylist-mode-go
+ "t" 'hydra-emms-persps/body
  "P" 'hydra-persp/body)
 
 (general-define-key
  :keymaps 'emms-metaplaylist-mode-map
  "SPC" 'emms-metaplaylist-mode-goto
  "c" 'emms-metaplaylist-mode-goto-current
- "h" 'hydra-emms-compact/body
- "H" 'hydra-emms/body
+ "h" 'hydra-emms/body
+ "H" 'hydra-emms-monolithic/body
+ "t" 'hydra-emms-persps/body
  "P" 'hydra-persp/body)
 
 ;; a handy function

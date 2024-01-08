@@ -22,6 +22,15 @@
 
 (require 'projectile)
 (require 'dashboard)
+(require 'persp-hydra)
+
+ ;;;;;;;;;;;;;;;;;;  ";; doesnt work.
+(general-define-key
+ :keymaps 'dashboard-mode-map
+ ;; fixing the default map.
+ "t" 'hydra-persps/body
+ "h" 'hydra-persp/body)
+
 
 ;; replace so that dashboard always starts. Sometimes I pass a title, evals or files.
 (defun dashboard-setup-startup-hook ()

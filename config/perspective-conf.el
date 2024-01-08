@@ -5,6 +5,12 @@
 (require 'perspective)
 (require 'persp-hydra)
 
+(customize-set-variable 'display-buffer-base-action
+                        '((display-buffer-reuse-window display-buffer-same-window)
+                          (reusable-frames . t)))
+
+(customize-set-variable 'even-window-sizes nil)     ; avoid resizing
+
 ;; (global-set-key (kbd "C-x C-b") 'persp-list-buffers)
 (customize-set-variable 'persp-mode-prefix-key (kbd "C-c d"))
 (persp-mode)

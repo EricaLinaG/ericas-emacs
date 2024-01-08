@@ -9,7 +9,7 @@
 ;; Should make one that takes a directory, a list of files,
 ;; and a list of executables. Essentially Xmonad topics
 (defun layout-3 (dir name &optional file)
-  "Change to DIR directory and open 3 windows then load the FILE if given."
+  "Change to DIR directory NAME and open 3 windows then load the FILE if given."
   (persp-switch name)
   (if dir
       (cd dir)
@@ -21,7 +21,10 @@
       (find-file file)
     (find-file (read-file-name
                 "Find file: " nil default-directory
-                (confirm-nonexistent-file-or-buffer))) ))
+                (confirm-nonexistent-file-or-buffer))) )
+  (persp-add-buffer "*Messages*")
+  (windmove-right)
+  (scratch-buffer))
 
 (defun layout-0 (dir name &optional file)
   "Create perspective of NAME, Change to DIR directory and open 0 windows then load the FILE if given."
@@ -33,7 +36,8 @@
       (find-file file)
     (find-file (read-file-name
                 "Find file: " nil default-directory
-                (confirm-nonexistent-file-or-buffer))) ))
+                (confirm-nonexistent-file-or-buffer))))
+  (persp-add-buffer "*Messages*"))
 
 (defun emms-persp ()
   "Start mpd, start emms,start playlist and lock it to the queue."
@@ -45,6 +49,8 @@
   (split-window-right)
   (emms-playlist-mode-go)
   (emms-lock-queue))
+
+
 
 (defhydra hydra-persp (:hint nil)
   "
@@ -59,7 +65,7 @@
                   _i_: import      _b_: switch
     <-arrows->    _m_: merge       _B_: scratch
       1-9         _u_: unmerge     _g_: global add
-                  _S_: save
+                  _S_: save        _M_: add *messages*
   _q_: quit         _l_: load
 
   ^Windows^
@@ -103,6 +109,8 @@
   ("k" persp-kill)
   ("r" persp-rename :exit t)
   ("a" persp-add-buffer :exit t)
+  ("M" '(progn (persp-add-buffer "*Messages*")
+               (switch-to-buffer "*Messages*")) :exit t)
   ("A" persp-set-buffer)
   ("b" persp-switch-to-buffer)
   ("B" persp-switch-to-scratch-buffer)
@@ -138,6 +146,35 @@
 ;; (define-key perspective-map (kbd "8") (lambda () (interactive) (persp-switch-by-number 8)))
 ;; (define-key perspective-map (kbd "9") (lambda () (interactive) (persp-switch-by-number 9)))
 ;; (define-key perspective-map (kbd "0") (lambda () (interactive) (persp-switch-by-number 10)))
+
+(defhydra hydra-persps (:hint nil)
+  "
+     Perspectives
+     Currently: %s(persp-names)
+
+  ^Create new perspective by topic.^ _c_: Custom
+  _E_: Emacsn      _d_: Emacsn dev   _s_: Emacsn stable
+  _q_: myQMK       _b_: BD           _m_: Music
+  _S_: Scad 3D     _z_: SPR          _x_: Xmonad
+  _e_: Emms dev    _M_: Mail
+"
+  ("q" nil)
+
+  ("c" (layout-3 nil nil))
+  ("d" (layout-3 "~/Emacsn/dev/" "Emacsn dev" "README.org") :exit t)
+  ("s" (layout-3 "~/Emacsn/stable/" "Emacsn stable" "README.org") :exit t)
+  ("x" (layout-3 "~/.xmonad/"    "Xmonad" "xmonad.hs") :exit t)
+  ("E" (layout-3 "~/Emacsn/"     "Emacsn" "README.org") :exit t)
+  ("S" (layout-3 "~/play/3D"     "3D"     "README.org"))
+  ("q" (layout-3 "~/play/myQMK" "myQMK" "README.org") :exit t)
+  ("M" (progn (layout-3 "~/" "Email" nil) (mu4e) :exit t))
+  ("m" (progn (layout-0 "/home/Music"   "Music"  "README.org")
+              (emms-persp))
+   :exit t)
+  ("b" (layout-3 "/home/BD"       "BD"     "README.org"))
+  ("z" (layout-3 "~/play/SPR/"    "Emacsn" "README.org"))
+  ("e" (layout-3 "~/play/emms/" "Emms dev" "README"))
+  )
 
 (provide 'persp-hydra)
 ;;; persp-hydra.el ends here

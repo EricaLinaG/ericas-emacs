@@ -14,8 +14,8 @@
       (append (list
                (expand-file-name "./early-packages" user-emacs-directory)
                (expand-file-name "./themes" user-emacs-directory)
-               (expand-file-name "./extensions" user-emacs-directory)
                (expand-file-name "./extensions/Emms" user-emacs-directory)
+               (expand-file-name "./extensions" user-emacs-directory)
                (expand-file-name "./config" user-emacs-directory))
               load-path))
 
