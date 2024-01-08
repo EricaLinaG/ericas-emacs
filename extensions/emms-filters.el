@@ -33,11 +33,11 @@
 ;; A filter can be 'kept'. The function 'emf-keep will create and register
 ;; a multi-filter of the current filter, adding it to the multi-filter menu.
 ;; This only lasts until the current Emacs session ends.
-;; If emf-multi-filter-save-file is set, a usable filter definition will also be
+;; If emf-multi-filter-save-file is set, a usable multi-filter definition will also be
 ;; appended to the file.
 ;;
 ;; Manage the search cache with emf-hard-filter, emf-one-shot, emf-quick-one-shot,
-;; emf-browser-search, emf-pop-cache, emf-squash-caches,
+;; emf-search-by, emf-pop-cache, emf-squash-caches,
 ;; emf-clear-caches, emf-push-db-cache
 ;;
 ;; Caches can be stashed for the session and pushed back to the stack
@@ -1663,22 +1663,6 @@ Use the current filter name so that 'no filter' shows."
 (defvar emf-search-caches '()
   "The stack of search result caches.")
 
-(defun emf-search (factory-name)
-  "Search in the cache creating a filter from the FACTORY-NAME given.
-Intended as a replacement for emms-browser-search.
-A one-shot filter with a hard filter followed by a filter pop. leaving
-the new search cache on the cache stack, and a new filter in the select list.
-
-A replacement for emms-browser-search using a factory.
-
-Use an automatic filter name based on the FACTORY-NAME and its parameters
-reducing the prompts to just the search parameters for the given
-filter factory. Leaves the filter in the factory's filter choices."
-  ;; new filter, using Search fields factory, make name true.
-  (emf-push (emf-new-filter factory-name t))
-  (emf-hard-filter)
-  (emf-pop))
-
 (defun emf-browser-search (fields)
   "Search track FIELDS in the cache for a compare string.
 An exact replacement for emms-browser-search.
@@ -1851,7 +1835,7 @@ and cache the results to the cache stack."
 
 (defun emf-search-by-album ()
   (interactive)
-  (emf-quick-one-shot "Album"))
+  (emf-quick "Album"))
 
 (defun emf-search-by-titles ()
   (interactive)
