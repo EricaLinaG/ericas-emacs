@@ -1412,7 +1412,7 @@ it a meta-filter, if it is a meta-filter use it."
 (defun emf-save-meta-filter (meta-filter)
   (when emf-multi-filter-save-file
     (append-to-file
-     (format "(\"Multi-filter\"\n %s\n (%s))\n\n"
+     (format "(\"Multi-filter\"\n %S\n %S)\n\n"
              (car meta-filter)
              (cdr meta-filter))
      nil emf-multi-filter-save-file)))
@@ -1709,8 +1709,9 @@ allow selection of a cache from the cache stash."
   (if (and filter-name cache)
       (push (cons filter-name cache) emf-search-caches)
     (let ((stashed-cache
-           (completing-read "Select Cache"
-                            emf-cache-stash nil t)))
+           (assoc (completing-read "Select Cache"
+                                   emf-cache-stash nil t)
+                  emf-cache-stash)))
       (push stashed-cache emf-search-caches)))
   (emf-refilter))
 
@@ -1764,7 +1765,9 @@ or the emf-filter-factory 'search-fields'."
   "Show the cache names in the stash."
   (interactive)
   (message "Emms cache stash:\n%s\n"
-           (reverse (mapcar #'car emf-cache-stash))))
+           (mapconcat 'identity
+                      (reverse (mapcar #'car emf-cache-stash))
+                      ", ")))
 
 (defun emf-last-search-cache ()
   "Return the cache portion of the last search cache entry."
