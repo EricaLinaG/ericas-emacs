@@ -94,7 +94,7 @@ ARG is the thing being completed in the minibuffer."
 (customize-set-variable 'corfu-cycle t) ; Allows cycling through candidates
 (customize-set-variable 'corfu-auto t)  ; Enable auto completion
 (customize-set-variable 'corfu-auto-prefix 3) ; Complete with less prefix keys
-(customize-set-variable 'corfu-auto-delay 0.3) ; No delay for completion not recommended.
+(customize-set-variable 'corfu-auto-delay 0.9) ; No delay for completion not recommended.
 (customize-set-variable 'corfu-echo-documentation 0.25) ; Echo docs for current completion option
 
 (global-corfu-mode 1)

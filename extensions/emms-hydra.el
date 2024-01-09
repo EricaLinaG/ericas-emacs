@@ -161,11 +161,11 @@
   ("c c" emf-clear-caches)
   ("<right>" emf-next-ring-filter)
   ("<left>" emf-previous-ring-filter)
-  ("f p" emf-select-push)
-  ("f s" emf-select-smash)
-  ("f o" emf-select-or)
-  ("f a" emf-select-and)
-  ("f n" emf-select-and-not)
+  ("f p" emf-push)
+  ("f s" emf-smash)
+  ("f o" emf-or)
+  ("f a" emf-and)
+  ("f n" emf-and-not)
   )
 
 (defhydra hydra-emms-playlists (;; :color teal
@@ -289,11 +289,11 @@
   ("<left>" emf-previous-ring-filter)
 
   ("!" emf-clear-ring-filter)
-  ("p" emf-select-push)
-  ("s" emf-select-smash)
-  ("o" emf-select-or)
-  ("a" emf-select-and)
-  ("n" emf-select-and-not)
+  ("p" emf-push)
+  ("s" emf-smash)
+  ("o" emf-or)
+  ("a" emf-and)
+  ("n" emf-and-not)
   )
 
 

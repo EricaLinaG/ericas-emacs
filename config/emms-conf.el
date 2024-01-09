@@ -123,11 +123,12 @@
         ("Year range" "1940-1946" 1940 1946)
         ("Year range" "1946-1958" 1946 1958)
         ("Year range" "1958-"     1958 3000)
+
         ("Directory" "tangotunes" "tangotunesflac")
 
-        ;; ("genre" "Vals"    "vals")
-        ;; ("genre" "Tango"   "tango")
-        ;; ("genre" "Milonga" "milonga")
+        ("genre" "Vals"    "vals")
+        ("genre" "Tango"   "tango")
+        ("genre" "Milonga" "milonga")
 
         ("Multi-filter"
          "1900-1937"
@@ -168,7 +169,6 @@
 
 ;; need silence and cortinas...
 (emf-make-filter-ring my-filter-ring)
-
 
 ;; extras - start and stop mpd. A function to give to Perspective.
 (defun mpd/start-music-daemon ()

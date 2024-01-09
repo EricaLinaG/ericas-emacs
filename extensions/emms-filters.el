@@ -19,8 +19,8 @@
 ;; organized by factory.
 ;;
 ;; Apply a filter with the functions
-;;    emf-select-push, emf-select-or, emf-select-and, emf-select-and-not
-;;    emf-select-smash and emf-select-one-shot.
+;;    emf-push, emf-or, emf-and, emf-and-not
+;;    emf-smash and emf-one-shot.
 ;; manipulate the stack with the functions:
 ;; emf-push, emf-pop, emf-clear and emf-squash, swap and swap-pop.
 ;;
@@ -225,7 +225,7 @@
 ;;                     ("Genre" "Blues"      "blues")
 ;;                     ("Genre" "Jazz"       "jazz")))
 ;;
-;; Or just push a filter onto the stack with emf-select-push,
+;; Or just push a filter onto the stack with emf-push,
 ;; select 'new filter' and follow the prompts.
 
 ;;; Factory Prompts.
@@ -299,7 +299,7 @@
 ;; The function; emf-hard-filter creates a cache from the current filter
 ;; and cache, and pushes it to the stack.
 ;;
-;; Using emf-select-one-shot, emf-quick-one-shot and emf-browser-search
+;; Using emf-one-shot, emf-quick-one-shot and emf-browser-search
 ;; also create caches on the stack.
 ;;
 ;; The usual commands exist for manipulating the stack.
@@ -334,10 +334,9 @@
 ;; with emf-keep.  One shots, (searches), are automatically kept for the session.
 ;; Keep may also write them to a file for later use.
 ;;
-;; Push a filter to the filter stack with emf-select-push and then
-;; add to it with the other emf-select-* functions. Each change results
+;; Push a filter to the filter stack with emf-push and then
+;; add to it with the -or, -and, and -and-not functions. Each change results
 ;; in new filter on the stack.
-;; Add another filter pop, try again.
 ;;
 ;; Use emf-select-or to add another filter and choose 'new filter' to
 ;; interactively create and add a filter to the current filter.
@@ -1347,16 +1346,22 @@ Run the filter changed hook. Ask the browser to re-render."
         ;; meta-filter - cdr is a listp
         (t filter)))
 
-(defun emf-push (filter)
+(defun emf-push (&optional filter)
   "Push a copy of FILTER to the meta-filter stack.
 Should be of the form (filter-name . metafilter/filter)
 or a filter-name.
+
+If filter is not supplied select a filter from the
+  list of filter functions or create a new one.
+
 Make a filter function and set it. If it is a name,
 look it up in our filter list. If it is a function, make
 it a meta-filter, if it is a meta-filter use it."
-  (push (emf-ensure-metafilter filter)
-        emf-stack)
-  (emf-refilter))
+  (interactive)
+  (let ((fname (or filter (emf-choose-filter))))
+    (push (emf-ensure-metafilter fname)
+          emf-stack)
+    (emf-refilter)))
 
 ;;; base functions
 (defun emf-current-meta-filter-name ()
@@ -1418,7 +1423,8 @@ it a meta-filter, if it is a meta-filter use it."
      nil emf-multi-filter-save-file)))
 
 (defun  emf-keep ()
-  "Register the current filter into the list of filters for the session."
+  "Register the current filter into the list of filters for the session.
+If emf-multi-filter-save-file is set, append the filter definition there."
   (interactive)
   (message "Registering the current meta-filter as a filter for the session")
   (emf-status)
@@ -1489,27 +1495,29 @@ Stupid, Assumes our tree is an alist of lists of strings."
            emf-filter-factories)
    nil t))
 
-(defun emf-one-shot (filter-name)
+(defun emf-one-shot (&optional filter-name)
   "Push FILTER-NAME given onto the filter stack,
-hard filter to create a cache, Then pop the filter."
-  (emf-push filter-name)
-  (emf-hard-filter)
-  (emf-pop))
+hard filter to create a cache, Then pop the filter.
 
-(defun emf-select-one-shot ()
-  "Select or create a filter from the list of filter functions.
+If not given, Select or create a filter from the list of filter functions.
 The filter will be used to create a new entry on the
 cache stack and will be added to the filter menu.
 
 Steps are;
- 1. Create or choose a filter,
+ 1. Take, Create, or choose a filter,
  2. Push filter,
  3. Push cache with filter,
  4. Pop filter.
 If a filter was created it will remain as a filter choice for the session.
-This is like browser-search, but with more choices."
+This is like browser-search, but with more choices.
+"
   (interactive)
-  (emf-one-shot (emf-choose-filter)))
+  (let ((fname
+         (or filter-name
+             (emf-chooose-filter))))
+    (emf-push fname)
+    (emf-hard-filter)
+    (emf-pop)))
 
 (defun emf-quick-one-shot (factory-name)
   "Create a new filter from FACTORY-NAME, using a generated filter name.
@@ -1520,13 +1528,7 @@ This imitates the emms browser search."
   (interactive)
   (emf-one-shot (emf-new-filter factory-name t)))
 
-(defun emf-select-push ()
-  "Select a filter from the list of filter functions."
-  (interactive)
-  (let ((fname (emf-choose-filter)))
-    (emf-push fname)))
-
-(defun emf-select-smash ()
+(defun emf-smash ()
   "Clear the stack and Select a filter from the list of filter functions."
   (interactive)
   (emf-clear)
@@ -1540,7 +1542,7 @@ This imitates the emms browser search."
     (append rest-mf
             (list (append (car rev-mf) (list filter-name))))))
 
-(defun  emf-select-or ()
+(defun  emf-or ()
   "Add filter to current/last filter list in the current filter.
 Creates an 'OR' filter."
   (interactive)
@@ -1553,7 +1555,7 @@ Creates an 'OR' filter."
   "Push a new And list with FILTER-NAME onto FILTER."
   (append filter (list (list filter-name))))
 
-(defun  emf-select-and ()
+(defun  emf-and ()
   "Select a filter to start a new list of filters.
 Creates a new 'AND' list of filters."
   (interactive)
@@ -1562,7 +1564,7 @@ Creates a new 'AND' list of filters."
      (emf-make-filter-cons-from-meta-filter
       (emf-push-and fname (emf-copy-meta-filter (cdar emf-stack)))))))
 
-(defun  emf-select-and-not ()
+(defun  emf-and-not ()
   "Select a filter to start a new list of filters.
 Creates a new 'AND-NOT' list of filters."
   (interactive)
@@ -1814,70 +1816,86 @@ and cache the results to the cache stack."
 
 ;; replacements for emms-browser and then some.
 (defun emf-search-by-albumartist ()
+  "A fields search quick one shot for Album Artist."
   (interactive)
   (emf-quick-one-shot "Album artist"))
 
 (defun emf-search-by-artist ()
+  "A fields search quick one shot for Artist."
   (interactive)
   (emf-quick-one-shot "Artist"))
 
 (defun emf-search-by-composer ()
+  "A fields search quick one shot for composer."
   (interactive)
   (emf-quick-one-shot "Composer"))
 
 (defun emf-search-by-performer ()
+  "A fields search quick one shot for performer."
   (interactive)
   (emf-quick-one-shot "Performer"))
 
 (defun emf-search-by-title ()
+  "A fields search quick one shot for title."
   (interactive)
   (emf-quick-one-shot "Title"))
 
 (defun emf-search-by-album ()
+  "A fields search quick one shot for album title."
   (interactive)
   (emf-quick-one-shot "Album"))
 
 (defun emf-search-by-titles ()
+  "A fields search quick one shot for album and song titles."
   (interactive)
   (emf-quick-one-shot "Titles"))
 
 (defun emf-search-by-names-and-titles ()
+  "A fields search quick one shot for all names and titles."
   (interactive)
   (emf-quick-one-shot "Names and titles"))
 
 (defun emf-search-by-names ()
+  "A fields search quick one shot for all names."
   (interactive)
   (emf-quick-one-shot "Names"))
 
 (defun emf-search-by-all-text ()
+  "A fields search quick one shot for All text fields."
   (interactive)
   (emf-quick-one-shot "All text"))
 
 (setq emms-browser-mode-map
       (let ((map emms-browser-mode-map))
         (define-key map (kbd "Q") #'emf-pop-cache)
+        ;; (define-key map (kbd "h") #'hydra-emms/body)
         (define-key map (kbd ">") #'emf-next-ring-filter)
         (define-key map (kbd "<") #'emf-previous-ring-filter)
         (define-key map (kbd "f !") #'emf-clear-ring-filter)
         (define-key map (kbd "f >") #'emf-next-ring-filter)
         (define-key map (kbd "f <") #'emf-previous-ring-filter)
 
-        (define-key map (kbd "f S") #'emf-status-print)
-        (define-key map (kbd "f S") #'emf-show-filters)
-        (define-key map (kbd "f F") #'emf-show-filter-factories)
+        (define-key map (kbd "i s") #'emf-status-print)
+        (define-key map (kbd "i f") #'emf-show-filters)
+        (define-key map (kbd "i m") #'emf-show-filter-menu)
+        (define-key map (kbd "i F") #'emf-show-filter-factories)
+        (define-key map (kbd "i c") #'emf-show-cache-stack)
+        (define-key map (kbd "i S") #'emf-show-cache-stash)
+
         (define-key map (kbd "f P") #'emf-pop)
         (define-key map (kbd "f h") #'emf-hard-filter)
+        ;; (define-key map (kbd "f H") #'hydra-emms-filters/body)
         (define-key map (kbd "f r") #'emf-swap) ; rotate ?
         (define-key map (kbd "f R") #'emf-swap-pop) ; rotate-eject, ,pop-previous
         (define-key map (kbd "f f") #'emf-squash) ;flatten
         (define-key map (kbd "f k") #'emf-keep)
         (define-key map (kbd "f C") #'emf-clear-all)
         (define-key map (kbd "f c") #'emf-clear)
-        (define-key map (kbd "f p") #'emf-select-push)
-        (define-key map (kbd "f s") #'emf-select-smash)
-        (define-key map (kbd "f o") #'emf-select-or)
-        (define-key map (kbd "f a") #'emf-select-and)
-        (define-key map (kbd "f n") #'emf-select-and-not)
+        (define-key map (kbd "f p") #'emf-push)
+        (define-key map (kbd "f s") #'emf-smash)
+        (define-key map (kbd "f o") #'emf-or)
+        (define-key map (kbd "f a") #'emf-and)
+        (define-key map (kbd "f n") #'emf-and-not)
 
         (define-key map (kbd "c p") #'emf-push-cache)
         (define-key map (kbd "c z") #'emf-stash-pop-cache)
@@ -1886,10 +1904,8 @@ and cache the results to the cache stack."
         (define-key map (kbd "c h") #'emf-hard-filter)
         (define-key map (kbd "c r") #'emf-swap-cache)
         (define-key map (kbd "c R") #'emf-swap-pop-cache)
-        (define-key map (kbd "c f") #'emf-squash-caches)
+        (define-key map (kbd "c S") #'emf-squash-caches)
         (define-key map (kbd "c c") #'emf-clear-caches)
-        (define-key map (kbd "c s") #'emf-show-caches)
-        (define-key map (kbd "c S") #'emf-show-cache-stash)
 
         (define-key map (kbd "s o") #'emf-search-by-albumartist)
         (define-key map (kbd "s a") #'emf-search-by-artist)
