@@ -1923,8 +1923,9 @@ This:
          (interactive)
          (emf-push name)))))
 
-;; The original, inverted, emms-browser filters
-;; Works with the above make-filter macro.
+;; The original, inverted, emms-browser filters examples
+;; Works with the above make-filter macro and Emms-filters.
+;; Deprecated.
 (defun emms-browser-filter-only-dir (dirname)
   "Generate a function to check if a track is in DIRNAME.
 If the track is not in DIRNAME, return t."

@@ -1293,7 +1293,7 @@ Returns True if the track should be filtered out."
 
 (defun emf-current-meta-filter ()
   "Return the current meta-filter from the top of the stack."
-  (car emf-stack))
+  (format "%S" (car emf-stack)))
 
 (defun emf-copy-meta-filter (filter)
   "Copy the meta-filter given by FILTER."
@@ -1335,7 +1335,9 @@ Run the filter changed hook. Ask the browser to re-render."
                         (emf-make-multi-filter (cdar emf-stack))))
   (run-hooks 'emf-filter-changed-hook)
   (emf-browse-by)
-  (emms-browser-expand-all))
+  ;; If it is a search or a filter expand the results.
+  (when (or emf-stack emf-search-caches)
+    (emms-browser-expand-all)))
 
 (defun emf-ensure-metafilter (filter)
   "Ensure that FILTER is a meta-filter."
@@ -1378,7 +1380,7 @@ it a meta-filter, if it is a meta-filter use it."
   (interactive)
   (emf-clear)
   (emf-clear-caches)
-  (emf-set-ring-filter "no filter"))
+  (emf-clear-ring-filter))
 
 (defun  emf-pop ()
   "Pop the stack, set the current filter function and re-render."
@@ -1414,12 +1416,15 @@ it a meta-filter, if it is a meta-filter use it."
   (interactive)
   (append-to-file string nil filename))
 
+(defun emf-format-multi-filter (meta-filter)
+  (format "(\"Multi-filter\"\n %S\n %S)\n\n"
+          (car meta-filter)
+          (cdr meta-filter)))
+
 (defun emf-save-meta-filter (meta-filter)
   (when emf-multi-filter-save-file
     (append-to-file
-     (format "(\"Multi-filter\"\n %S\n %S)\n\n"
-             (car meta-filter)
-             (cdr meta-filter))
+     (emf-format-multi-filter meta-filter)
      nil emf-multi-filter-save-file)))
 
 (defun  emf-keep ()
@@ -1764,7 +1769,8 @@ or the emf-filter-factory 'search-fields'."
 (defun emf-pop-cache ()
   "Pop the search results cache and then render to show the previous search result."
   (interactive)
-  (pop emf-search-caches))
+  (pop emf-search-caches)
+  (emf-refilter))
 
 (defun  emf-clear-caches ()
   "Clear the cache stack."
@@ -1882,7 +1888,7 @@ and cache the results to the cache stack."
         (define-key map (kbd "i c") #'emf-show-cache-stack)
         (define-key map (kbd "i S") #'emf-show-cache-stash)
 
-        (define-key map (kbd "f P") #'emf-pop)
+        (define-key map (kbd "f q") #'emf-pop)
         (define-key map (kbd "f h") #'emf-hard-filter)
         ;; (define-key map (kbd "f H") #'hydra-emms-filters/body)
         (define-key map (kbd "f r") #'emf-swap) ; rotate ?
@@ -1900,7 +1906,7 @@ and cache the results to the cache stack."
         (define-key map (kbd "c p") #'emf-push-cache)
         (define-key map (kbd "c z") #'emf-stash-pop-cache)
         (define-key map (kbd "c Z") #'emf-stash-cache)
-        (define-key map (kbd "c P") #'emf-pop-cache)
+        (define-key map (kbd "c q") #'emf-pop-cache)
         (define-key map (kbd "c h") #'emf-hard-filter)
         (define-key map (kbd "c r") #'emf-swap-cache)
         (define-key map (kbd "c R") #'emf-swap-pop-cache)

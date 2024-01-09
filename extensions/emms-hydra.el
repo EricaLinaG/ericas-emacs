@@ -65,12 +65,12 @@
     _c h_ hard-filter/push    _c z_ Stash and pop
     _c p_ Push from stash     _c Z_ Stash current
 
-    _c P_ Pop/Quit            _c r_ Rotate/Swap
+    _c q_ Pop/Quit            _c r_ Rotate/Swap
     _c c_ Clear               _c R_ Swap and Pop
     _c S_ Squash
 ---------------------------------------------------------
                   Filter Stack:
-    _f P_ pop/quit           _f r_ rotate/swap
+    _f q_ pop/quit           _f r_ rotate/swap
     _f c_ clear              _f R_ rotate/swap pop
     _f S_ squash
 
@@ -138,7 +138,7 @@
   ("i F" emf-show-filter-factories)
   ("i r" emf-show-filter-ring)
 
-  ("f P" emf-pop)
+  ("f q" emf-pop)
   ("f r" emf-swap) ; rotate ?
   ("f R" emf-swap-pop) ; rotate-eject, ,pop-previous
   ("f S" emf-squash)
@@ -152,7 +152,7 @@
   ("c P" emf-pop-cache)
   ("c h" emf-hard-filter)
   ("c r" emf-swap-cache) ; rotate ?
-  ("c P" emf-pop-cache)
+  ("c q" emf-pop-cache)
   ("c h" emf-hard-filter)
   ("c d" emf-push-db-cache)
   ("c r" emf-swap-cache) ; rotate ?
@@ -244,12 +244,12 @@
     _c h_ hard-filter/push      _c Z_ Stash current
     _c p_ Push from stash       _c z_ Stash and pop
 
-    _c P_ Pop/Quit              _c r_ Rotate/Swap
+    _c q_ Pop/Quit              _c r_ Rotate/Swap
     _c c_ Clear                 _c R_ Swap and Pop
     _c S_ Squash
 ---------------------------------------------------------
                   Filter Stack
-    _P_ Pop/Quit               _r_ Rotate/Swap
+    _q_ Pop/Quit               _r_ Rotate/Swap
     _C_ Clear                  _R_ Swap and Pop
     _S_ Squash
 ---------------------------------------------------------
@@ -266,7 +266,7 @@
   ("i F" emf-show-filter-factories)
   ("i r" emf-show-filter-ring)
 
-  ("P" emf-pop)
+  ("q" emf-pop)
   ("r" emf-swap) ; rotate ?
   ("R" emf-swap-pop) ; rotate-eject, ,pop-previous
   ("S" emf-squash)
@@ -278,7 +278,7 @@
   ("c p" emf-push-cache)
   ("c z" emf-stash-pop-cache)
   ("c Z" emf-stash-cache)
-  ("c P" emf-pop-cache)
+  ("c q" emf-pop-cache)
   ("c h" emf-hard-filter)
   ("c r" emf-swap-cache) ; rotate ?
   ("c R" emf-swap-pop-cache) ; rotate-eject, ,pop-previous
@@ -293,8 +293,7 @@
   ("s" emf-smash)
   ("o" emf-or)
   ("a" emf-and)
-  ("n" emf-and-not)
-  )
+  ("n" emf-and-not))
 
 
 (defhydra hydra-emms-filter-ring (:hint nil)
@@ -332,7 +331,7 @@
     _p_ Push from stash           _z_ Stash and pop
     _h_ hard-filter/push          _Z_ Stash current
 
-    _P_ Pop/Quit                  _r_ Rotate/Swap
+    _q_ Pop/Quit                  _r_ Rotate/Swap
     _c c_ Clear                   _R_ Swap and Pop
     _S_ Squash
   "
@@ -343,7 +342,7 @@
   ("p" emf-push-cache)
   ("z" emf-stash-pop-cache)
   ("Z" emf-stash-cache)
-  ("P" emf-pop-cache)
+  ("q" emf-pop-cache)
   ("h" emf-hard-filter)
   ("r" emf-swap-cache) ; rotate ?
   ("R" emf-swap-pop-cache) ; rotate-eject, ,pop-previous

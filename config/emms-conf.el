@@ -126,9 +126,9 @@
 
         ("Directory" "tangotunes" "tangotunesflac")
 
-        ("genre" "Vals"    "vals")
-        ("genre" "Tango"   "tango")
-        ("genre" "Milonga" "milonga")
+        ("Genre" "Vals"    "vals")
+        ("Genre" "Tango"   "tango")
+        ("Genre" "Milonga" "milonga")
 
         ("Multi-filter"
          "1900-1937"
