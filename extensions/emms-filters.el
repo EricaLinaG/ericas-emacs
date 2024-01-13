@@ -470,7 +470,7 @@
 ;; (emf-make-filter-ring '("Tango" "Vals" "Milonga"))
 
 ;;; Code:
-(require 'cl-lib)  ; for lexical-let
+(require 'cl)  ; for lexical-let
 (require 'emms-browser)
 
 (defvar  emf-replace-browser-filters t
