@@ -16,6 +16,7 @@
     dmenu
     async
     nov
+    chess
 
     vertico
     marginalia
