@@ -470,7 +470,7 @@
 ;; (emf-make-filter-ring '("Tango" "Vals" "Milonga"))
 
 ;;; Code:
-(require 'cl)  ; for lexical-let
+(require 'cl-lib)  ; for lexical-let
 (require 'emms-browser)
 
 (defvar  emf-replace-browser-filters t
@@ -501,7 +501,7 @@
   "Automatically generate filter names when creating filters interactively.")
 
 (defvar emf-current-filter emf-no-filter
-  "The current filter function")
+  "The current filter function.")
 
 (defvar emf-current-filter-name "no filter"
   "A name string of the filter for everyone to use.")
@@ -551,7 +551,7 @@ then we combine with the result of the emf-current-filter."
 ;;               emf-filter-menu)))
 
 (defun emf-add-to-filter-menu-from-filter-list (folder filters)
-  "Add a FOLDER and FILTERS to the filter select list menu. "
+  "Add a FOLDER and FILTERS to the filter select list menu."
   (emf-add-to-filter-menu folder (mapcar 'cadr tango-filters)))
 
 (defun emf-add-to-filter-menu (folder-name filter-or-list)
@@ -597,7 +597,7 @@ Appends the 'no filter' filter."
           (cons "no filter" list-of-filter-names)))
 
 (defun emf-append-to-filter-ring (filter-name)
-  "Append a single FILTER-NAME to the filter-ring,
+  "Append a single FILTER-NAME to the filter-ring.
 This creates the filter ring as needed."
   (if emf-filter-ring
       (ring-insert+extend emf-filter-ring
@@ -638,7 +638,7 @@ the 'browser-filters' selection menu."
 
 (defun emf-find-filter-function (filter-name)
   "Find the Function for FILTER-NAME in emf-filters.
-  Pass functions through untouched."
+Pass functions through untouched."
   (if (eq filter-name :not)
       :not
     (cdr (assoc filter-name emf-filters))))
@@ -668,8 +668,8 @@ look for the function in emf-filter-factories."
 
 (defun emf-make-filter (factory filter-name factory-args)
   "Make a filter named FILTER-NAME using the FACTORY and FACTORY-ARGS.
-  if factory is a function it is used directly. Otherwise, it will
-  look for the function in emf-filter-factories."
+If factory is a function it is used directly. Otherwise, it will
+look for the function in emf-filter-factories."
   (emf-add-to-filter-menu factory filter-name)
   (emf-register-filter
    filter-name
@@ -687,12 +687,12 @@ The filter list holds entries specified as
 
 (defun emf-new-filter (&optional factory-name make-filter-name)
   "Build a new filter from a filter factory interactively.
-  Use FACTORY-NAME instead of prompting if given.
-  If MAKE-FILTER-NAME or EMF-AUTOMATIC-FILTER-NAMES is true the name will
-  be constructed instead of prompted.
+Use FACTORY-NAME instead of prompting if given.
+If MAKE-FILTER-NAME or EMF-AUTOMATIC-FILTER-NAMES is true the name will
+be constructed instead of prompted.
 
-  Normally prompts for a filter factory and its parameters, prompts for a
-  filter name and then creates and registers a new filter,then returns its name."
+Normally prompts for a filter factory and its parameters, prompts for a
+filter name and then creates and registers a new filter,then returns its name."
   (interactive)
   (let* ((factory-name (if factory-name factory-name
                          (emf-choose-factory)))
@@ -750,9 +750,9 @@ Give it the shape: (name . (func . prompt-list))."
 ;; This is used for the fields-search factory.
 (defun emf-string-field-list-prompt (prompt)
   "Recursively PROMPT for elements of a list.
-  Prompt must define a select list. The only usage example so
-  far is the field-search list which is all symbols.
-  (info-artist, info-genre, ...).  intern-soft works for those."
+Prompt must define a select list. The only usage example so
+far is the field-search list which is all symbols.
+ info-artist, info-genre, 'intern-soft' works for those."
   (let* ((prompt-string (car prompt))
          (selections (cdar (cdr prompt)))
          (value
@@ -767,9 +767,9 @@ Give it the shape: (name . (func . prompt-list))."
 
 (defun emf-coerce-prompt-value (prompt value)
   "Coerce VALUE, a string, according to the prompt type inside PROMPT.
-  PROMPT should be in the form (prompt (type . <select-list>)).
-  Types are :number, :symbol, :string and :function.
-  Strings pass through."
+PROMPT should be in the form (prompt (type . <select-list>)).
+Types are :number, :symbol, :string and :function.
+Strings pass through."
   (let ((type (car (cadr prompt))))
     (cond
      ((string= type :number) (string-to-number value))
@@ -779,9 +779,9 @@ Give it the shape: (name . (func . prompt-list))."
 
 (defun emf-read-string-or-choose (prompt)
   "Choose the method input using PROMPT.
-  Do a string read or completing read if PROMPT has a select-list.
-  Do a recursive completing read with selection-list if a :list type.
-  A prompt should look like this; (prompt (type . <select-list>))."
+Do a string read or completing read if PROMPT has a select-list.
+Do a recursive completing read with selection-list if a :list type.
+A prompt should look like this; (prompt (type . <select-list>))."
   (let* ((prompt-string (car prompt))
          (selections (cdr (cadr prompt)))
          (_ (message "Selections %s" selections))
@@ -931,7 +931,7 @@ This replaces the original emms-browser search match-p functionality."
     info-originaldate
     info-note
     info-genre)
-  "The list of track field names that are strings")
+  "The list of track field names that are strings.")
 
 (emf-register-filter-factory
  "Fields search"
@@ -971,7 +971,7 @@ This replaces the original emms-browser search match-p functionality."
 (defun emf-match-string (string1 string2)
   "Check to see if STRING2 is in STRING1.
 
-This is the inverse parameter list of string-match.
+This is the inverse parameter list of 'string-match'.
 So we can continue with the language of
 'filter track where field contains string'
 'filter track where field > value'."
@@ -1412,16 +1412,18 @@ it a meta-filter, if it is a meta-filter use it."
     (push current emf-stack)))
 
 (defun emf-append-string-to-file (string filename)
-  "Appends STRING to FILENAME."
+  "Append STRING to FILENAME."
   (interactive)
   (append-to-file string nil filename))
 
 (defun emf-format-multi-filter (meta-filter)
+  "Format the META-FILTER as Lisp code to use with 'emf-make-filters'."
   (format "(\"Multi-filter\"\n %S\n %S)\n\n"
           (car meta-filter)
           (cdr meta-filter)))
 
 (defun emf-save-meta-filter (meta-filter)
+  "Save the META-FILTER  to the  'emf-multi-filter-save-file' if set."
   (when emf-multi-filter-save-file
     (append-to-file
      (emf-format-multi-filter meta-filter)

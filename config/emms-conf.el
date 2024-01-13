@@ -93,8 +93,8 @@
 
 ;; Formats
 ;; Need to be able to switch formats based on browse type.
-(setq emms-browser-info-title-format "%i%-30t %-8g %y %a")
-(setq emms-browser-playlist-info-title-format "%i%-30t %-8g %o : %a %y")
+;; (setq emms-browser-info-title-format "%i%-30t %-8g %y %a")
+;; (setq emms-browser-playlist-info-title-format "%i%-30t %-8g %o : %a %y")
 
 ;; Sorting
 ;; For tango music we want everything in order by year.
